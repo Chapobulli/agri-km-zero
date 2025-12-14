@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+import logging
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -11,6 +12,10 @@ def create_app():
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///agri_km_zero.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # Aggiungi logging per debug
+    logging.basicConfig(level=logging.DEBUG)
+    app.logger.setLevel(logging.DEBUG)
 
     db.init_app(app)
     login_manager.init_app(app)
@@ -28,7 +33,12 @@ def create_app():
     from .messages import messages as messages_blueprint
     app.register_blueprint(messages_blueprint)
 
-    with app.app_context():
-        db.create_all()
+    try:
+        with app.app_context():
+            db.create_all()
+            app.logger.info("Database tables created successfully")
+    except Exception as e:
+        app.logger.error(f"Error creating database: {e}")
+        raise
 
     return app
