@@ -23,7 +23,7 @@ Una app per agricoltori e clienti per prodotti agricoli a km0.
 3. Crea un nuovo **Web Service**:
    - **Runtime**: Python 3.
    - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT app:create_app`
+   - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT "app:create_app()"`
 4. Aggiungi un database PostgreSQL gratuito su Render e collega via `DATABASE_URL`.
 5. Imposta variabili d'ambiente: `SECRET_KEY` (genera una chiave sicura).
 6. Deploy!
