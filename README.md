@@ -25,7 +25,7 @@ Una app per agricoltori e clienti per prodotti agricoli a km0.
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT "app:create_app()"`
    - **Environment Variables**:
-     - `PYTHON_VERSION`: `3.12`
+     - `PYTHON_VERSION`: `3.12.0`
      - `DATABASE_URL`: (URL del database PostgreSQL)
      - `SECRET_KEY`: (la chiave generata)
 4. Aggiungi un database PostgreSQL gratuito su Render e collega via `DATABASE_URL`.
