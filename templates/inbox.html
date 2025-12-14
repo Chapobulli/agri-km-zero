@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Messaggi</h2>
+<ul class="list-group">
+    {% for message in messages %}
+        <li class="list-group-item">
+            <strong>Da: {{ message.sender.username }}</strong>
+            <p>{{ message.content }}</p>
+            <small>{{ message.timestamp }}</small>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

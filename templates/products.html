@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Prodotti</h2>
+<ul class="list-group">
+    {% for product in products %}
+        <li class="list-group-item">
+            <h5>{{ product.name }}</h5>
+            <p>{{ product.description }}</p>
+            <p>Prezzo: €{{ product.price }}</p>
+            <p>Agricoltore: {{ product.farmer.username }}</p>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

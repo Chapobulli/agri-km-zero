@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Agricoltori Vicini</h2>
+<ul class="list-group">
+    {% for farmer, dist in nearby %}
+        <li class="list-group-item">
+            {{ farmer.username }} - {{ "%.2f"|format(dist) }} km
+            <a href="{{ url_for('messages.send_message', user_id=farmer.id) }}" class="btn btn-sm btn-primary">Contatta</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}
