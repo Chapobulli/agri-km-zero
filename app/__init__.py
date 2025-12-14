@@ -8,7 +8,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='templates')
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///agri_km_zero.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
