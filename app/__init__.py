@@ -33,6 +33,11 @@ def create_app():
     from .messages import messages as messages_blueprint
     app.register_blueprint(messages_blueprint)
 
+    @login_manager.user_loader
+    def load_user(user_id):
+        from .models import User
+        return User.query.get(int(user_id))
+
     try:
         with app.app_context():
             db.create_all()
