@@ -8,7 +8,27 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    return render_template('index.html')
+    # Posizione di riferimento (Firenze come centro Italia)
+    reference_location = (43.7696, 11.2558)  # Firenze coordinates
+
+    # Prendi alcuni prodotti recenti con le loro distanze
+    products = Product.query.join(User).filter(User.is_farmer == True).limit(6).all()
+
+    products_with_distance = []
+    for product in products:
+        if product.farmer.latitude and product.farmer.longitude:
+            farmer_location = (product.farmer.latitude, product.farmer.longitude)
+            distance = geodesic(reference_location, farmer_location).km
+            products_with_distance.append({
+                'product': product,
+                'farmer': product.farmer,
+                'distance': round(distance, 1)
+            })
+
+    # Ordina per distanza
+    products_with_distance.sort(key=lambda x: x['distance'])
+
+    return render_template('index.html', nearby_products=products_with_distance)
 
 @main.route('/search', methods=['GET', 'POST'])
 @login_required

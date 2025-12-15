@@ -124,6 +124,63 @@
     </div>
 </section>
 
+<!-- Nearby Products Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title fade-in-up">Prodotti Vicini a Te</h2>
+        <p class="text-center mb-4 fade-in-up">Scopri prodotti freschi dagli agricoltori locali nella tua zona</p>
+
+        {% if nearby_products %}
+        <div class="row">
+            {% for item in nearby_products %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 fade-in-up">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title text-success">{{ item.product.name }}</h6>
+                            <span class="badge badge-primary">
+                                <i class="fas fa-map-marker-alt"></i> {{ item.distance }} km
+                            </span>
+                        </div>
+                        <p class="card-text text-muted small">{{ item.product.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-success font-weight-bold">{{ "%.2f"|format(item.product.price) }} €/kg</span>
+                            <small class="text-muted">
+                                <i class="fas fa-user"></i> {{ item.farmer.username }}
+                            </small>
+                        </div>
+                        {% if not current_user.is_authenticated %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-sm mt-2">
+                            <i class="fas fa-shopping-cart"></i> Contatta
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-4">
+            {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-custom">
+                <i class="fas fa-search"></i> Vedi Tutti i Prodotti
+            </a>
+            {% else %}
+            <a href="{{ url_for('products.list_products') }}" class="btn btn-custom">
+                <i class="fas fa-search"></i> Vedi Tutti i Prodotti
+            </a>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-seedling text-success" style="font-size: 4rem;"></i>
+            <h4 class="mt-3">Nessun prodotto disponibile al momento</h4>
+            <p class="text-muted">Torna presto per scoprire nuovi prodotti locali!</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
 <!-- Guarantees Section -->
 <section class="guaranties">
     <div class="container">

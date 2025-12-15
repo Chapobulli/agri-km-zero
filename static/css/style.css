@@ -226,17 +226,33 @@ body {
     animation: fadeInUp 0.6s ease-out;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .hero-section h1 {
-        font-size: 2rem;
-    }
-    .section-title {
-        font-size: 2rem;
-    }
-    .hero-image-large {
-        max-height: 300px;
-    }
+/* Nearby Products Section */
+.nearby-products .card {
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.nearby-products .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.distance-badge {
+    background: linear-gradient(45deg, #4CAF50, #66BB6A);
+    border: none;
+    font-size: 0.75rem;
+    padding: 0.375rem 0.5rem;
+}
+
+.product-price {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.farmer-info {
+    font-size: 0.8rem;
+    color: #6c757d;
 }
 
 /* Hero image styling */
