@@ -237,22 +237,42 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.distance-badge {
-    background: linear-gradient(45deg, #4CAF50, #66BB6A);
-    border: none;
-    font-size: 0.75rem;
-    padding: 0.375rem 0.5rem;
+/* Hero Overlay Styles */
+.hero-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    z-index: 10;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    width: 100%;
+    max-width: 400px;
 }
 
-.product-price {
-    font-size: 1.1rem;
+.hero-overlay-title {
+    font-size: 2.5rem;
     font-weight: bold;
-    color: #4CAF50;
+    margin-bottom: 0.5rem;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
 }
 
-.farmer-info {
-    font-size: 0.8rem;
-    color: #6c757d;
+.hero-overlay-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 0;
+    opacity: 0.9;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+/* Responsive adjustments for overlay */
+@media (max-width: 768px) {
+    .hero-overlay-title {
+        font-size: 2rem;
+    }
+    .hero-overlay-subtitle {
+        font-size: 1rem;
+    }
 }
 
 /* Hero image styling */

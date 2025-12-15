@@ -2,10 +2,10 @@
 
 {% block content %}
 <!-- Nearby Products Section -->
-<section class="py-5 bg-light">
+<section class="py-5 bg-light nearby-products">
     <div class="container">
-        <h2 class="section-title fade-in-up">Prodotti Vicini a Te</h2>
-        <p class="text-center mb-4 fade-in-up">Scopri prodotti freschi dagli agricoltori locali nella tua zona (demo da Roma)</p>
+        <!-- Title removed - now appears as overlay on hero image -->
+        <p class="text-center mb-4 fade-in-up text-muted">(Demo da Roma - prodotti entro 40km)</p>
 
         {% if nearby_products %}
         <div class="row">
@@ -70,8 +70,13 @@
                     <a class="btn btn-outline-light btn-custom ml-2 fade-in-up" href="{{ url_for('auth.login') }}">Accedi</a>
                 {% endif %}
             </div>
-            <div class="col-lg-7">
+            <div class="col-lg-7 position-relative">
                 <img src="/static/images/hero/hero.png" alt="Fresh Local Products" class="hero-image-large fade-in-up" onerror="this.src='https://via.placeholder.com/600x400/4CAF50/ffffff?text=Aggiungi+immagine+hero.png'">
+                <!-- Overlay Title -->
+                <div class="hero-overlay">
+                    <h2 class="hero-overlay-title">Prodotti Vicini a Te</h2>
+                    <p class="hero-overlay-subtitle">Scopri prodotti freschi dagli agricoltori locali nella tua zona</p>
+                </div>
             </div>
         </div>
     </div>
