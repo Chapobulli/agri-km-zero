@@ -8,8 +8,8 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    # Posizione di riferimento (Roma come centro per demo km 0)
-    reference_location = (41.9028, 12.4964)  # Roma coordinates
+    # Posizione di riferimento (Oristano, Sardegna)
+    reference_location = (39.9031, 8.5919)  # Oristano coordinates
 
     # Prendi alcuni prodotti recenti con le loro distanze
     products = Product.query.join(User).filter(User.is_farmer == True).limit(6).all()

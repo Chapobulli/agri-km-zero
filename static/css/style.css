@@ -237,41 +237,65 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-/* Hero Overlay Styles */
+/* Hero Overlay Styles - Removed for cleaner look */
 .hero-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: white;
-    z-index: 10;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-    width: 100%;
-    max-width: 400px;
+    display: none; /* Removed overlay for cleaner design */
 }
 
-.hero-overlay-title {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+/* Nearby Products Section */
+.nearby-products .card {
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    margin-bottom: 1rem;
 }
 
-.hero-overlay-subtitle {
-    font-size: 1.2rem;
-    margin-bottom: 0;
-    opacity: 0.9;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+.nearby-products .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-/* Responsive adjustments for overlay */
+/* Enhanced mobile responsiveness */
 @media (max-width: 768px) {
-    .hero-overlay-title {
-        font-size: 2rem;
+    .hero-section {
+        padding: 60px 0;
+        min-height: 70vh;
     }
-    .hero-overlay-subtitle {
-        font-size: 1rem;
+    
+    .hero-section h1 {
+        font-size: 1.8rem;
+    }
+    
+    .hero-image-large {
+        max-height: 300px;
+        margin-top: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+    }
+    
+    .nearby-products .card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .distance-badge {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.4rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section h1 {
+        font-size: 1.5rem;
+    }
+    
+    .hero-image-large {
+        max-height: 250px;
+    }
+    
+    .btn-custom {
+        padding: 10px 20px;
+        font-size: 0.9rem;
     }
 }
 
