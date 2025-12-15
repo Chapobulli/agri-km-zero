@@ -19,10 +19,13 @@ body {
 
 .hero-section {
     background: linear-gradient(135deg, #81C784 0%, #A5D6A7 100%);
-    padding: 80px 0;
+    padding: 120px 0;
     color: white;
     position: relative;
     overflow: hidden;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
 }
 
 .hero-section::before {
@@ -32,7 +35,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('https://via.placeholder.com/1920x600/4CAF50/ffffff?text=') no-repeat center center;
+    background: url('/static/images/hero/hero.png') no-repeat center center;
     background-size: cover;
     opacity: 0.1;
     z-index: 1;
@@ -231,4 +234,25 @@ body {
     .section-title {
         font-size: 2rem;
     }
+    .hero-image-large {
+        max-height: 300px;
+    }
+}
+
+/* Hero image styling */
+.hero-image-large {
+    max-height: 500px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease;
+}
+
+.hero-image-large:hover {
+    transform: scale(1.05);
+}
+
+.min-vh-80 {
+    min-height: 80vh;
 }
