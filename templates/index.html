@@ -1,63 +1,176 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="jumbotron bg-success text-white">
-    <h1 class="display-4">Benvenuto in Agri KM Zero</h1>
-    <p class="lead">Connetti agricoltori locali e clienti per prodotti freschi a km0. Acquista direttamente dagli agricoltori vicini, senza intermediari!</p>
-    <hr class="my-4">
-    <p>Prodotti freschi, sostenibili e locali direttamente dalla fattoria alla tua tavola.</p>
-    {% if not current_user.is_authenticated %}
-        <a class="btn btn-light btn-lg" href="{{ url_for('auth.register') }}">Iscriviti Ora</a>
-        <a class="btn btn-outline-light btn-lg ml-2" href="{{ url_for('auth.login') }}">Accedi</a>
-    {% endif %}
-</div>
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <h2>Per gli Agricoltori</h2>
-            <p>Pubblica i tuoi prodotti agricoli freschi e connetti con clienti locali interessati ad acquisti diretti. Scegli se offrire consegne a domicilio.</p>
-            <ul>
-                <li>Modello freemium: paga per pubblicare prodotti.</li>
-                <li>Ricevi messaggi dai clienti per visite in azienda.</li>
-                <li>Promuovi la tua fattoria e i tuoi prodotti sostenibili.</li>
-            </ul>
-            {% if not current_user.is_authenticated %}
-                <a class="btn btn-success" href="{{ url_for('auth.register') }}">Registrati come Agricoltore</a>
-            {% endif %}
-        </div>
-        <div class="col-md-6">
-            <h2>Per i Clienti</h2>
-            <p>Scopri agricoltori vicini e acquista prodotti freschi a km0. Contatta direttamente gli agricoltori per organizzare il ritiro o la consegna.</p>
-            <ul>
-                <li>Cerca prodotti locali nella tua zona.</li>
-                <li>Messaggia gli agricoltori per dettagli e acquisti.</li>
-                <li>Sostieni l'agricoltura locale e sostenibile.</li>
-            </ul>
-            {% if not current_user.is_authenticated %}
-                <a class="btn btn-primary" href="{{ url_for('auth.register') }}">Registrati come Cliente</a>
-            {% endif %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="fade-in-up">Benvenuto in Agri KM Zero</h1>
+                <p class="fade-in-up">Connetti agricoltori locali e clienti per prodotti freschi a km0. Acquista direttamente dagli agricoltori vicini, senza intermediari!</p>
+                {% if not current_user.is_authenticated %}
+                    <a class="btn btn-light btn-custom fade-in-up" href="{{ url_for('auth.register') }}">Iscriviti Ora</a>
+                    <a class="btn btn-outline-light btn-custom ml-2 fade-in-up" href="{{ url_for('auth.login') }}">Accedi</a>
+                {% endif %}
+            </div>
+            <div class="col-lg-6">
+                <img src="https://via.placeholder.com/600x400/4CAF50/ffffff?text=Fresh+Local+Products" alt="Fresh Local Products" class="img-fluid rounded fade-in-up">
+            </div>
         </div>
     </div>
+</section>
 
-    <hr>
-
-    <div class="text-center">
-        <h3>Perché Scegliere Agri KM Zero?</h3>
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title fade-in-up">Perché Scegliere Agri KM Zero?</h2>
         <div class="row">
-            <div class="col-md-4">
-                <h5>Prodotti Freschi</h5>
-                <p>Direttamente dagli agricoltori locali, garantendo freschezza e qualità.</p>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 fade-in-up">
+                    <div class="card-body text-center">
+                        <i class="fas fa-leaf feature-icon"></i>
+                        <h5 class="card-title">Prodotti Freschi</h5>
+                        <p class="card-text">Direttamente dagli agricoltori locali, garantendo freschezza e qualità massima.</p>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-4">
-                <h5>Sostenibilità</h5>
-                <p>Riduci l'impatto ambientale acquistando prodotti a km0.</p>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 fade-in-up">
+                    <div class="card-body text-center">
+                        <i class="fas fa-globe-americas feature-icon"></i>
+                        <h5 class="card-title">Sostenibilità</h5>
+                        <p class="card-text">Riduci l'impatto ambientale acquistando prodotti a km0 e sostenendo l'agricoltura locale.</p>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-4">
-                <h5>Connessione Diretta</h5>
-                <p>Interagisci direttamente con gli agricoltori senza intermediari.</p>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 fade-in-up">
+                    <div class="card-body text-center">
+                        <i class="fas fa-handshake feature-icon"></i>
+                        <h5 class="card-title">Connessione Diretta</h5>
+                        <p class="card-text">Interagisci direttamente con gli agricoltori senza intermediari, costruendo relazioni di fiducia.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- How It Works Section -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="section-title fade-in-up">Come Funziona</h2>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 fade-in-up">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-user-friends text-success mr-2"></i>Per gli Agricoltori</h5>
+                        <p class="card-text">Pubblica i tuoi prodotti agricoli freschi e connetti con clienti locali interessati ad acquisti diretti.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success mr-2"></i>Modello freemium: paga per pubblicare prodotti</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Ricevi messaggi dai clienti per visite in azienda</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Promuovi la tua fattoria e prodotti sostenibili</li>
+                        </ul>
+                        {% if not current_user.is_authenticated %}
+                            <a class="btn btn-success btn-custom" href="{{ url_for('auth.register') }}">Registrati come Agricoltore</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 fade-in-up">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-shopping-cart text-primary mr-2"></i>Per i Clienti</h5>
+                        <p class="card-text">Scopri agricoltori vicini e acquista prodotti freschi a km0.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-primary mr-2"></i>Cerca prodotti locali nella tua zona</li>
+                            <li><i class="fas fa-check text-primary mr-2"></i>Messaggia gli agricoltori per dettagli</li>
+                            <li><i class="fas fa-check text-primary mr-2"></i>Sostieni l'agricoltura locale sostenibile</li>
+                        </ul>
+                        {% if not current_user.is_authenticated %}
+                            <a class="btn btn-primary btn-custom" href="{{ url_for('auth.register') }}">Registrati come Cliente</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title fade-in-up">Cosa Dicono i Nostri Utenti</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="testimonial fade-in-up">
+                    <p>"Ho trovato agricoltori fantastici vicino a casa mia. I prodotti sono sempre freschissimi!"</p>
+                    <footer class="blockquote-footer">Maria R., Cliente</footer>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="testimonial fade-in-up">
+                    <p>"Come agricoltore, finalmente posso vendere direttamente ai clienti locali senza intermediari."</p>
+                    <footer class="blockquote-footer">Giuseppe V., Agricoltore</footer>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="testimonial fade-in-up">
+                    <p>"La piattaforma è facile da usare e mi aiuta a sostenere l'agricoltura sostenibile."</p>
+                    <footer class="blockquote-footer">Anna L., Cliente</footer>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Guarantees Section -->
+<section class="guaranties">
+    <div class="container">
+        <h2 class="section-title fade-in-up">Le Nostre Garanzie</h2>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="guaranty-item fade-in-up">
+                    <i class="fas fa-shield-alt"></i>
+                    <h5>Sicurezza</h5>
+                    <p>Piattaforma sicura per transazioni affidabili</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="guaranty-item fade-in-up">
+                    <i class="fas fa-truck"></i>
+                    <h5>Consegna</h5>
+                    <p>Opzioni flessibili di ritiro e consegna</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="guaranty-item fade-in-up">
+                    <i class="fas fa-award"></i>
+                    <h5>Qualità</h5>
+                    <p>Prodotti verificati e di alta qualità</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="guaranty-item fade-in-up">
+                    <i class="fas fa-users"></i>
+                    <h5>Supporto</h5>
+                    <p>Assistenza clienti dedicata</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2 class="fade-in-up">Pronto a Iniziare?</h2>
+        <p class="fade-in-up">Unisciti alla comunità di Agri KM Zero e scopri il piacere dei prodotti locali freschi.</p>
+        {% if not current_user.is_authenticated %}
+            <a class="btn btn-light btn-custom fade-in-up" href="{{ url_for('auth.register') }}">Iscriviti Gratuitamente</a>
+        {% else %}
+            <a class="btn btn-light btn-custom fade-in-up" href="{{ url_for('products.list_products') }}">Esplora Prodotti</a>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}
