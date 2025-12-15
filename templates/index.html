@@ -14,7 +14,7 @@
                 {% endif %}
             </div>
             <div class="col-lg-6">
-                <img src="https://via.placeholder.com/600x400/4CAF50/ffffff?text=Fresh+Local+Products" alt="Fresh Local Products" class="img-fluid rounded fade-in-up">
+                <img src="{{ url_for('static', filename='images/hero/hero-main.jpg') }}" alt="Fresh Local Products" class="img-fluid rounded fade-in-up" onerror="this.src='https://via.placeholder.com/600x400/4CAF50/ffffff?text=Aggiungi+immagine+hero-main.jpg'">
             </div>
         </div>
     </div>
@@ -67,7 +67,7 @@
                         <h5 class="card-title"><i class="fas fa-user-friends text-success mr-2"></i>Per gli Agricoltori</h5>
                         <p class="card-text">Pubblica i tuoi prodotti agricoli freschi e connetti con clienti locali interessati ad acquisti diretti.</p>
                         <ul class="list-unstyled">
-                            <li><i class="fas fa-check text-success mr-2"></i>Modello freemium: paga per pubblicare prodotti</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Vendi gli ortaggi che hai prodotto</li>
                             <li><i class="fas fa-check text-success mr-2"></i>Ricevi messaggi dai clienti per visite in azienda</li>
                             <li><i class="fas fa-check text-success mr-2"></i>Promuovi la tua fattoria e prodotti sostenibili</li>
                         </ul>
