@@ -1,6 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-80">
+            <div class="col-lg-5">
+                <h1 class="fade-in-up">Benvenuto in Agri KM Zero</h1>
+                <p class="fade-in-up">Connetti agricoltori locali e clienti per prodotti freschi a km0. Acquista direttamente dagli agricoltori vicini, senza intermediari!</p>
+                {% if not current_user.is_authenticated %}
+                    <a class="btn btn-light btn-custom fade-in-up" href="{{ url_for('auth.register') }}">Iscriviti Ora</a>
+                    <a class="btn btn-outline-light btn-custom ml-2 fade-in-up" href="{{ url_for('auth.login') }}">Accedi</a>
+                {% endif %}
+            </div>
+            <div class="col-lg-7">
+                <img src="/static/images/hero/hero.png" alt="Fresh Local Products" class="hero-image-large fade-in-up" onerror="this.src='https://via.placeholder.com/600x400/4CAF50/ffffff?text=Aggiungi+immagine+hero.png'">
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Nearby Products Section -->
 <section class="py-5 bg-light nearby-products">
     <div class="container">
@@ -58,25 +77,6 @@
     </div>
 </section>
 
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="container">
-        <div class="row align-items-center min-vh-80">
-            <div class="col-lg-5">
-                <h1 class="fade-in-up">Benvenuto in Agri KM Zero</h1>
-                <p class="fade-in-up">Connetti agricoltori locali e clienti per prodotti freschi a km0. Acquista direttamente dagli agricoltori vicini, senza intermediari!</p>
-                {% if not current_user.is_authenticated %}
-                    <a class="btn btn-light btn-custom fade-in-up" href="{{ url_for('auth.register') }}">Iscriviti Ora</a>
-                    <a class="btn btn-outline-light btn-custom ml-2 fade-in-up" href="{{ url_for('auth.login') }}">Accedi</a>
-                {% endif %}
-            </div>
-            <div class="col-lg-7">
-                <img src="/static/images/hero/hero.png" alt="Fresh Local Products" class="hero-image-large fade-in-up" onerror="this.src='https://via.placeholder.com/600x400/4CAF50/ffffff?text=Aggiungi+immagine+hero.png'">
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- Features Section -->
 <section class="py-5">
     <div class="container">
@@ -107,6 +107,33 @@
                         <h5 class="card-title">Connessione Diretta</h5>
                         <p class="card-text">Interagisci direttamente con gli agricoltori senza intermediari, costruendo relazioni di fiducia.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title fade-in-up">Cosa Dicono i Nostri Utenti</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="testimonial fade-in-up">
+                    <p>"Ho trovato agricoltori fantastici vicino a casa mia. I prodotti sono sempre freschissimi!"</p>
+                    <footer class="blockquote-footer">Maria R., Cliente</footer>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="testimonial fade-in-up">
+                    <p>"Come agricoltore, finalmente posso vendere direttamente ai clienti locali senza intermediari."</p>
+                    <footer class="blockquote-footer">Giuseppe V., Agricoltore</footer>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="testimonial fade-in-up">
+                    <p>"La piattaforma è facile da usare e mi aiuta a sostenere l'agricoltura sostenibile."</p>
+                    <footer class="blockquote-footer">Anna L., Cliente</footer>
                 </div>
             </div>
         </div>
@@ -148,33 +175,6 @@
                             <a class="btn btn-primary btn-custom" href="{{ url_for('auth.register') }}">Registrati come Cliente</a>
                         {% endif %}
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Testimonials Section -->
-<section class="py-5">
-    <div class="container">
-        <h2 class="section-title fade-in-up">Cosa Dicono i Nostri Utenti</h2>
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="testimonial fade-in-up">
-                    <p>"Ho trovato agricoltori fantastici vicino a casa mia. I prodotti sono sempre freschissimi!"</p>
-                    <footer class="blockquote-footer">Maria R., Cliente</footer>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="testimonial fade-in-up">
-                    <p>"Come agricoltore, finalmente posso vendere direttamente ai clienti locali senza intermediari."</p>
-                    <footer class="blockquote-footer">Giuseppe V., Agricoltore</footer>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="testimonial fade-in-up">
-                    <p>"La piattaforma è facile da usare e mi aiuta a sostenere l'agricoltura sostenibile."</p>
-                    <footer class="blockquote-footer">Anna L., Cliente</footer>
                 </div>
             </div>
         </div>
