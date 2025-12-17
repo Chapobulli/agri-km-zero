@@ -14,6 +14,7 @@
                     <span class="text-success font-weight-bold">{{ '%.2f'|format(product.price) }} €/{{ product.unit or 'kg' }}</span>
                     <small class="text-muted"><i class="fas fa-user"></i> {{ product.farmer.username }}</small>
                 </div>
+                <a href="{{ url_for('messages.send_message', recipient_id=product.user_id) }}" class="btn btn-sm btn-success mt-2"><i class="fas fa-envelope"></i> Contatta</a>
             </div>
         </div>
     </div>

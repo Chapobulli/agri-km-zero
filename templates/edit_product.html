@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Modifica Prodotto</h2>
+<form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.name.label }} {{ form.name(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.description.label }} {{ form.description(class="form-control", placeholder="Lascia vuoto per mantenere il valore attuale") }}
+    </div>
+    <div class="form-group">
+        {{ form.price.label }} {{ form.price(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.unit.label }} {{ form.unit(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.image.label }} {{ form.image(class="form-control-file") }}
+        {% if product.image_path %}
+        <small class="text-muted">Immagine attuale: <img src="/{{ product.image_path }}" style="max-height:60px;" class="mt-2"></small>
+        {% endif %}
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+    <a href="{{ url_for('profiles.view_profile', username=current_user.username) }}" class="btn btn-secondary">Annulla</a>
+</form>
+{% endblock %}
