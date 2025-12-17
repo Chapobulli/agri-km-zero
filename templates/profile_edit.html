@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    {% if farmer %}
+    <h2>Modifica Pagina Azienda</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="form-group">{{ form.company_name.label }} {{ form.company_name(class="form-control") }}</div>
+        <div class="form-group">{{ form.company_description.label }} {{ form.company_description(class="form-control") }}</div>
+        <div class="form-group">{{ form.address.label }} {{ form.address(class="form-control") }}</div>
+        <div class="form-row">
+            <div class="form-group col-md-6">{{ form.latitude.label }} {{ form.latitude(class="form-control") }}</div>
+            <div class="form-group col-md-6">{{ form.longitude.label }} {{ form.longitude(class="form-control") }}</div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">{{ form.company_logo.label }} {{ form.company_logo(class="form-control-file") }}</div>
+            <div class="form-group col-md-6">{{ form.company_cover.label }} {{ form.company_cover(class="form-control-file") }}</div>
+        </div>
+        <div class="form-group form-check">{{ form.delivery() }} {{ form.delivery.label }}</div>
+        {{ form.submit(class="btn btn-success") }}
+    </form>
+    {% else %}
+    <h2>Modifica Profilo</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="form-group">{{ form.username.label }} {{ form.username(class="form-control") }}</div>
+        <div class="form-group">{{ form.bio.label }} {{ form.bio(class="form-control") }}</div>
+        <div class="form-group">{{ form.address.label }} {{ form.address(class="form-control") }}</div>
+        <div class="form-row">
+            <div class="form-group col-md-6">{{ form.latitude.label }} {{ form.latitude(class="form-control") }}</div>
+            <div class="form-group col-md-6">{{ form.longitude.label }} {{ form.longitude(class="form-control") }}</div>
+        </div>
+        <div class="form-group">{{ form.profile_photo.label }} {{ form.profile_photo(class="form-control-file") }}</div>
+        {{ form.submit(class="btn btn-success") }}
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

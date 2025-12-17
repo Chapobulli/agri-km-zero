@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user
 from . import db
 from .models import Product
 from .forms import ProductForm
+import os
+from werkzeug.utils import secure_filename
 
 products = Blueprint('products', __name__)
 
@@ -26,7 +28,22 @@ def add_product():
         return redirect(url_for('main.index'))
     form = ProductForm()
     if form.validate_on_submit():
-        product = Product(name=form.name.data, description=form.description.data, price=form.price.data, user_id=current_user.id)
+        image_path = None
+        if form.image.data:
+            filename = secure_filename(form.image.data.filename)
+            upload_dir = os.path.join(current_app.root_path, '..', 'static', 'uploads', 'products')
+            os.makedirs(upload_dir, exist_ok=True)
+            save_path = os.path.join(upload_dir, filename)
+            form.image.data.save(save_path)
+            image_path = f"uploads/products/{filename}"
+        product = Product(
+            name=form.name.data,
+            description=form.description.data,
+            price=form.price.data,
+            unit=form.unit.data,
+            image_path=image_path,
+            user_id=current_user.id
+        )
         db.session.add(product)
         db.session.commit()
         flash('Prodotto aggiunto!')

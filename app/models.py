@@ -13,6 +13,14 @@ class User(UserMixin, db.Model):
     longitude = db.Column(db.Float)
     address = db.Column(db.String(300))
     delivery = db.Column(db.Boolean, default=False)  # if farmer offers delivery
+    # Profile fields (client)
+    bio = db.Column(db.Text)
+    profile_photo = db.Column(db.String(300))
+    # Company page fields (farmer)
+    company_name = db.Column(db.String(200))
+    company_description = db.Column(db.Text)
+    company_logo = db.Column(db.String(300))
+    company_cover = db.Column(db.String(300))
 
     products = db.relationship('Product', backref='farmer', lazy=True)
     sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
@@ -29,6 +37,8 @@ class Product(db.Model):
     name = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text)
     price = db.Column(db.Float)
+    unit = db.Column(db.String(20))  # 'kg', 'pezzo', 'cassetta'
+    image_path = db.Column(db.String(300))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class Message(db.Model):

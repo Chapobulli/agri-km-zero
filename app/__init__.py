@@ -34,6 +34,8 @@ def create_app():
 
     from .messages import messages as messages_blueprint
     app.register_blueprint(messages_blueprint)
+    from .profiles import profiles as profiles_blueprint
+    app.register_blueprint(profiles_blueprint)
 
     @login_manager.user_loader
     def load_user(user_id):
