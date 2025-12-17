@@ -12,6 +12,7 @@
             <div class="form-group col-md-6">{{ form.latitude.label }} {{ form.latitude(class="form-control") }}</div>
             <div class="form-group col-md-6">{{ form.longitude.label }} {{ form.longitude(class="form-control") }}</div>
         </div>
+        <button type="button" class="btn btn-secondary btn-sm mb-3" onclick="geocodeAddress('farmer')"><i class="fas fa-map-marked-alt"></i> Geocodifica Indirizzo</button>
         <div class="form-row">
             <div class="form-group col-md-6">{{ form.company_logo.label }} {{ form.company_logo(class="form-control-file") }}</div>
             <div class="form-group col-md-6">{{ form.company_cover.label }} {{ form.company_cover(class="form-control-file") }}</div>
@@ -30,9 +31,29 @@
             <div class="form-group col-md-6">{{ form.latitude.label }} {{ form.latitude(class="form-control") }}</div>
             <div class="form-group col-md-6">{{ form.longitude.label }} {{ form.longitude(class="form-control") }}</div>
         </div>
+        <button type="button" class="btn btn-secondary btn-sm mb-3" onclick="geocodeAddress('client')"><i class="fas fa-map-marked-alt"></i> Geocodifica Indirizzo</button>
         <div class="form-group">{{ form.profile_photo.label }} {{ form.profile_photo(class="form-control-file") }}</div>
         {{ form.submit(class="btn btn-success") }}
     </form>
     {% endif %}
 </div>
+<script>
+async function geocodeAddress(type) {
+    let addressInput = document.querySelector(type === 'farmer' ? 'input[name=address]' : 'input[name=address]');
+    let latInput = document.querySelector(type === 'farmer' ? 'input[name=latitude]' : 'input[name=latitude]');
+    let lngInput = document.querySelector(type === 'farmer' ? 'input[name=longitude]' : 'input[name=longitude]');
+    if (!addressInput || !addressInput.value) { alert('Inserisci un indirizzo.'); return; }
+    try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressInput.value)}`;
+        const res = await fetch(url, { headers: { 'Accept-Language': 'it' } });
+        const data = await res.json();
+        if (data && data.length > 0) {
+            latInput.value = data[0].lat;
+            lngInput.value = data[0].lon;
+        } else {
+            alert('Indirizzo non trovato. Prova a essere più specifico.');
+        }
+    } catch (e) { alert('Errore nella geocodifica.'); }
+}
+</script>
 {% endblock %}

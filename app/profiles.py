@@ -81,3 +81,9 @@ def view_profile(username):
         return render_template('profile.html', user=user, products=products, farmer=True)
     else:
         return render_template('profile.html', user=user, farmer=False)
+
+
+@profiles.route('/companies')
+def companies():
+    farmers = User.query.filter_by(is_farmer=True).all()
+    return render_template('companies.html', farmers=farmers)

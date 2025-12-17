@@ -2,14 +2,25 @@
 
 {% block content %}
 <h2>Prodotti</h2>
-<ul class="list-group">
+<div class="row">
     {% for product in products %}
-        <li class="list-group-item">
-            <h5>{{ product.name }}</h5>
-            <p>{{ product.description }}</p>
-            <p>Prezzo: €{{ product.price }}</p>
-            <p>Agricoltore: {{ product.farmer.username }}</p>
-        </li>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <img src="/{{ product.image_path or 'https://via.placeholder.com/400x250/eeeeee/555?text=Foto+prodotto' }}" class="card-img-top" alt="Prodotto">
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text small text-muted">{{ product.description }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-success font-weight-bold">{{ '%.2f'|format(product.price) }} €/{{ product.unit or 'kg' }}</span>
+                    <small class="text-muted"><i class="fas fa-user"></i> {{ product.farmer.username }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
     {% endfor %}
-</ul>
+    {% if products|length == 0 %}
+    <div class="col-12">
+        <div class="text-center py-5 text-muted">Nessun prodotto disponibile.</div>
+    </div>
+    {% endif %}
 {% endblock %}

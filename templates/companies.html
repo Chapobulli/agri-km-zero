@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Aziende Agricole</h2>
+<div class="row">
+    {% for f in farmers %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <img src="/{{ f.company_cover or 'https://via.placeholder.com/600x250/cccccc/000?text=Copertina' }}" class="card-img-top" alt="Cover">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                    <img src="/{{ f.company_logo or 'https://via.placeholder.com/48x48/4CAF50/ffffff?text=Logo' }}" class="mr-2" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" alt="Logo">
+                    <div>
+                        <h6 class="m-0">{{ f.company_name or f.username }}</h6>
+                        <small class="text-muted"><i class="fas fa-map-marker-alt"></i> {{ f.address or 'Posizione non impostata' }}</small>
+                    </div>
+                </div>
+                <p class="small text-muted">{{ f.company_description or 'Nessuna descrizione.' }}</p>
+                <a href="{{ url_for('profiles.view_profile', username=f.username) }}" class="btn btn-outline-success btn-sm">Visita Pagina</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% if farmers|length == 0 %}
+    <div class="col-12"><div class="text-center py-5 text-muted">Nessuna azienda disponibile.</div></div>
+    {% endif %}
+</div>
+{% endblock %}
