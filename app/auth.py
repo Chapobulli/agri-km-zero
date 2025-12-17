@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash
@@ -6,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from . import db
 from .models import User
 from .forms import RegistrationForm, LoginForm
+from .email_utils import send_email
 
 auth = Blueprint('auth', __name__)
 
@@ -35,10 +37,20 @@ def register():
             flash('Email o username già in uso. Riprova con credenziali diverse.')
             return render_template('register.html', form=form)
 
-        # MVP: print verification link (add email service later)
-        verify_url = url_for('auth.verify_email', token=token, _external=True)
-        print(f'\n=== EMAIL VERIFICATION LINK ===\n{verify_url}\n')
-        flash('Registrazione completata! Controlla i log del server per il link di verifica (MVP mode).')
+        # Build verification URL (prefer APP_BASE_URL if provided)
+        base_url = os.environ.get('APP_BASE_URL')
+        path_only = url_for('auth.verify_email', token=token, _external=False)
+        verify_url = (base_url.rstrip('/') + path_only) if base_url else url_for('auth.verify_email', token=token, _external=True)
+
+        # Send verification email (falls back to logging if not configured)
+        email_body = f"""
+            <p>Ciao {user.username},</p>
+            <p>Conferma la tua email per attivare l'account su Agri KM Zero:</p>
+            <p><a href="{verify_url}">Verifica la tua email</a></p>
+            <p>Se non hai richiesto tu questa registrazione, ignora questa email.</p>
+        """
+        send_email(user.email, 'Verifica la tua email - Agri KM Zero', email_body)
+        flash('Registrazione completata! Ti abbiamo inviato un’email per verificare il tuo account.')
         return redirect(url_for('auth.login'))
     return render_template('register.html', form=form)
 
@@ -58,3 +70,58 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('main.index'))
+
+@auth.route('/verify/<token>')
+def verify_email(token):
+    user = User.query.filter_by(verification_token=token).first()
+    if not user:
+        flash('Link di verifica non valido o scaduto.')
+        return redirect(url_for('auth.login'))
+    user.email_verified = True
+    user.verification_token = None
+    db.session.commit()
+    flash('Email verificata con successo! Ora puoi accedere.')
+    return redirect(url_for('auth.login'))
+
+@auth.route('/request-reset', methods=['GET', 'POST'])
+def request_reset():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            flash('Se l’email esiste, invieremo un link di reset.')
+            return redirect(url_for('auth.login'))
+        token = user.generate_reset_token()
+        db.session.commit()
+        base_url = os.environ.get('APP_BASE_URL')
+        path_only = url_for('auth.reset_password', token=token, _external=False)
+        reset_url = (base_url.rstrip('/') + path_only) if base_url else url_for('auth.reset_password', token=token, _external=True)
+        email_body = f"""
+            <p>Ciao {user.username},</p>
+            <p>Per reimpostare la tua password clicca sul link:</p>
+            <p><a href="{reset_url}">Reimposta la password</a></p>
+            <p>Se non l’hai richiesto tu, ignora questa email.</p>
+        """
+        send_email(user.email, 'Reset password - Agri KM Zero', email_body)
+        flash('Se l’email esiste, invieremo un link di reset.')
+        return redirect(url_for('auth.login'))
+    return render_template('request_reset.html')
+
+@auth.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    user = User.query.filter_by(reset_token=token).first()
+    if not user:
+        flash('Link di reset non valido o scaduto.')
+        return redirect(url_for('auth.login'))
+    if request.method == 'POST':
+        pwd = request.form.get('password')
+        confirm = request.form.get('confirm_password')
+        if not pwd or pwd != confirm:
+            flash('Le password non coincidono.')
+            return render_template('reset_password.html')
+        user.set_password(pwd)
+        user.reset_token = None
+        db.session.commit()
+        flash('Password aggiornata con successo. Puoi accedere.')
+        return redirect(url_for('auth.login'))
+    return render_template('reset_password.html')
