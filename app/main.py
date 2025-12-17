@@ -1,3 +1,11 @@
+
+@main.route('/terms')
+def terms():
+    return render_template('terms.html')
+
+@main.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 from . import db

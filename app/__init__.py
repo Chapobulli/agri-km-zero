@@ -56,6 +56,17 @@ def create_app():
         from .models import User
         return User.query.get(int(user_id))
 
+    @app.errorhandler(404)
+    def not_found(error):
+        from flask import render_template
+        return render_template('404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        from flask import render_template
+        db.session.rollback()
+        return render_template('500.html'), 500
+
     try:
         with app.app_context():
             db.create_all()

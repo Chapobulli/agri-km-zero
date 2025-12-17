@@ -13,9 +13,13 @@ def register():
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data, is_farmer=form.is_farmer.data)
         user.set_password(form.password.data)
+        token = user.generate_verification_token()
         db.session.add(user)
         db.session.commit()
-        flash('Registrazione completata!')
+        # MVP: print verification link (add email service later)
+        verify_url = url_for('auth.verify_email', token=token, _external=True)
+        print(f'\n=== EMAIL VERIFICATION LINK ===\n{verify_url}\n')
+        flash('Registrazione completata! Controlla i log del server per il link di verifica (MVP mode).')
         return redirect(url_for('auth.login'))
     return render_template('register.html', form=form)
 

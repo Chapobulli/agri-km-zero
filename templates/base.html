@@ -57,10 +57,10 @@
                 <div class="col-md-4 mb-4">
                     <h5>Link Utili</h5>
                     <ul class="list-unstyled">
-                        <li><a href="#">Chi Siamo</a></li>
-                        <li><a href="#">Come Funziona</a></li>
-                        <li><a href="#">Contatti</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="{{ url_for('main.terms') }}">Termini e Condizioni</a></li>
+                        <li><a href="{{ url_for('main.privacy') }}">Privacy Policy</a></li>
+                        <li><a href="mailto:info@agrikmzero.it">Contatti</a></li>
+                        <li><a href="{{ url_for('profiles.companies') }}">Aziende</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4 mb-4">
