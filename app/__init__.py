@@ -50,33 +50,33 @@ def create_app():
             try:
                 engine = db.engine
                 insp = inspect(engine)
-                conn = engine.connect()
-                # User table columns
-                user_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('user')}
-                additions_user = [
-                    ('bio', 'TEXT'),
-                    ('profile_photo', 'VARCHAR(300)'),
-                    ('company_name', 'VARCHAR(200)'),
-                    ('company_description', 'TEXT'),
-                    ('company_logo', 'VARCHAR(300)'),
-                    ('company_cover', 'VARCHAR(300)')
-                ]
-                for col_name, col_type in additions_user:
-                    if col_name not in user_cols:
-                        app.logger.info(f"Adding missing column user.{col_name}")
-                        conn.execute(text(f'ALTER TABLE "user" ADD COLUMN {col_name} {col_type}'))
+                # Use autocommit context for DDL (PostgreSQL)
+                with engine.begin() as conn:
+                    # User table columns
+                    user_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('user')}
+                    additions_user = [
+                        ('bio', 'TEXT'),
+                        ('profile_photo', 'VARCHAR(300)'),
+                        ('company_name', 'VARCHAR(200)'),
+                        ('company_description', 'TEXT'),
+                        ('company_logo', 'VARCHAR(300)'),
+                        ('company_cover', 'VARCHAR(300)')
+                    ]
+                    for col_name, col_type in additions_user:
+                        if col_name not in user_cols:
+                            app.logger.info(f"Adding missing column user.{col_name}")
+                            conn.execute(text(f'ALTER TABLE "user" ADD COLUMN {col_name} {col_type}'))
 
-                # Product table columns
-                product_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('product')}
-                additions_product = [
-                    ('unit', 'VARCHAR(20)'),
-                    ('image_path', 'VARCHAR(300)')
-                ]
-                for col_name, col_type in additions_product:
-                    if col_name not in product_cols:
-                        app.logger.info(f"Adding missing column product.{col_name}")
-                        conn.execute(text(f'ALTER TABLE "product" ADD COLUMN {col_name} {col_type}'))
-                conn.close()
+                    # Product table columns
+                    product_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('product')}
+                    additions_product = [
+                        ('unit', 'VARCHAR(20)'),
+                        ('image_path', 'VARCHAR(300)')
+                    ]
+                    for col_name, col_type in additions_product:
+                        if col_name not in product_cols:
+                            app.logger.info(f"Adding missing column product.{col_name}")
+                            conn.execute(text(f'ALTER TABLE "product" ADD COLUMN {col_name} {col_type}'))
             except Exception as e:
                 app.logger.warning(f"Schema ensure failed (may already be up-to-date): {e}")
             app.logger.info("Database tables created successfully")
