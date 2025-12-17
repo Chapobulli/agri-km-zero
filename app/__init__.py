@@ -48,8 +48,9 @@ def create_app():
             db.create_all()
             # Ensure schema columns exist for upgrades without migrations
             try:
-                engine = db.get_engine()
+                engine = db.engine
                 insp = inspect(engine)
+                conn = engine.connect()
                 # User table columns
                 user_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('user')}
                 additions_user = [
@@ -63,7 +64,7 @@ def create_app():
                 for col_name, col_type in additions_user:
                     if col_name not in user_cols:
                         app.logger.info(f"Adding missing column user.{col_name}")
-                        engine.execute(text(f'ALTER TABLE "user" ADD COLUMN {col_name} {col_type}'))
+                        conn.execute(text(f'ALTER TABLE "user" ADD COLUMN {col_name} {col_type}'))
 
                 # Product table columns
                 product_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('product')}
@@ -74,7 +75,8 @@ def create_app():
                 for col_name, col_type in additions_product:
                     if col_name not in product_cols:
                         app.logger.info(f"Adding missing column product.{col_name}")
-                        engine.execute(text(f'ALTER TABLE "product" ADD COLUMN {col_name} {col_type}'))
+                        conn.execute(text(f'ALTER TABLE "product" ADD COLUMN {col_name} {col_type}'))
+                conn.close()
             except Exception as e:
                 app.logger.warning(f"Schema ensure failed (may already be up-to-date): {e}")
             app.logger.info("Database tables created successfully")
