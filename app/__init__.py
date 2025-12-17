@@ -5,6 +5,8 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 import logging
 from sqlalchemy import inspect, text
+import cloudinary
+import cloudinary.uploader
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -14,6 +16,13 @@ def create_app():
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///agri_km_zero.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # Configure Cloudinary
+    cloudinary.config(
+        cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+        api_key=os.environ.get('CLOUDINARY_API_KEY'),
+        api_secret=os.environ.get('CLOUDINARY_API_SECRET')
+    )
 
     # Aggiungi logging per debug
     logging.basicConfig(level=logging.DEBUG)
@@ -37,6 +46,10 @@ def create_app():
     app.register_blueprint(messages_blueprint)
     from .profiles import profiles as profiles_blueprint
     app.register_blueprint(profiles_blueprint)
+
+    # Register custom filters
+    from .template_filters import url_or_local
+    app.jinja_env.filters['url_or_local'] = url_or_local
 
     @login_manager.user_loader
     def load_user(user_id):

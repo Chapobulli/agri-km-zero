@@ -27,12 +27,9 @@ def add_product():
     if form.validate_on_submit():
         image_path = None
         if form.image.data:
-            filename = secure_filename(form.image.data.filename)
-            upload_dir = os.path.join(current_app.root_path, '..', 'static', 'uploads', 'products')
-            os.makedirs(upload_dir, exist_ok=True)
-            save_path = os.path.join(upload_dir, filename)
-            form.image.data.save(save_path)
-            image_path = f"uploads/products/{filename}"
+            import cloudinary.uploader
+            upload_result = cloudinary.uploader.upload(form.image.data, folder="agri_km_zero/products")
+            image_path = upload_result['secure_url']
         product = Product(
             name=form.name.data,
             description=form.description.data,
@@ -68,12 +65,9 @@ def edit_product(product_id):
             product.price = form.price.data
         product.unit = form.unit.data
         if form.image.data:
-            filename = secure_filename(form.image.data.filename)
-            upload_dir = os.path.join(current_app.root_path, '..', 'static', 'uploads', 'products')
-            os.makedirs(upload_dir, exist_ok=True)
-            save_path = os.path.join(upload_dir, filename)
-            form.image.data.save(save_path)
-            product.image_path = f"uploads/products/{filename}"
+            import cloudinary.uploader
+            upload_result = cloudinary.uploader.upload(form.image.data, folder="agri_km_zero/products")
+            product.image_path = upload_result['secure_url']
         db.session.commit()
         flash('Prodotto aggiornato!')
         return redirect(url_for('profiles.view_profile', username=current_user.username))

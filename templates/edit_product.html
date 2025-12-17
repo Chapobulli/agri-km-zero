@@ -19,7 +19,7 @@
     <div class="form-group">
         {{ form.image.label }} {{ form.image(class="form-control-file") }}
         {% if product.image_path %}
-        <small class="text-muted">Immagine attuale: <img src="/{{ product.image_path }}" style="max-height:60px;" class="mt-2"></small>
+        <small class="text-muted">Immagine attuale: <img src="{{ product.image_path | url_or_local }}" style="max-height:60px;" class="mt-2"></small>
         {% endif %}
     </div>
     {{ form.submit(class="btn btn-primary") }}

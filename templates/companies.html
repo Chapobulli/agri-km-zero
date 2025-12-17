@@ -5,10 +5,10 @@
     {% for f in farmers %}
     <div class="col-md-4 mb-4">
         <div class="card h-100">
-            <img src="/{{ f.company_cover or 'https://via.placeholder.com/600x250/cccccc/000?text=Copertina' }}" class="card-img-top" alt="Cover">
+            <img src="{{ (f.company_cover | url_or_local) or 'https://via.placeholder.com/600x250/cccccc/000?text=Copertina' }}" class="card-img-top" alt="Cover">
             <div class="card-body">
                 <div class="d-flex align-items-center mb-2">
-                    <img src="/{{ f.company_logo or 'https://via.placeholder.com/48x48/4CAF50/ffffff?text=Logo' }}" class="mr-2" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" alt="Logo">
+                    <img src="{{ (f.company_logo | url_or_local) or 'https://via.placeholder.com/48x48/4CAF50/ffffff?text=Logo' }}" class="mr-2" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" alt="Logo">
                     <div>
                         <h6 class="m-0">{{ f.company_name or f.username }}</h6>
                         <small class="text-muted"><i class="fas fa-map-marker-alt"></i> {{ f.address or 'Posizione non impostata' }}</small>

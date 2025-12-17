@@ -2,9 +2,9 @@
 {% block content %}
 {% if farmer %}
 <div class="company-header" style="position:relative;">
-    <img src="/{{ user.company_cover or 'static/images/hero/hero.png' }}" alt="Cover" class="img-fluid w-100" style="max-height:300px;object-fit:cover;" onerror="this.src='https://via.placeholder.com/1200x300/cccccc/000?text=Copertina'">
+    <img src="{{ (user.company_cover | url_or_local) or '/static/images/hero/hero.png' }}" alt="Cover" class="img-fluid w-100" style="max-height:300px;object-fit:cover;" onerror="this.src='https://via.placeholder.com/1200x300/cccccc/000?text=Copertina'">
     <div class="d-flex align-items-center p-3" style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.4);border-radius:8px;">
-        <img src="/{{ user.company_logo or 'static/images/logo/logo.png' }}" alt="Logo" class="mr-3" style="height:60px;width:60px;object-fit:cover;border-radius:8px;" onerror="this.src='https://via.placeholder.com/60x60/4CAF50/ffffff?text=Logo'">
+        <img src="{{ (user.company_logo | url_or_local) or '/static/images/logo/logo.png' }}" alt="Logo" class="mr-3" style="height:60px;width:60px;object-fit:cover;border-radius:8px;" onerror="this.src='https://via.placeholder.com/60x60/4CAF50/ffffff?text=Logo'">
         <div class="text-white">
             <h2 class="m-0">{{ user.company_name or user.username }}</h2>
             <small><i class="fas fa-map-marker-alt"></i> {{ user.address or 'Posizione non impostata' }}</small>
@@ -21,7 +21,7 @@
                 {% for p in products %}
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
-                        <img src="/{{ p.image_path or 'https://via.placeholder.com/400x250/eeeeee/555?text=Foto+prodotto' }}" class="card-img-top" alt="Prodotto">
+                        <img src="{{ (p.image_path | url_or_local) or 'https://via.placeholder.com/400x250/eeeeee/555?text=Foto+prodotto' }}" class="card-img-top" alt="Prodotto">
                         <div class="card-body">
                             <h6 class="card-title">{{ p.name }}</h6>
                             <p class="small text-muted">{{ p.description }}</p>
@@ -62,7 +62,7 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-3 text-center">
-            <img src="/{{ user.profile_photo or 'https://via.placeholder.com/200x200/cccccc/000?text=Profilo' }}" alt="Foto Profilo" class="img-thumbnail" style="width:200px;height:200px;object-fit:cover;">
+            <img src="{{ (user.profile_photo | url_or_local) or 'https://via.placeholder.com/200x200/cccccc/000?text=Profilo' }}" alt="Foto Profilo" class="img-thumbnail" style="width:200px;height:200px;object-fit:cover;">
         </div>
         <div class="col-md-9">
             <h2>{{ user.username }}</h2>

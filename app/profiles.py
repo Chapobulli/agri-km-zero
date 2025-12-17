@@ -12,12 +12,9 @@ profiles = Blueprint('profiles', __name__)
 def save_upload(file_storage, subfolder):
     if not file_storage:
         return None
-    filename = secure_filename(file_storage.filename)
-    upload_dir = os.path.join(current_app.root_path, '..', 'static', 'uploads', subfolder)
-    os.makedirs(upload_dir, exist_ok=True)
-    save_path = os.path.join(upload_dir, filename)
-    file_storage.save(save_path)
-    return f"uploads/{subfolder}/{filename}"
+    import cloudinary.uploader
+    upload_result = cloudinary.uploader.upload(file_storage, folder=f"agri_km_zero/{subfolder}")
+    return upload_result['secure_url']
 
 
 @profiles.route('/profile', methods=['GET', 'POST'])
