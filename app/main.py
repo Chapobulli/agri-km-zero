@@ -1,3 +1,10 @@
+from flask import Blueprint, render_template, request, redirect, url_for
+from flask_login import login_required, current_user
+from . import db
+from .models import User, Product
+from geopy.distance import geodesic
+
+main = Blueprint('main', __name__)
 
 @main.route('/terms')
 def terms():
@@ -6,13 +13,6 @@ def terms():
 @main.route('/privacy')
 def privacy():
     return render_template('privacy.html')
-from flask import Blueprint, render_template, request, redirect, url_for
-from flask_login import login_required, current_user
-from . import db
-from .models import User, Product
-from geopy.distance import geodesic
-
-main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():

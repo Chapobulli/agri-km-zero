@@ -14,7 +14,15 @@ login_manager = LoginManager()
 def create_app():
     app = Flask(__name__, template_folder='../templates', static_folder='../static')
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///agri_km_zero.db')
+
+    # Normalize DATABASE_URL for SQLAlchemy and enforce SSL on hosted DBs
+    db_url = os.environ.get('DATABASE_URL', 'sqlite:///agri_km_zero.db')
+    if db_url.startswith('postgres://'):
+        db_url = db_url.replace('postgres://', 'postgresql://', 1)
+    if db_url.startswith('postgresql://') and 'sslmode=' not in db_url and 'localhost' not in db_url:
+        separator = '&' if '?' in db_url else '?'
+        db_url = f"{db_url}{separator}sslmode=require"
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Configure Cloudinary
