@@ -6,8 +6,8 @@
     <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="form-group">{{ form.company_name.label }} {{ form.company_name(class="form-control") }}</div>
-        <div class="form-group">{{ form.company_description.label }} {{ form.company_description(class="form-control") }}</div>
-        <div class="form-group">{{ form.address.label }} {{ form.address(class="form-control") }}</div>
+        <div class="form-group">{{ form.company_description.label }} {{ form.company_description(class="form-control", placeholder="Lascia vuoto per mantenere il valore attuale") }}</div>
+        <div class="form-group">{{ form.address.label }} {{ form.address(class="form-control", placeholder="Lascia vuoto per mantenere il valore attuale") }}</div>
         <div class="form-row">
             <div class="form-group col-md-6">{{ form.latitude.label }} {{ form.latitude(class="form-control") }}</div>
             <div class="form-group col-md-6">{{ form.longitude.label }} {{ form.longitude(class="form-control") }}</div>
@@ -25,8 +25,8 @@
     <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="form-group">{{ form.username.label }} {{ form.username(class="form-control") }}</div>
-        <div class="form-group">{{ form.bio.label }} {{ form.bio(class="form-control") }}</div>
-        <div class="form-group">{{ form.address.label }} {{ form.address(class="form-control") }}</div>
+        <div class="form-group">{{ form.bio.label }} {{ form.bio(class="form-control", placeholder="Lascia vuoto per mantenere il valore attuale") }}</div>
+        <div class="form-group">{{ form.address.label }} {{ form.address(class="form-control", placeholder="Lascia vuoto per mantenere il valore attuale") }}</div>
         <div class="form-row">
             <div class="form-group col-md-6">{{ form.latitude.label }} {{ form.latitude(class="form-control") }}</div>
             <div class="form-group col-md-6">{{ form.longitude.label }} {{ form.longitude(class="form-control") }}</div>
