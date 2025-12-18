@@ -40,8 +40,6 @@ def edit_profile():
             if current_user.province:
                 form.city.choices = [('', 'Seleziona Comune')] + [(c, c) for c in get_cities(current_user.province)]
             form.address.data = current_user.address
-            form.latitude.data = current_user.latitude
-            form.longitude.data = current_user.longitude
             form.delivery.data = current_user.delivery
         if form.validate_on_submit():
             # Validazione custom: se provincia è selezionata, anche comune deve esserlo
@@ -57,10 +55,6 @@ def edit_profile():
                 current_user.company_description = form.company_description.data
             if form.address.data:
                 current_user.address = form.address.data
-            if form.latitude.data is not None:
-                current_user.latitude = form.latitude.data
-            if form.longitude.data is not None:
-                current_user.longitude = form.longitude.data
             current_user.delivery = form.delivery.data
             logo_path = save_upload(form.company_logo.data, 'profiles')
             cover_path = save_upload(form.company_cover.data, 'profiles')
@@ -78,18 +72,12 @@ def edit_profile():
             form.username.data = current_user.username
             form.bio.data = current_user.bio
             form.address.data = current_user.address
-            form.latitude.data = current_user.latitude
-            form.longitude.data = current_user.longitude
         if form.validate_on_submit():
             current_user.username = form.username.data
             if form.bio.data:
                 current_user.bio = form.bio.data
             if form.address.data:
                 current_user.address = form.address.data
-            if form.latitude.data is not None:
-                current_user.latitude = form.latitude.data
-            if form.longitude.data is not None:
-                current_user.longitude = form.longitude.data
             photo_path = save_upload(form.profile_photo.data, 'profiles')
             if photo_path:
                 current_user.profile_photo = photo_path
