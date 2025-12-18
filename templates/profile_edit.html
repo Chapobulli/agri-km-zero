@@ -3,11 +3,21 @@
 <div class="container mt-4">
     {% if farmer %}
     <h2>Modifica Pagina Azienda</h2>
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" id="farmerForm">
         {{ form.hidden_tag() }}
         <div class="form-group">{{ form.company_name.label }} {{ form.company_name(class="form-control") }}</div>
         <div class="form-group">{{ form.company_description.label }} {{ form.company_description(class="form-control", placeholder="Lascia vuoto per mantenere il valore attuale") }}</div>
-        <div class="form-group">{{ form.address.label }} {{ form.address(class="form-control", placeholder="Lascia vuoto per mantenere il valore attuale") }}</div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.province.label }} 
+                {{ form.province(class="form-control", id="province", onchange="updateCities()") }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.city.label }} 
+                {{ form.city(class="form-control", id="city") }}
+            </div>
+        </div>
+        <div class="form-group">{{ form.address.label }} {{ form.address(class="form-control", placeholder="Indirizzo completo (via, numero)") }}</div>
         <div class="form-row">
             <div class="form-group col-md-6">{{ form.latitude.label }} {{ form.latitude(class="form-control") }}</div>
             <div class="form-group col-md-6">{{ form.longitude.label }} {{ form.longitude(class="form-control") }}</div>
@@ -54,6 +64,30 @@ async function geocodeAddress(type) {
             alert('Indirizzo non trovato. Prova a essere più specifico.');
         }
     } catch (e) { alert('Errore nella geocodifica.'); }
+}
+}
+
+// Dynamic cities loading
+async function updateCities() {
+    const province = document.getElementById('province').value;
+    const citySelect = document.getElementById('city');
+    if (!province) {
+        citySelect.innerHTML = '<option value="">Seleziona prima la provincia</option>';
+        return;
+    }
+    try {
+        const res = await fetch(`/api/cities?province=${encodeURIComponent(province)}`);
+        const cities = await res.json();
+        citySelect.innerHTML = '<option value="">Seleziona Comune</option>';
+        cities.forEach(city => {
+            const opt = document.createElement('option');
+            opt.value = city;
+            opt.textContent = city;
+            citySelect.appendChild(opt);
+        });
+    } catch (e) {
+        console.error('Error loading cities:', e);
+    }
 }
 </script>
 {% endblock %}

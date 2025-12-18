@@ -20,52 +20,112 @@
     </div>
 </section>
 
-<!-- Nearby Products Section -->
+<!-- Location Filter Section -->
+<section class="py-4 bg-white">
+    <div class="container">
+        <h3 class="text-center mb-4"><i class="fas fa-map-marker-alt text-success"></i> Trova Agricoltori e Prodotti nella Tua Zona</h3>
+        <form method="GET" action="/" id="locationFilter">
+            <div class="row justify-content-center">
+                <div class="col-md-4 mb-3">
+                    <select name="province" id="provinceSelect" class="form-control" onchange="updateCitiesFilter()">
+                        <option value="">Tutte le Province</option>
+                        {% for prov in provinces %}
+                        <option value="{{ prov }}" {% if prov == selected_province %}selected{% endif %}>{{ prov }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <select name="city" id="citySelect" class="form-control">
+                        <option value="">Tutti i Comuni</option>
+                        {% for c in cities %}
+                        <option value="{{ c }}" {% if c == selected_city %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <button type="submit" class="btn btn-success btn-block"><i class="fas fa-search"></i> Cerca</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Farmers List Section -->
+{% if farmers %}
+<section class="py-4">
+    <div class="container">
+        <h3 class="mb-4">Agricoltori Disponibili ({{ farmers|length }})</h3>
+        <div class="row">
+            {% for farmer in farmers %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ farmer.company_name or farmer.username }}</h5>
+                        <p class="text-muted small">
+                            <i class="fas fa-map-marker-alt"></i> 
+                            {{ farmer.city }}, {{ farmer.province }}
+                        </p>
+                        {% if farmer.address %}
+                        <p class="small">
+                            <a href="https://www.google.com/maps/search/?api=1&query={{ farmer.address|urlencode }},{{ farmer.city|urlencode }},{{ farmer.province|urlencode }}" target="_blank" class="text-success">
+                                <i class="fas fa-directions"></i> {{ farmer.address }}
+                            </a>
+                        </p>
+                        {% endif %}
+                        {% if farmer.company_description %}
+                        <p class="card-text small">{{ farmer.company_description[:100] }}...</p>
+                        {% endif %}
+                        <a href="{{ url_for('profiles.view_profile', username=farmer.username) }}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-store"></i> Vedi Prodotti
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Products Section -->
 <section class="py-5 bg-light nearby-products">
     <div class="container">
-        <h2 class="section-title fade-in-up">Prodotti Vicini a Te</h2>
-        <p class="text-center mb-4 fade-in-up">Scopri prodotti freschi dagli agricoltori locali nella tua zona (Oristano, Sardegna)</p>
+        <h2 class="section-title fade-in-up">Prodotti Disponibili</h2>
+        <p class="text-center mb-4 fade-in-up">Prodotti freschi a km0 dagli agricoltori locali</p>
 
-        {% if nearby_products %}
+        {% if products_data %}
         <div class="row">
-            {% for item in nearby_products %}
+            {% for item in products_data %}
             <div class="col-md-4 mb-4">
                 <div class="card h-100 fade-in-up">
+                    {% if item.product.image_path %}
+                    <img src="{{ item.product.image_path|url_or_local }}" class="card-img-top" alt="{{ item.product.name }}" style="height: 200px; object-fit: cover;">
+                    {% endif %}
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h6 class="card-title text-success">{{ item.product.name }}</h6>
-                            <span class="badge badge-primary">
-                                <i class="fas fa-map-marker-alt"></i> {{ item.distance }} km
-                            </span>
-                        </div>
+                        <h6 class="card-title text-success">{{ item.product.name }}</h6>
                         <p class="card-text text-muted small">{{ item.product.description }}</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-success font-weight-bold">{{ "%.2f"|format(item.product.price) }} €/kg</span>
-                            <small class="text-muted">
-                                <i class="fas fa-user"></i> {{ item.farmer.username }}
-                            </small>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-success font-weight-bold">{{ "%.2f"|format(item.product.price) }} €/{{ item.product.unit }}</span>
                         </div>
-                        {% if not current_user.is_authenticated %}
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-sm mt-2">
-                            <i class="fas fa-shopping-cart"></i> Contatta
+                        <small class="text-muted d-block">
+                            <i class="fas fa-store"></i> {{ item.farmer.company_name or item.farmer.username }}
+                        </small>
+                        <small class="text-muted d-block">
+                            <i class="fas fa-map-marker-alt"></i> {{ item.farmer.city }}, {{ item.farmer.province }}
+                        </small>
+                        {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('messages.send_message', recipient_id=item.farmer.id) }}" class="btn btn-success btn-sm mt-2">
+                            <i class="fas fa-envelope"></i> Contatta
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-success btn-sm mt-2">
+                            <i class="fas fa-sign-in-alt"></i> Accedi per Contattare
                         </a>
                         {% endif %}
                     </div>
                 </div>
             </div>
             {% endfor %}
-        </div>
-
-        <div class="text-center mt-4">
-            {% if not current_user.is_authenticated %}
-            <a href="{{ url_for('auth.register') }}" class="btn btn-custom">
-                <i class="fas fa-search"></i> Vedi Tutti i Prodotti
-            </a>
-            {% else %}
-            <a href="{{ url_for('products.list_products') }}" class="btn btn-custom">
-                <i class="fas fa-search"></i> Vedi Tutti i Prodotti
-            </a>
-            {% endif %}
         </div>
         {% else %}
         <div class="text-center py-5">
@@ -230,4 +290,31 @@
         {% endif %}
     </div>
 </section>
+
+<script>
+// Dynamic city loading for filter
+async function updateCitiesFilter() {
+    const province = document.getElementById('provinceSelect').value;
+    const citySelect = document.getElementById('citySelect');
+    
+    if (!province) {
+        citySelect.innerHTML = '<option value="">Tutti i Comuni</option>';
+        return;
+    }
+    
+    try {
+        const res = await fetch(`/api/cities?province=${encodeURIComponent(province)}`);
+        const cities = await res.json();
+        citySelect.innerHTML = '<option value="">Tutti i Comuni</option>';
+        cities.forEach(city => {
+            const opt = document.createElement('option');
+            opt.value = city;
+            opt.textContent = city;
+            citySelect.appendChild(opt);
+        });
+    } catch (e) {
+        console.error('Error loading cities:', e);
+    }
+}
+</script>
 {% endblock %}

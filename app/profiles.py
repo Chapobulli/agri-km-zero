@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from . import db
 from .models import User, Product
 from .forms import FarmerProfileForm, ClientProfileForm
+from .locations import get_provinces, get_cities
 from werkzeug.utils import secure_filename
 import os
 
@@ -22,15 +23,30 @@ def save_upload(file_storage, subfolder):
 def edit_profile():
     if current_user.is_farmer:
         form = FarmerProfileForm()
+        # Populate province choices
+        form.province.choices = [('', 'Seleziona Provincia')] + [(p, p) for p in get_provinces()]
+        # Populate city choices based on selected province
+        if form.province.data:
+            form.city.choices = [('', 'Seleziona Comune')] + [(c, c) for c in get_cities(form.province.data)]
+        else:
+            form.city.choices = [('', 'Seleziona prima la provincia')]
+        
         if request.method == 'GET':
             form.company_name.data = current_user.company_name
             form.company_description.data = current_user.company_description
+            form.province.data = current_user.province
+            form.city.data = current_user.city
+            # Reload cities for GET with existing province
+            if current_user.province:
+                form.city.choices = [('', 'Seleziona Comune')] + [(c, c) for c in get_cities(current_user.province)]
             form.address.data = current_user.address
             form.latitude.data = current_user.latitude
             form.longitude.data = current_user.longitude
             form.delivery.data = current_user.delivery
         if form.validate_on_submit():
             current_user.company_name = form.company_name.data
+            current_user.province = form.province.data
+            current_user.city = form.city.data
             # Preserve existing fields if left empty
             if form.company_description.data:
                 current_user.company_description = form.company_description.data

@@ -10,9 +10,12 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     is_farmer = db.Column(db.Boolean, default=False)
     premium = db.Column(db.Boolean, default=False)  # for freemium
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
-    address = db.Column(db.String(300))
+    # Location fields
+    province = db.Column(db.String(100))  # Provincia (es. Oristano)
+    city = db.Column(db.String(100))  # Comune (es. Cabras)
+    address = db.Column(db.String(300))  # Indirizzo specifico
+    latitude = db.Column(db.Float)  # Keep for map display
+    longitude = db.Column(db.Float)  # Keep for map display
     delivery = db.Column(db.Boolean, default=False)  # if farmer offers delivery
     # Profile fields (client)
     bio = db.Column(db.Text)

@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from flask_login import login_required, current_user
 from . import db
 from .models import User, Product
+from .locations import get_provinces, get_cities
 from geopy.distance import geodesic
 
 main = Blueprint('main', __name__)
@@ -14,29 +15,52 @@ def terms():
 def privacy():
     return render_template('privacy.html')
 
+@main.route('/api/cities')
+def api_cities():
+    province = request.args.get('province', '')
+    cities = get_cities(province)
+    return jsonify(cities)
+
 @main.route('/')
 def index():
-    # Posizione di riferimento (Oristano, Sardegna)
-    reference_location = (39.9031, 8.5919)  # Oristano coordinates
-
-    # Prendi alcuni prodotti recenti con le loro distanze
-    products = Product.query.join(User).filter(User.is_farmer == True).limit(6).all()
-
-    products_with_distance = []
+    # Get filter parameters from query string
+    province_filter = request.args.get('province', '')
+    city_filter = request.args.get('city', '')
+    
+    # Start with all farmers
+    query = User.query.filter_by(is_farmer=True)
+    
+    # Apply filters
+    if province_filter:
+        query = query.filter_by(province=province_filter)
+    if city_filter:
+        query = query.filter_by(city=city_filter)
+    
+    farmers = query.all()
+    
+    # Get products from filtered farmers
+    farmer_ids = [f.id for f in farmers]
+    products = Product.query.filter(Product.user_id.in_(farmer_ids)).all() if farmer_ids else []
+    
+    # Prepare data with farmer info
+    products_data = []
     for product in products:
-        if product.farmer.latitude and product.farmer.longitude:
-            farmer_location = (product.farmer.latitude, product.farmer.longitude)
-            distance = geodesic(reference_location, farmer_location).km
-            products_with_distance.append({
-                'product': product,
-                'farmer': product.farmer,
-                'distance': round(distance, 1)
-            })
-
-    # Ordina per distanza
-    products_with_distance.sort(key=lambda x: x['distance'])
-
-    return render_template('index.html', nearby_products=products_with_distance)
+        products_data.append({
+            'product': product,
+            'farmer': product.farmer
+        })
+    
+    # Get provinces and cities for filters
+    provinces = get_provinces()
+    cities = get_cities(province_filter) if province_filter else []
+    
+    return render_template('index.html', 
+                         products_data=products_data,
+                         farmers=farmers,
+                         provinces=provinces,
+                         cities=cities,
+                         selected_province=province_filter,
+                         selected_city=city_filter)
 
 @main.route('/search', methods=['GET', 'POST'])
 @login_required
