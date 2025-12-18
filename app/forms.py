@@ -32,7 +32,7 @@ class FarmerProfileForm(FlaskForm):
     company_name = StringField('Nome Azienda', validators=[DataRequired(), Length(max=200)])
     company_description = TextAreaField('Descrizione Azienda', validators=[Optional()])
     province = SelectField('Provincia', choices=[], validators=[DataRequired()])
-    city = SelectField('Comune', choices=[], validators=[DataRequired()])
+    city = SelectField('Comune', choices=[], validators=[Optional()])
     address = StringField('Indirizzo', validators=[Optional(), Length(max=300)])
     latitude = FloatField('Latitudine', validators=[Optional()])
     longitude = FloatField('Longitudine', validators=[Optional()])

@@ -44,6 +44,11 @@ def edit_profile():
             form.longitude.data = current_user.longitude
             form.delivery.data = current_user.delivery
         if form.validate_on_submit():
+            # Validazione custom: se provincia è selezionata, anche comune deve esserlo
+            if form.province.data and not form.city.data:
+                flash('Seleziona un comune dalla provincia scelta', 'error')
+                return render_template('profile_edit.html', farmer=True, form=form)
+            
             current_user.company_name = form.company_name.data
             current_user.province = form.province.data
             current_user.city = form.city.data
