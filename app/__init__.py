@@ -92,7 +92,10 @@ def create_app():
                         ('company_name', 'VARCHAR(200)'),
                         ('company_description', 'TEXT'),
                         ('company_logo', 'VARCHAR(300)'),
-                        ('company_cover', 'VARCHAR(300)')
+                        ('company_cover', 'VARCHAR(300)'),
+                        ('email_verified', 'BOOLEAN DEFAULT FALSE'),
+                        ('verification_token', 'VARCHAR(100)'),
+                        ('reset_token', 'VARCHAR(100)')
                     ]
                     for col_name, col_type in additions_user:
                         if col_name not in user_cols:
