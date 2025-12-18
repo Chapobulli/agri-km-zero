@@ -1,8 +1,14 @@
 import os
 import logging
-import requests
 import smtplib
 from email.message import EmailMessage
+
+# Optional: requests is only needed for SendGrid API
+try:
+    import requests
+    HAS_REQUESTS = True
+except ImportError:
+    HAS_REQUESTS = False
 
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 MAIL_FROM = os.environ.get('MAIL_FROM', 'no-reply@agrikmzero.it')
@@ -19,6 +25,9 @@ SENDGRID_URL = 'https://api.sendgrid.com/v3/mail/send'
 
 
 def _send_via_sendgrid(to_email: str, subject: str, html_content: str) -> bool:
+    if not HAS_REQUESTS:
+        logging.warning("SendGrid requires 'requests' library (not installed)")
+        return False
     headers = {
         'Authorization': f'Bearer {SENDGRID_API_KEY}',
         'Content-Type': 'application/json'
