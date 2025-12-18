@@ -1,27 +1,111 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Prodotti</h2>
-<div class="row">
-    {% for product in products %}
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
-            <img src="{{ (product.image_path | url_or_local) or 'https://via.placeholder.com/400x250/eeeeee/555?text=Foto+prodotto' }}" class="card-img-top" alt="Prodotto">
-            <div class="card-body">
-                <h5 class="card-title">{{ product.name }}</h5>
-                <p class="card-text small text-muted">{{ product.description }}</p>
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-success font-weight-bold">{{ '%.2f'|format(product.price) }} €/{{ product.unit or 'kg' }}</span>
-                    <small class="text-muted"><i class="fas fa-user"></i> {{ product.farmer.username }}</small>
-                </div>
-                <a href="{{ url_for('messages.send_message', recipient_id=product.user_id) }}" class="btn btn-sm btn-success mt-2"><i class="fas fa-envelope"></i> Contatta</a>
-            </div>
+<div class="container mt-4 mb-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3"><i class="fas fa-shopping-basket text-success"></i> Tutti i Prodotti</h2>
+            <p class="text-muted">Scopri i prodotti freschi e locali dei nostri agricoltori in Sardegna</p>
         </div>
     </div>
-    {% endfor %}
-    {% if products|length == 0 %}
-    <div class="col-12">
-        <div class="text-center py-5 text-muted">Nessun prodotto disponibile.</div>
+
+    <div class="row">
+        {% if products %}
+            {% for product in products %}
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card h-100 shadow-sm hover-shadow">
+                    {% if product.image_path %}
+                        <img src="{{ product.image_path | url_or_local }}" 
+                             class="card-img-top" 
+                             alt="{{ product.name }}"
+                             style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas fa-image fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title font-weight-bold mb-2">{{ product.name }}</h5>
+                        
+                        {% if product.description %}
+                            <p class="card-text small text-muted mb-3" style="min-height: 40px;">
+                                {{ product.description[:80] }}{% if product.description|length > 80 %}...{% endif %}
+                            </p>
+                        {% else %}
+                            <p class="card-text small text-muted mb-3" style="min-height: 40px;">Nessuna descrizione</p>
+                        {% endif %}
+                        
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="h4 text-success font-weight-bold mb-0">
+                                    {{ '%.2f'|format(product.price) }} €
+                                </span>
+                                <span class="badge badge-secondary">{{ product.unit }}</span>
+                            </div>
+                            
+                            <div class="border-top pt-2 mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-store"></i> 
+                                    {% if product.farmer_username %}
+                                        <a href="{{ url_for('profiles.view_profile', username=product.farmer_username) }}" 
+                                           class="text-decoration-none">
+                                            {{ product.farmer_name }}
+                                        </a>
+                                    {% else %}
+                                        {{ product.farmer_name }}
+                                    {% endif %}
+                                </small>
+                                {% if product.farmer_city %}
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-map-marker-alt"></i> {{ product.farmer_city }}{% if product.farmer_province %} ({{ product.farmer_province }}){% endif %}
+                                    </small>
+                                {% endif %}
+                            </div>
+                            
+                            {% if current_user.is_authenticated %}
+                                {% if current_user.id != product.user_id %}
+                                    <a href="{{ url_for('messages.send_message', recipient_id=product.user_id) }}" 
+                                       class="btn btn-success btn-sm btn-block">
+                                        <i class="fas fa-envelope"></i> Contatta Agricoltore
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('products.edit_product', product_id=product.id) }}" 
+                                       class="btn btn-primary btn-sm btn-block">
+                                        <i class="fas fa-edit"></i> Modifica Prodotto
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <a href="{{ url_for('auth.login') }}" 
+                                   class="btn btn-outline-success btn-sm btn-block">
+                                    <i class="fas fa-sign-in-alt"></i> Accedi per Contattare
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center py-5">
+                    <i class="fas fa-info-circle fa-3x mb-3"></i>
+                    <h4>Nessun prodotto disponibile al momento</h4>
+                    <p class="mb-0">Torna presto per scoprire i prodotti freschi dei nostri agricoltori!</p>
+                </div>
+            </div>
+        {% endif %}
     </div>
-    {% endif %}
+</div>
+
+<style>
+.hover-shadow {
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-5px);
+}
+</style>
 {% endblock %}

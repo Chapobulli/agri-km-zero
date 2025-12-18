@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user
 from . import db
-from .models import Product
+from .models import Product, User
 from .forms import ProductForm
 import os
 from werkzeug.utils import secure_filename
@@ -9,13 +9,27 @@ from werkzeug.utils import secure_filename
 products = Blueprint('products', __name__)
 
 @products.route('/products')
-@login_required
 def list_products():
-    if current_user.is_farmer:
-        products = Product.query.filter_by(user_id=current_user.id).all()
-    else:
-        products = Product.query.all()
-    return render_template('products.html', products=products)
+    # Pagina pubblica - mostra tutti i prodotti
+    all_products = Product.query.all()
+    # Add farmer info to each product
+    products_data = []
+    for p in all_products:
+        farmer = db.session.get(User, p.user_id)
+        products_data.append({
+            'id': p.id,
+            'name': p.name,
+            'description': p.description,
+            'price': p.price,
+            'unit': p.unit,
+            'image_path': p.image_path,
+            'user_id': p.user_id,
+            'farmer_name': farmer.company_name if farmer and farmer.company_name else (farmer.username if farmer else 'Sconosciuto'),
+            'farmer_username': farmer.username if farmer else None,
+            'farmer_city': farmer.city if farmer else None,
+            'farmer_province': farmer.province if farmer else None
+        })
+    return render_template('products.html', products=products_data)
 
 @products.route('/add_product', methods=['GET', 'POST'])
 @login_required
