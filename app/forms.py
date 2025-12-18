@@ -17,12 +17,12 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Accedi')
 
 class ProductForm(FlaskForm):
-    name = StringField('Nome Prodotto', validators=[DataRequired()])
-    description = TextAreaField('Descrizione')
-    price = FloatField('Prezzo')
-    unit = SelectField('Unità', choices=[('kg','€/kg'), ('pezzo','€/pezzo'), ('cassetta','€/cassetta')], validators=[DataRequired()])
-    image = FileField('Foto Prodotto', validators=[Optional(), FileAllowed(['jpg','jpeg','png','gif'], 'Solo immagini')])
-    submit = SubmitField('Pubblica')
+    name = StringField('Nome Prodotto', validators=[DataRequired(message="Il nome del prodotto è obbligatorio")])
+    description = TextAreaField('Descrizione', validators=[Optional()])
+    price = FloatField('Prezzo (€)', validators=[DataRequired(message="Il prezzo è obbligatorio")])
+    unit = SelectField('Unità di Misura', choices=[('kg','€/kg'), ('pezzo','€/pezzo'), ('cassetta','€/cassetta')], validators=[DataRequired()])
+    image = FileField('Foto Prodotto', validators=[Optional(), FileAllowed(['jpg','jpeg','png','gif'], 'Solo immagini JPG, PNG o GIF')])
+    submit = SubmitField('Pubblica Prodotto')
 
 class MessageForm(FlaskForm):
     content = TextAreaField('Messaggio', validators=[DataRequired()])
