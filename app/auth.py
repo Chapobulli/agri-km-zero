@@ -21,9 +21,9 @@ def register():
         ).first()
         if existing:
             if existing.email == form.email.data:
-                flash('Questa email è già registrata. Prova ad accedere o recuperare la password.')
+                flash('⚠ Questa email è già registrata. Prova ad accedere o recuperare la password.', 'warning')
             else:
-                flash('Questo username è già in uso. Scegline un altro.')
+                flash('⚠ Questo username è già in uso. Scegline un altro.', 'warning')
             return render_template('register.html', form=form)
 
         user = User(username=form.username.data, email=form.email.data, is_farmer=form.is_farmer.data)
@@ -34,7 +34,7 @@ def register():
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
-            flash('Email o username già in uso. Riprova con credenziali diverse.')
+            flash('⚠ Email o username già in uso. Riprova con credenziali diverse.', 'danger')
             return render_template('register.html', form=form)
 
         # Build verification URL (prefer APP_BASE_URL if provided)
@@ -50,7 +50,7 @@ def register():
             <p>Se non hai richiesto tu questa registrazione, ignora questa email.</p>
         """
         send_email(user.email, 'Verifica la tua email - Agri KM Zero', email_body)
-        flash('Registrazione completata! Ti abbiamo inviato un’email per verificare il tuo account.')
+        flash('✓ Registrazione completata! Ti abbiamo inviato un\'email per verificare il tuo account.', 'success')
         return redirect(url_for('auth.login'))
     return render_template('register.html', form=form)
 
@@ -61,26 +61,28 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
+            flash(f'✓ Benvenuto {user.username}!', 'success')
             return redirect(url_for('main.index'))
-        flash('Credenziali non valide.')
+        flash('⚠ Credenziali non valide.', 'danger')
     return render_template('login.html', form=form)
 
 @auth.route('/logout')
 @login_required
 def logout():
     logout_user()
+    flash('✓ Logout effettuato con successo. A presto!', 'info')
     return redirect(url_for('main.index'))
 
 @auth.route('/verify/<token>')
 def verify_email(token):
     user = User.query.filter_by(verification_token=token).first()
     if not user:
-        flash('Link di verifica non valido o scaduto.')
+        flash('⚠ Link di verifica non valido o scaduto.', 'warning')
         return redirect(url_for('auth.login'))
     user.email_verified = True
     user.verification_token = None
     db.session.commit()
-    flash('Email verificata con successo! Ora puoi accedere.')
+    flash('✓ Email verificata con successo! Ora puoi accedere.', 'success')
     return redirect(url_for('auth.login'))
 
 @auth.route('/request-reset', methods=['GET', 'POST'])
@@ -89,7 +91,7 @@ def request_reset():
         email = request.form.get('email')
         user = User.query.filter_by(email=email).first()
         if not user:
-            flash('Se l’email esiste, invieremo un link di reset.')
+            flash('✓ Se l\'email esiste, invieremo un link di reset.', 'info')
             return redirect(url_for('auth.login'))
         token = user.generate_reset_token()
         db.session.commit()
@@ -103,7 +105,7 @@ def request_reset():
             <p>Se non l’hai richiesto tu, ignora questa email.</p>
         """
         send_email(user.email, 'Reset password - Agri KM Zero', email_body)
-        flash('Se l’email esiste, invieremo un link di reset.')
+        flash('✓ Se l\'email esiste, invieremo un link di reset.', 'info')
         return redirect(url_for('auth.login'))
     return render_template('request_reset.html')
 
@@ -111,17 +113,17 @@ def request_reset():
 def reset_password(token):
     user = User.query.filter_by(reset_token=token).first()
     if not user:
-        flash('Link di reset non valido o scaduto.')
+        flash('⚠ Link di reset non valido o scaduto.', 'warning')
         return redirect(url_for('auth.login'))
     if request.method == 'POST':
         pwd = request.form.get('password')
         confirm = request.form.get('confirm_password')
         if not pwd or pwd != confirm:
-            flash('Le password non coincidono.')
+            flash('⚠ Le password non coincidono.', 'danger')
             return render_template('reset_password.html')
         user.set_password(pwd)
         user.reset_token = None
         db.session.commit()
-        flash('Password aggiornata con successo. Puoi accedere.')
+        flash('✓ Password aggiornata con successo. Puoi accedere.', 'success')
         return redirect(url_for('auth.login'))
     return render_template('reset_password.html')

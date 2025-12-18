@@ -44,7 +44,7 @@ def edit_profile():
         if form.validate_on_submit():
             # Validazione custom: se provincia è selezionata, anche comune deve esserlo
             if form.province.data and not form.city.data:
-                flash('Seleziona un comune dalla provincia scelta', 'error')
+                flash('⚠ Seleziona un comune dalla provincia scelta', 'warning')
                 return render_template('profile_edit.html', farmer=True, form=form)
             
             current_user.company_name = form.company_name.data
@@ -63,7 +63,7 @@ def edit_profile():
             if cover_path:
                 current_user.company_cover = cover_path
             db.session.commit()
-            flash('Profilo azienda aggiornato!')
+            flash('✓ Profilo azienda aggiornato con successo!', 'success')
             return redirect(url_for('profiles.view_profile', username=current_user.username))
         return render_template('profile_edit.html', farmer=True, form=form)
     else:
@@ -82,7 +82,7 @@ def edit_profile():
             if photo_path:
                 current_user.profile_photo = photo_path
             db.session.commit()
-            flash('Profilo aggiornato!')
+            flash('✓ Profilo aggiornato con successo!', 'success')
             return redirect(url_for('profiles.view_profile', username=current_user.username))
         return render_template('profile_edit.html', farmer=False, form=form)
 

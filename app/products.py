@@ -21,7 +21,7 @@ def list_products():
 @login_required
 def add_product():
     if not current_user.is_farmer:
-        flash('Solo agricoltori possono aggiungere prodotti.')
+        flash('⚠ Solo agricoltori possono aggiungere prodotti.', 'warning')
         return redirect(url_for('main.index'))
     form = ProductForm()
     if form.validate_on_submit():
@@ -40,7 +40,7 @@ def add_product():
         )
         db.session.add(product)
         db.session.commit()
-        flash('Prodotto aggiunto!')
+        flash('✓ Prodotto aggiunto con successo!', 'success')
         return redirect(url_for('profiles.view_profile', username=current_user.username))
     return render_template('add_product.html', form=form)
 
@@ -49,7 +49,7 @@ def add_product():
 def edit_product(product_id):
     product = Product.query.get_or_404(product_id)
     if product.user_id != current_user.id:
-        flash('Non autorizzato.')
+        flash('⚠ Non autorizzato.', 'danger')
         return redirect(url_for('main.index'))
     form = ProductForm()
     if request.method == 'GET':
@@ -69,7 +69,7 @@ def edit_product(product_id):
             upload_result = cloudinary.uploader.upload(form.image.data, folder="agri_km_zero/products")
             product.image_path = upload_result['secure_url']
         db.session.commit()
-        flash('Prodotto aggiornato!')
+        flash('✓ Prodotto aggiornato con successo!', 'success')
         return redirect(url_for('profiles.view_profile', username=current_user.username))
     return render_template('edit_product.html', form=form, product=product)
 
@@ -78,9 +78,9 @@ def edit_product(product_id):
 def delete_product(product_id):
     product = Product.query.get_or_404(product_id)
     if product.user_id != current_user.id:
-        flash('Non autorizzato.')
+        flash('⚠ Non autorizzato.', 'danger')
         return redirect(url_for('main.index'))
     db.session.delete(product)
     db.session.commit()
-    flash('Prodotto eliminato!')
+    flash('✓ Prodotto eliminato con successo!', 'success')
     return redirect(url_for('profiles.view_profile', username=current_user.username))
