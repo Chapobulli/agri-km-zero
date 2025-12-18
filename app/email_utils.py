@@ -75,24 +75,37 @@ def send_email(to_email: str, subject: str, html_content: str) -> bool:
     1) If EMAIL_PROVIDER == 'smtp' use SMTP.
     2) Else if SENDGRID_API_KEY set, use SendGrid.
     3) Else if SMTP envs present, try SMTP.
-    4) Fallback: log email content and return True.
+    4) Fallback: log email content and return True (never block user flow).
     """
     try:
         if EMAIL_PROVIDER == 'smtp':
-            ok = _send_via_smtp(to_email, subject, html_content)
-            if ok:
-                return True
+            try:
+                ok = _send_via_smtp(to_email, subject, html_content)
+                if ok:
+                    return True
+            except Exception as e:
+                logging.warning("SMTP send failed, falling back: %s", e)
+        
         if SENDGRID_API_KEY and (EMAIL_PROVIDER in (None, '', 'sendgrid')):
-            ok = _send_via_sendgrid(to_email, subject, html_content)
-            if ok:
-                return True
-        # Attempt SMTP if creds exist
-        if SMTP_HOST and SMTP_USER and SMTP_PASS:
-            ok = _send_via_smtp(to_email, subject, html_content)
-            if ok:
-                return True
-        logging.info("[Email Fallback] To: %s | Subject: %s\n%s", to_email, subject, html_content)
+            try:
+                ok = _send_via_sendgrid(to_email, subject, html_content)
+                if ok:
+                    return True
+            except Exception as e:
+                logging.warning("SendGrid send failed, falling back: %s", e)
+        
+        # Attempt SMTP if creds exist and not already tried
+        if SMTP_HOST and SMTP_USER and SMTP_PASS and EMAIL_PROVIDER != 'smtp':
+            try:
+                ok = _send_via_smtp(to_email, subject, html_content)
+                if ok:
+                    return True
+            except Exception as e:
+                logging.warning("SMTP fallback failed: %s", e)
+        
+        # Ultimate fallback: log and succeed (don't block user actions)
+        logging.info("[Email Fallback - Dev Mode] To: %s | Subject: %s\n%s", to_email, subject, html_content)
         return True
     except Exception as e:
-        logging.exception("send_email failed: %s", e)
-        return False
+        logging.exception("send_email completely failed, but returning True to not block user flow: %s", e)
+        return True  # Never block registration/reset on email failure
