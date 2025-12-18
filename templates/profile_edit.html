@@ -43,8 +43,13 @@
                     </div>
                     <div class="form-group mb-3">
                         {{ form.address.label(class="font-weight-bold") }}
-                        {{ form.address(class="form-control", placeholder="Via, numero civico") }}
-                        <small class="form-text text-muted">L'indirizzo completo aiuta i clienti a trovarti</small>
+                        <div class="position-relative">
+                            {{ form.address(class="form-control", id="addressInput", placeholder="Es: Via Roma, 10", autocomplete="off") }}
+                            <div id="addressSuggestions" class="list-group position-absolute w-100" style="z-index: 1000; max-height: 200px; overflow-y: auto; display: none;"></div>
+                        </div>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-lightbulb"></i> Inizia a digitare l'indirizzo e seleziona dai suggerimenti
+                        </small>
                     </div>
                 </div>
 
@@ -184,6 +189,94 @@ if (provinceSelect) {
             }
         }, 100);
     }
+}
+
+// Address autocomplete with Nominatim
+const addressInput = document.getElementById('addressInput');
+if (addressInput) {
+    let debounceTimer;
+    const suggestionsDiv = document.getElementById('addressSuggestions');
+    
+    addressInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+        
+        if (query.length < 3) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+        
+        debounceTimer = setTimeout(async () => {
+            const cityValue = document.getElementById('city')?.value;
+            const provinceValue = document.getElementById('province')?.value;
+            
+            // Build search query with context
+            let searchQuery = query;
+            if (cityValue) searchQuery += `, ${cityValue}`;
+            if (provinceValue) searchQuery += `, ${provinceValue}`;
+            searchQuery += ', Sardegna, Italia';
+            
+            try {
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5&addressdetails=1`;
+                const res = await fetch(url, {
+                    headers: { 
+                        'Accept-Language': 'it',
+                        'User-Agent': 'AgriKmZero/1.0'
+                    }
+                });
+                const data = await res.json();
+                
+                if (data && data.length > 0) {
+                    suggestionsDiv.innerHTML = '';
+                    data.forEach(item => {
+                        const address = item.address;
+                        let displayText = '';
+                        
+                        // Format address intelligently
+                        if (address.road) {
+                            displayText = address.road;
+                            if (address.house_number) {
+                                displayText += ', ' + address.house_number;
+                            }
+                        } else {
+                            displayText = item.display_name.split(',').slice(0, 2).join(',');
+                        }
+                        
+                        const suggestionItem = document.createElement('a');
+                        suggestionItem.href = '#';
+                        suggestionItem.className = 'list-group-item list-group-item-action';
+                        suggestionItem.innerHTML = `
+                            <div class="d-flex w-100 justify-content-between">
+                                <small><i class="fas fa-map-marker-alt text-success"></i> ${displayText}</small>
+                            </div>
+                            <small class="text-muted">${address.city || address.town || address.village || ''}</small>
+                        `;
+                        
+                        suggestionItem.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            addressInput.value = displayText;
+                            suggestionsDiv.style.display = 'none';
+                        });
+                        
+                        suggestionsDiv.appendChild(suggestionItem);
+                    });
+                    suggestionsDiv.style.display = 'block';
+                } else {
+                    suggestionsDiv.style.display = 'none';
+                }
+            } catch (e) {
+                console.error('Error fetching address suggestions:', e);
+                suggestionsDiv.style.display = 'none';
+            }
+        }, 500);
+    });
+    
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (e.target !== addressInput && !suggestionsDiv.contains(e.target)) {
+            suggestionsDiv.style.display = 'none';
+        }
+    });
 }
 </script>
 {% endblock %}

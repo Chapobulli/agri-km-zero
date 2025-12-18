@@ -50,9 +50,36 @@
             {% endif %}
             <div class="card mt-3">
                 <div class="card-body">
-                    <h6>Informazioni</h6>
-                    <p><i class="fas fa-phone"></i> Consegna: {{ 'Sì' if user.delivery else 'No' }}</p>
-                    <p><i class="fas fa-map-marker-alt"></i> Lat/Lng: {{ user.latitude or '?' }}, {{ user.longitude or '?' }}</p>
+                    <h6><i class="fas fa-info-circle"></i> Informazioni</h6>
+                    <hr>
+                    {% if user.province or user.city %}
+                    <p class="mb-2">
+                        <i class="fas fa-map-marker-alt text-success"></i> 
+                        <strong>Località:</strong><br>
+                        <small class="ml-4">{{ user.city }}{% if user.province %} ({{ user.province }}){% endif %}</small>
+                    </p>
+                    {% endif %}
+                    {% if user.address %}
+                    <p class="mb-2">
+                        <i class="fas fa-road text-primary"></i> 
+                        <strong>Indirizzo:</strong><br>
+                        <small class="ml-4">{{ user.address }}</small>
+                    </p>
+                    {% endif %}
+                    <p class="mb-2">
+                        <i class="fas fa-truck text-info"></i> 
+                        <strong>Consegna:</strong> 
+                        <span class="badge badge-{{ 'success' if user.delivery else 'secondary' }}">
+                            {{ 'Disponibile' if user.delivery else 'Non disponibile' }}
+                        </span>
+                    </p>
+                    {% if user.address and user.city and user.province %}
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ user.address }},{{ user.city }},{{ user.province }}" 
+                       target="_blank" 
+                       class="btn btn-sm btn-outline-success btn-block mt-3">
+                        <i class="fas fa-map-marked-alt"></i> Visualizza su Maps
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
