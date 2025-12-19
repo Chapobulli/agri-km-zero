@@ -91,6 +91,7 @@ def create_app():
                     additions_user = [
                         ('bio', 'TEXT'),
                         ('profile_photo', 'VARCHAR(300)'),
+                        ('display_name', 'VARCHAR(150)'),
                         ('company_name', 'VARCHAR(200)'),
                         ('company_description', 'TEXT'),
                         ('company_logo', 'VARCHAR(300)'),
