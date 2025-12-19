@@ -71,7 +71,7 @@
                     <i class="fas fa-edit"></i> Modifica Pagina Azienda
                 </a>
             {% elif current_user.is_authenticated %}
-                <a class="btn btn-success btn-block mb-3" href="{{ url_for('messages.send_message', recipient_id=user.id) }}">
+                <a class="btn btn-success btn-block mb-3" href="{{ url_for('messages.send_message', user_id=user.id) }}">
                     <i class="fas fa-envelope"></i> Invia Messaggio
                 </a>
             {% endif %}
@@ -125,7 +125,7 @@
             {% if current_user.is_authenticated and current_user.id == user.id %}
                 <a class="btn btn-success" href="{{ url_for('profiles.edit_profile') }}"><i class="fas fa-edit"></i> Modifica Profilo</a>
             {% elif current_user.is_authenticated %}
-                <a class="btn btn-success" href="{{ url_for('messages.send_message', recipient_id=user.id) }}"><i class="fas fa-envelope"></i> Invia Messaggio</a>
+                <a class="btn btn-success" href="{{ url_for('messages.send_message', user_id=user.id) }}"><i class="fas fa-envelope"></i> Invia Messaggio</a>
             {% endif %}
         </div>
     </div>
