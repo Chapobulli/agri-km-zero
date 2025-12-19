@@ -32,6 +32,8 @@ def edit_profile():
             form.city.choices = [('', 'Seleziona prima la provincia')]
         
         if request.method == 'GET':
+            form.username.data = current_user.username
+            form.display_name.data = current_user.display_name
             form.company_name.data = current_user.company_name
             form.company_description.data = current_user.company_description
             form.province.data = current_user.province
@@ -47,6 +49,9 @@ def edit_profile():
                 flash('⚠ Seleziona un comune dalla provincia scelta', 'warning')
                 return render_template('profile_edit.html', farmer=True, form=form)
             
+            current_user.username = form.username.data
+            if form.display_name.data:
+                current_user.display_name = form.display_name.data
             current_user.company_name = form.company_name.data
             current_user.province = form.province.data
             current_user.city = form.city.data
@@ -70,10 +75,13 @@ def edit_profile():
         form = ClientProfileForm()
         if request.method == 'GET':
             form.username.data = current_user.username
+            form.display_name.data = current_user.display_name
             form.bio.data = current_user.bio
             form.address.data = current_user.address
         if form.validate_on_submit():
             current_user.username = form.username.data
+            if form.display_name.data:
+                current_user.display_name = form.display_name.data
             if form.bio.data:
                 current_user.bio = form.bio.data
             if form.address.data:

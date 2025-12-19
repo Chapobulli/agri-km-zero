@@ -10,6 +10,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     is_farmer = db.Column(db.Boolean, default=False)
     premium = db.Column(db.Boolean, default=False)  # for freemium
+    display_name = db.Column(db.String(150))  # Nome visualizzato pubblicamente
     # Location fields
     province = db.Column(db.String(100))  # Provincia (es. Oristano)
     city = db.Column(db.String(100))  # Comune (es. Cabras)

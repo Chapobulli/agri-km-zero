@@ -9,8 +9,9 @@ messages = Blueprint('messages', __name__)
 @messages.route('/messages')
 @login_required
 def inbox():
-    messages = Message.query.filter_by(recipient_id=current_user.id).all()
-    return render_template('inbox.html', messages=messages)
+    received = Message.query.filter_by(recipient_id=current_user.id).order_by(Message.timestamp.desc()).all()
+    sent = Message.query.filter_by(sender_id=current_user.id).order_by(Message.timestamp.desc()).all()
+    return render_template('inbox.html', received=received, sent=sent)
 
 @messages.route('/send_message/<int:user_id>', methods=['GET', 'POST'])
 @login_required

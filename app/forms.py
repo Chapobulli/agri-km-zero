@@ -29,6 +29,8 @@ class MessageForm(FlaskForm):
     submit = SubmitField('Invia')
 
 class FarmerProfileForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=150)])
+    display_name = StringField('Nome Visualizzato', validators=[Optional(), Length(max=150)])
     company_name = StringField('Nome Azienda', validators=[DataRequired(), Length(max=200)])
     company_description = TextAreaField('Descrizione Azienda', validators=[Optional()])
     province = SelectField('Provincia', choices=[], validators=[DataRequired()])
@@ -41,6 +43,7 @@ class FarmerProfileForm(FlaskForm):
 
 class ClientProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=150)])
+    display_name = StringField('Nome Visualizzato', validators=[Optional(), Length(max=150)])
     bio = TextAreaField('Descrizione', validators=[Optional()])
     address = StringField('Posizione Approssimativa', validators=[Optional(), Length(max=300)])
     profile_photo = FileField('Foto Profilo', validators=[Optional(), FileAllowed(['jpg','jpeg','png'], 'Solo immagini')])

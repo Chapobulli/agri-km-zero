@@ -54,6 +54,8 @@ def create_app():
     app.register_blueprint(messages_blueprint)
     from .profiles import profiles as profiles_blueprint
     app.register_blueprint(profiles_blueprint)
+    from .debug import debug as debug_blueprint
+    app.register_blueprint(debug_blueprint)
 
     # Register custom filters
     from .template_filters import url_or_local

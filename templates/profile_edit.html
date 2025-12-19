@@ -11,6 +11,21 @@
                 {{ form.hidden_tag() }}
                 
                 <div class="mb-4">
+                    <h5 class="text-success"><i class="fas fa-user"></i> Account</h5>
+                    <hr>
+                    <div class="form-group mb-3">
+                        {{ form.username.label(class="font-weight-bold") }}
+                        {{ form.username(class="form-control") }}
+                        <small class="form-text text-muted">Il tuo nome utente univoco per il login</small>
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.display_name.label(class="font-weight-bold") }}
+                        {{ form.display_name(class="form-control", placeholder="Es: Mario Rossi") }}
+                        <small class="form-text text-muted">Nome mostrato pubblicamente (opzionale)</small>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
                     <h5 class="text-success"><i class="fas fa-info-circle"></i> Informazioni Azienda</h5>
                     <hr>
                     <div class="form-group mb-3">
@@ -108,6 +123,12 @@
                     <div class="form-group mb-3">
                         {{ form.username.label(class="font-weight-bold") }}
                         {{ form.username(class="form-control form-control-lg") }}
+                        <small class="form-text text-muted">Il tuo nome utente univoco per il login</small>
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.display_name.label(class="font-weight-bold") }}
+                        {{ form.display_name(class="form-control", placeholder="Es: Mario Rossi") }}
+                        <small class="form-text text-muted">Nome mostrato pubblicamente (opzionale)</small>
                     </div>
                     <div class="form-group mb-3">
                         {{ form.bio.label(class="font-weight-bold") }}
