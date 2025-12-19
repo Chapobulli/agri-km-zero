@@ -45,10 +45,22 @@ def index():
     # Prepare data with farmer info
     products_data = []
     for product in products:
-        products_data.append({
-            'product': product,
-            'farmer': product.farmer
-        })
+        farmer = db.session.get(User, product.user_id)
+        if farmer:
+            products_data.append({
+                'id': product.id,
+                'name': product.name,
+                'description': product.description,
+                'price': product.price,
+                'unit': product.unit,
+                'image_path': product.image_path,
+                'farmer_name': farmer.company_name or farmer.username,
+                'farmer_username': farmer.username,
+                'farmer_city': farmer.city,
+                'farmer_province': farmer.province,
+                'farmer_address': farmer.address,
+                'user_id': farmer.id
+            })
     
     # Get provinces and cities for filters
     provinces = get_provinces()
