@@ -117,6 +117,16 @@ def create_app():
                         if col_name not in product_cols:
                             app.logger.info(f"Adding missing column product.{col_name}")
                             conn.execute(text(f'ALTER TABLE "product" ADD COLUMN {col_name} {col_type}'))
+                    
+                    # Message table columns
+                    message_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('message')}
+                    additions_message = [
+                        ('read', 'BOOLEAN DEFAULT FALSE')
+                    ]
+                    for col_name, col_type in additions_message:
+                        if col_name not in message_cols:
+                            app.logger.info(f"Adding missing column message.{col_name}")
+                            conn.execute(text(f'ALTER TABLE "message" ADD COLUMN {col_name} {col_type}'))
             except Exception as e:
                 app.logger.warning(f"Schema ensure failed (may already be up-to-date): {e}")
             app.logger.info("Database tables created successfully")

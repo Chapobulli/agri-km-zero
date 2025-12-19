@@ -4,89 +4,67 @@
 <div class="container mt-4 mb-5">
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
-            <h3 class="mb-0"><i class="fas fa-envelope"></i> Messaggi</h3>
+            <h3 class="mb-0"><i class="fas fa-comments"></i> Messaggi</h3>
         </div>
-        <div class="card-body">
-            <!-- Tabs Navigation -->
-            <ul class="nav nav-tabs mb-4" id="messagesTabs" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" id="received-tab" data-toggle="tab" href="#received" role="tab">
-                        <i class="fas fa-inbox"></i> Ricevuti <span class="badge badge-primary">{{ received|length }}</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="sent-tab" data-toggle="tab" href="#sent" role="tab">
-                        <i class="fas fa-paper-plane"></i> Inviati <span class="badge badge-secondary">{{ sent|length }}</span>
-                    </a>
-                </li>
-            </ul>
-
-            <!-- Tabs Content -->
-            <div class="tab-content" id="messagesTabsContent">
-                <!-- Received Messages Tab -->
-                <div class="tab-pane fade show active" id="received" role="tabpanel">
-                    {% if received %}
-                        <div class="list-group">
-                            {% for message in received %}
-                                <div class="list-group-item list-group-item-action">
-                                    <div class="d-flex w-100 justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1">
-                                                <i class="fas fa-user-circle text-success"></i> 
-                                                <strong>Da: {{ message.sender.display_name or message.sender.username }}</strong>
+        <div class="card-body p-0">
+            {% if conversations %}
+                <div class="list-group list-group-flush">
+                    {% for conv in conversations %}
+                        <a href="{{ url_for('messages.conversation', user_id=conv.user.id) }}" 
+                           class="list-group-item list-group-item-action {% if conv.unread_count > 0 %}bg-light{% endif %}">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    {% if conv.user.profile_photo or conv.user.company_logo %}
+                                        <img src="{{ conv.user.profile_photo or conv.user.company_logo }}" 
+                                             alt="{{ conv.user.username }}"
+                                             class="rounded-circle mr-3"
+                                             style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mr-3"
+                                             style="width: 50px; height: 50px; font-size: 1.5rem; font-weight: bold;">
+                                            {{ conv.user.username[0].upper() }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <h6 class="mb-1 {% if conv.unread_count > 0 %}font-weight-bold{% endif %}">
+                                                {{ conv.user.display_name or conv.user.username }}
+                                                {% if conv.user.company_name %}
+                                                    <small class="text-muted">- {{ conv.user.company_name }}</small>
+                                                {% endif %}
                                             </h6>
-                                            <p class="mb-2">{{ message.content }}</p>
                                             <small class="text-muted">
-                                                <i class="fas fa-clock"></i> {{ message.timestamp.strftime('%d/%m/%Y %H:%M') }}
+                                                {{ conv.last_message.timestamp.strftime('%d/%m %H:%M') if conv.last_message else '' }}
                                             </small>
                                         </div>
-                                        <div class="ml-3">
-                                            <a href="{{ url_for('messages.send_message', user_id=message.sender.id) }}" 
-                                               class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-reply"></i> Rispondi
-                                            </a>
-                                        </div>
+                                        <p class="mb-0 text-muted {% if conv.unread_count > 0 %}font-weight-bold text-dark{% endif %}" 
+                                           style="font-size: 0.9rem;">
+                                            {% if conv.last_message %}
+                                                {% if conv.last_message.sender_id == current_user.id %}
+                                                    <i class="fas fa-reply"></i> Tu: 
+                                                {% endif %}
+                                                {{ conv.last_message.content[:60] }}{% if conv.last_message.content|length > 60 %}...{% endif %}
+                                            {% endif %}
+                                        </p>
                                     </div>
                                 </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="text-center py-5 text-muted">
-                            <i class="fas fa-inbox fa-4x mb-3"></i>
-                            <p class="h5">Nessun messaggio ricevuto</p>
-                        </div>
-                    {% endif %}
+                                {% if conv.unread_count > 0 %}
+                                    <span class="badge badge-success badge-pill ml-2">{{ conv.unread_count }}</span>
+                                {% endif %}
+                            </div>
+                        </a>
+                    {% endfor %}
                 </div>
-
-                <!-- Sent Messages Tab -->
-                <div class="tab-pane fade" id="sent" role="tabpanel">
-                    {% if sent %}
-                        <div class="list-group">
-                            {% for message in sent %}
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <div>
-                                            <h6 class="mb-1">
-                                                <i class="fas fa-user-circle text-primary"></i> 
-                                                <strong>A: {{ message.recipient.display_name or message.recipient.username }}</strong>
-                                            </h6>
-                                            <p class="mb-2">{{ message.content }}</p>
-                                            <small class="text-muted">
-                                                <i class="fas fa-clock"></i> {{ message.timestamp.strftime('%d/%m/%Y %H:%M') }}
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="text-center py-5 text-muted">
-                            <i class="fas fa-paper-plane fa-4x mb-3"></i>
-                            <p class="h5">Nessun messaggio inviato</p>
-                        </div>
-                    {% endif %}
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-comments fa-4x mb-3"></i>
+                    <h5>Nessuna conversazione</h5>
+                    <p>Inizia a contattare gli agricoltori dai loro prodotti!</p>
+                    <a href="{{ url_for('products.list_products') }}" class="btn btn-success mt-3">
+                        <i class="fas fa-shopping-basket"></i> Esplora Prodotti
+                    </a>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 </div>

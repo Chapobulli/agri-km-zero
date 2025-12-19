@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for('messages.inbox') }}" class="text-white mr-3">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                {% if other_user.profile_photo or other_user.company_logo %}
+                    <img src="{{ other_user.profile_photo or other_user.company_logo }}" 
+                         alt="{{ other_user.username }}"
+                         class="rounded-circle mr-3"
+                         style="width: 40px; height: 40px; object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle bg-light text-primary d-flex align-items-center justify-content-center mr-3"
+                         style="width: 40px; height: 40px; font-size: 1.2rem; font-weight: bold;">
+                        {{ other_user.username[0].upper() }}
+                    </div>
+                {% endif %}
+                <div>
+                    <h5 class="mb-0">{{ other_user.display_name or other_user.username }}</h5>
+                    {% if other_user.company_name %}
+                        <small>{{ other_user.company_name }}</small>
+                    {% endif %}
+                </div>
+            </div>
+            <a href="{{ url_for('profiles.view_profile', username=other_user.username) }}" 
+               class="btn btn-sm btn-light">
+                <i class="fas fa-user"></i> Profilo
+            </a>
+        </div>
+        
+        <div class="card-body" style="height: 500px; overflow-y: auto; background-color: #f8f9fa;" id="messagesContainer">
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.sender_id == current_user.id %}
+                        <!-- Message sent by current user -->
+                        <div class="d-flex justify-content-end mb-3">
+                            <div class="message-bubble bg-primary text-white" style="max-width: 70%; padding: 10px 15px; border-radius: 18px 18px 4px 18px;">
+                                <p class="mb-1">{{ message.content }}</p>
+                                <small class="text-white-50" style="font-size: 0.75rem;">
+                                    {{ message.timestamp.strftime('%H:%M') }}
+                                </small>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Message received from other user -->
+                        <div class="d-flex justify-content-start mb-3">
+                            <div class="message-bubble bg-white" style="max-width: 70%; padding: 10px 15px; border-radius: 18px 18px 18px 4px; border: 1px solid #dee2e6;">
+                                <p class="mb-1 text-dark">{{ message.content }}</p>
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                    {{ message.timestamp.strftime('%H:%M') }}
+                                </small>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-comments fa-3x mb-3"></i>
+                    <p>Inizia la conversazione inviando un messaggio</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="card-footer bg-white">
+            <form method="POST" class="d-flex align-items-center">
+                {{ form.hidden_tag() }}
+                <div class="flex-grow-1 mr-2">
+                    {{ form.content(class="form-control", placeholder="Scrivi un messaggio...", rows="1", style="resize: none;") }}
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Invia
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-scroll to bottom of messages
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('messagesContainer');
+    if (container) {
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    // Auto-expand textarea
+    const textarea = document.querySelector('textarea');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+        
+        // Submit on Ctrl+Enter
+        textarea.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                this.form.submit();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
