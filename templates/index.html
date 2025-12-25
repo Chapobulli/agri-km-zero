@@ -233,8 +233,8 @@
 {% endif %}
 
 <!-- Leaflet Assets -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4rVtNnG1rG2g9J7vQ1zJyG9GZC2tITrT+tG8vG6a8M=" crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20G0p6gGdV+WvQkZsUu9YfS1sVQy3kggl4p+G2V7QpA=" crossorigin=""></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 // Dynamic city loading for filter
@@ -265,6 +265,15 @@ async function updateCitiesFilter() {
 // Initialize map with Oristano default center if no farmer coords
 document.addEventListener('DOMContentLoaded', function() {
     try {
+        if (!window.L) {
+            console.warn('Leaflet non caricato');
+            return;
+        }
+        var el = document.getElementById('farmersMap');
+        if (!el) {
+            console.warn('Container mappa mancante');
+            return;
+        }
         var center = [{{ center_lat }}, {{ center_lng }}];
         var map = L.map('farmersMap').setView(center, 11);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
