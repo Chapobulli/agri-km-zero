@@ -32,6 +32,9 @@
                     </li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('profiles.companies') }}">Aziende</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% if current_user.is_authenticated %}{{ url_for('messages.inbox') }}{% else %}{{ url_for('auth.register') }}{% endif %}">Contatti</a></li>
+                    {% if current_user.is_authenticated and current_user.is_farmer %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('profiles.my_orders') }}">Ordini</a></li>
+                    {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{% if current_user.is_authenticated %}{{ url_for('profiles.view_profile', username=current_user.username) }}{% else %}{{ url_for('auth.login') }}{% endif %}">Carrello</a></li>
                 </ul>
                 <div class="nav-actions ml-lg-3">

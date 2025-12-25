@@ -107,6 +107,15 @@ def view_profile(username):
     else:
         return render_template('profile.html', user=user, farmer=False)
 
+@profiles.route('/my-orders')
+@login_required
+def my_orders():
+    if not current_user.is_farmer:
+        flash('Solo gli agricoltori possono visualizzare gli ordini ricevuti', 'warning')
+        return redirect(url_for('main.index'))
+    orders = OrderRequest.query.filter_by(farmer_id=current_user.id).order_by(OrderRequest.created_at.desc()).all()
+    return render_template('my_orders.html', orders=orders)
+
 
 @profiles.route('/companies')
 def companies():

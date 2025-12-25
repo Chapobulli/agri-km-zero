@@ -2,6 +2,7 @@ from flask import Blueprint, session, redirect, url_for, request, flash
 from flask_login import login_required, current_user
 from . import db
 from .models import Product, Message, User, OrderRequest
+from .email_utils import send_email
 import json
 
 cart = Blueprint('cart', __name__)
@@ -133,11 +134,37 @@ def create_order(farmer_id):
     )
     db.session.add(order)
     db.session.commit()
+    # Notify farmer via email (if available)
+    try:
+        farmer = User.query.get_or_404(farmer_id)
+        if farmer.email:
+            items = []
+            for _, item in farmer_cart.items():
+                items.append(f"<li><strong>{item['name']}</strong> x{item['qty']} {item['unit']} — {float(item['price'])*int(item['qty']):.2f} €</li>")
+            html = f"""
+                <h3>Nuovo ordine ricevuto</h3>
+                <p><strong>Da:</strong> {order.client_name or 'Cliente'}<br/>
+                <strong>Telefono:</strong> {order.client_phone or '—'}<br/>
+                <strong>Email:</strong> {order.client_email or '—'}</p>
+                <ul>{''.join(items)}</ul>
+                <p><strong>Totale:</strong> {order.total_price:.2f} €</p>
+                {'<p><strong>Consegna:</strong> ' + (order.delivery_address or '') + '</p>' if order.delivery_requested else ''}
+                <p>Accedi alla tua pagina per <strong>accettare</strong> o <strong>rifiutare</strong> l'ordine.</p>
+            """
+            send_email(farmer.email, "Agri KM Zero: nuovo ordine", html)
+        # Send confirmation to client if email provided
+        if order.client_email:
+            send_email(order.client_email, "Conferma ordine inviato", f"""
+                <h3>Ordine inviato a {farmer.company_name or farmer.username}</h3>
+                <p>Totale: <strong>{order.total_price:.2f} €</strong></p>
+                <p>Riceverai conferma dall'azienda.</p>
+            """)
+    except Exception:
+        pass
     # Clear cart after creating order
     c.pop(str(farmer_id), None)
     _save_session()
     flash('Ordine inviato: l\'azienda riceverà i dettagli e potrà rispondere', 'success')
-    farmer = User.query.get_or_404(farmer_id)
     return redirect(url_for('profiles.view_profile', username=farmer.username))
 
 @cart.route('/orders/accept/<int:order_id>', methods=['POST'])
