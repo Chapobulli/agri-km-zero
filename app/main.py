@@ -66,13 +66,24 @@ def index():
     provinces = get_provinces()
     cities = get_cities(province_filter) if province_filter else []
     
+    # Choose map center: default Oristano, else first farmer with coordinates
+    center_lat = 39.9043
+    center_lng = 8.5900
+    for f in farmers:
+        if f.latitude and f.longitude:
+            center_lat = f.latitude
+            center_lng = f.longitude
+            break
+
     return render_template('index.html', 
                          products_data=products_data,
                          farmers=farmers,
                          provinces=provinces,
                          cities=cities,
                          selected_province=province_filter,
-                         selected_city=city_filter)
+                         selected_city=city_filter,
+                         center_lat=center_lat,
+                         center_lng=center_lng)
 
 @main.route('/search', methods=['GET', 'POST'])
 @login_required
