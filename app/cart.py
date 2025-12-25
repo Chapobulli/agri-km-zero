@@ -176,8 +176,20 @@ def accept_order(order_id):
         return redirect(url_for('profiles.view_profile', username=current_user.username))
     order.status = 'accepted'
     db.session.commit()
+    # Send acceptance email to client
+    if order.client_email:
+        try:
+            farmer = User.query.get(order.farmer_id)
+            send_email(order.client_email, "Ordine accettato", f"""
+                <h3>Il tuo ordine è stato accettato!</h3>
+                <p><strong>Azienda:</strong> {farmer.company_name or farmer.username}</p>
+                <p><strong>Totale:</strong> {order.total_price:.2f} €</p>
+                <p>L'azienda ti contatterà a breve per i dettagli.</p>
+            """)
+        except Exception:
+            pass
     flash('Ordine accettato', 'success')
-    return redirect(url_for('profiles.view_profile', username=current_user.username))
+    return redirect(request.referrer or url_for('profiles.my_orders'))
 
 @cart.route('/orders/reject/<int:order_id>', methods=['POST'])
 @login_required
@@ -188,5 +200,16 @@ def reject_order(order_id):
         return redirect(url_for('profiles.view_profile', username=current_user.username))
     order.status = 'rejected'
     db.session.commit()
+    # Send rejection email to client
+    if order.client_email:
+        try:
+            farmer = User.query.get(order.farmer_id)
+            send_email(order.client_email, "Ordine non disponibile", f"""
+                <h3>Ordine non accettato</h3>
+                <p><strong>Azienda:</strong> {farmer.company_name or farmer.username}</p>
+                <p>Ci dispiace, l'ordine non può essere evaso al momento. Prova a contattare direttamente l'azienda.</p>
+            """)
+        except Exception:
+            pass
     flash('Ordine rifiutato', 'info')
-    return redirect(url_for('profiles.view_profile', username=current_user.username))
+    return redirect(request.referrer or url_for('profiles.my_orders'))

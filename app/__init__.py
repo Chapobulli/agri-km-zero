@@ -63,6 +63,16 @@ def create_app():
     from .template_filters import url_or_local
     app.jinja_env.filters['url_or_local'] = url_or_local
 
+    # Context processor for pending orders count
+    @app.context_processor
+    def inject_pending_orders_count():
+        from flask_login import current_user
+        from .models import OrderRequest
+        count = 0
+        if current_user.is_authenticated and current_user.is_farmer:
+            count = OrderRequest.query.filter_by(farmer_id=current_user.id, status='pending').count()
+        return dict(pending_orders_count=count)
+
     @login_manager.user_loader
     def load_user(user_id):
         from .models import User
