@@ -85,10 +85,14 @@
                                     </a>
                                 {% endif %}
                             {% else %}
-                                <a href="{{ url_for('auth.register') }}" 
-                                   class="btn btn-success btn-sm btn-block">
-                                    <i class="fas fa-user-plus"></i> Registrati per acquistare
-                                </a>
+                                <form method="post" action="{{ url_for('cart.add_to_cart', product_id=product.id) }}" style="margin-top: 8px;">
+                                    <div style="display:flex;gap:4px;">
+                                        <input type="number" name="qty" value="1" min="1" max="99" style="width:60px;border:1px solid #ccc;padding:6px;border-radius:4px;">
+                                        <button type="submit" class="btn btn-success btn-sm" style="flex:1;">
+                                            <i class="fas fa-shopping-cart"></i> Aggiungi
+                                        </button>
+                                    </div>
+                                </form>
                             {% endif %}
                         </div>
                     </div>

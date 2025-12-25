@@ -14,7 +14,6 @@ def _save_session():
     session.modified = True
 
 @cart.route('/cart/add/<int:product_id>', methods=['POST'])
-@login_required
 def add_to_cart(product_id):
     product = Product.query.get_or_404(product_id)
     farmer_id = product.user_id
@@ -38,7 +37,6 @@ def add_to_cart(product_id):
     return redirect(url_for('profiles.view_profile', username=farmer.username))
 
 @cart.route('/cart/remove/<int:product_id>', methods=['POST'])
-@login_required
 def remove_from_cart(product_id):
     product = Product.query.get_or_404(product_id)
     farmer_id = product.user_id
@@ -54,7 +52,6 @@ def remove_from_cart(product_id):
     return redirect(url_for('profiles.view_profile', username=farmer.username))
 
 @cart.route('/cart/clear/<int:farmer_id>', methods=['POST'])
-@login_required
 def clear_cart(farmer_id):
     c = _get_cart()
     c.pop(str(farmer_id), None)
