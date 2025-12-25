@@ -51,6 +51,29 @@ def remove_from_cart(product_id):
     farmer = User.query.get(farmer_id)
     return redirect(url_for('profiles.view_profile', username=farmer.username))
 
+@cart.route('/cart/update/<int:product_id>', methods=['POST'])
+def update_cart(product_id):
+    product = Product.query.get_or_404(product_id)
+    farmer_id = product.user_id
+    action = request.form.get('action', 'set')
+    qty = request.form.get('qty', '1')
+    try:
+        qty = max(1, int(qty))
+    except Exception:
+        qty = 1
+    c = _get_cart()
+    farmer_cart = c.get(str(farmer_id), {})
+    if str(product_id) in farmer_cart:
+        if action == 'increment':
+            farmer_cart[str(product_id)]['qty'] += 1
+        elif action == 'decrement':
+            farmer_cart[str(product_id)]['qty'] = max(1, farmer_cart[str(product_id)]['qty'] - 1)
+        else:
+            farmer_cart[str(product_id)]['qty'] = qty
+        _save_session()
+    farmer = User.query.get(farmer_id)
+    return redirect(url_for('profiles.view_profile', username=farmer.username))
+
 @cart.route('/cart/clear/<int:farmer_id>', methods=['POST'])
 def clear_cart(farmer_id):
     c = _get_cart()
