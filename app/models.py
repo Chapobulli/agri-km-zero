@@ -65,3 +65,17 @@ class Message(db.Model):
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     read = db.Column(db.Boolean, default=False)
+
+class OrderRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    farmer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    client_name = db.Column(db.String(150))
+    client_email = db.Column(db.String(150))
+    client_phone = db.Column(db.String(50))
+    delivery_address = db.Column(db.String(300))
+    delivery_requested = db.Column(db.Boolean, default=False)
+    items_json = db.Column(db.Text, nullable=False)  # JSON of items in cart
+    total_price = db.Column(db.Float, default=0.0)
+    status = db.Column(db.String(20), default='pending')  # pending|accepted|rejected
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())

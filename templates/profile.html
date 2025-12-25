@@ -86,7 +86,71 @@
                     <i class="fas fa-envelope"></i> Contatta
                 </a>
             {% endif %}
-            {% if current_user.is_authenticated and not (current_user.id == user.id) %}
+            {% if not current_user.is_authenticated %}
+            <!-- Guest checkout form -->
+            {% set farmer_id = user.id %}
+            {% set cart = session.get('cart', {}) %}
+            {% set fcart = cart.get(farmer_id|string, {}) %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6><i class="fas fa-shopping-cart"></i> Carrello</h6>
+                    <hr>
+                    {% if fcart %}
+                        <ul class="list-unstyled mb-3">
+                        {% set total = 0 %}
+                        {% for pid, item in fcart.items() %}
+                            {% set subtotal = (item.price|float) * (item.qty|int) %}
+                            {% set total = total + subtotal %}
+                            <li class="mb-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ item.name }}</strong>
+                                    <small class="text-muted"> x{{ item.qty }} {{ item.unit }}</small>
+                                </div>
+                                <span class="text-success font-weight-bold">{{ '%.2f'|format(subtotal) }} €</span>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>Totale</strong>
+                            <span class="h5 text-success mb-0">{{ '%.2f'|format(total) }} €</span>
+                        </div>
+                        <hr>
+                        <form method="POST" action="{{ url_for('cart.create_order', farmer_id=user.id) }}">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Nome</label>
+                                    <input type="text" name="name" class="form-control" placeholder="Il tuo nome">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Telefono</label>
+                                    <input type="text" name="phone" class="form-control" placeholder="Es. 320 123 4567">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label>Email</label>
+                                    <input type="email" name="email" class="form-control" placeholder="email@example.com">
+                                    <small class="text-muted">Inserisci telefono o email per ricevere conferma</small>
+                                </div>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="deliveryCheck" name="delivery" onchange="document.getElementById('deliveryAddr').style.display=this.checked?'block':'none'">
+                                <label class="form-check-label" for="deliveryCheck">Richiedo consegna</label>
+                            </div>
+                            <div id="deliveryAddr" style="display:none;">
+                                <div class="form-group">
+                                    <label>Indirizzo per consegna</label>
+                                    <input type="text" name="address" class="form-control" placeholder="Via, numero, città">
+                                </div>
+                            </div>
+                            <button class="btn btn-success btn-block mt-2" type="submit"><i class="fas fa-paper-plane"></i> Invia Ordine</button>
+                        </form>
+                    {% else %}
+                        <p class="text-muted mb-0">Il carrello è vuoto. Aggiungi prodotti per inviare un ordine.</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% elif current_user.is_authenticated and not (current_user.id == user.id) %}
             <!-- Cart Sidebar -->
             {% set farmer_id = user.id %}
             {% set cart = session.get('cart', {}) %}
@@ -188,5 +252,55 @@
         </div>
     </div>
 </div>
+{% endif %}
+
+{% if current_user.is_authenticated and current_user.id == user.id and orders %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h4 class="mb-3"><i class="fas fa-receipt"></i> Ordini ricevuti</h4>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>#</th><th>Cliente</th><th>Contatti</th><th>Totale</th><th>Stato</th><th>Azione</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in orders %}
+                        <tr>
+                            <td>{{ o.id }}</td>
+                            <td>{{ o.client_name or '—' }}</td>
+                            <td>
+                                {% if o.client_phone %}<div><i class="fas fa-phone"></i> {{ o.client_phone }}</div>{% endif %}
+                                {% if o.client_email %}<div><i class="fas fa-envelope"></i> {{ o.client_email }}</div>{% endif %}
+                                {% if o.delivery_requested %}<div><i class="fas fa-map-marker-alt"></i> {{ o.delivery_address }}</div>{% endif %}
+                            </td>
+                            <td class="text-success"><strong>{{ '%.2f'|format(o.total_price) }} €</strong></td>
+                            <td>
+                                {% if o.status == 'pending' %}<span class="badge badge-warning">In attesa</span>
+                                {% elif o.status == 'accepted' %}<span class="badge badge-success">Accettato</span>
+                                {% else %}<span class="badge badge-secondary">Rifiutato</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if o.status == 'pending' %}
+                                <form method="POST" action="{{ url_for('cart.accept_order', order_id=o.id) }}" class="d-inline">
+                                    <button class="btn btn-sm btn-success">Accetta</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('cart.reject_order', order_id=o.id) }}" class="d-inline">
+                                    <button class="btn btn-sm btn-outline-danger">Rifiuta</button>
+                                </form>
+                                {% else %}
+                                    <small class="text-muted">Nessuna azione</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 {% endif %}
 {% endblock %}

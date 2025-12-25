@@ -282,16 +282,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }).addTo(map);
         var farmers = [
             {% for f in farmers %}
-            {% if f.latitude and f.longitude %}
-            {lat: {{ f.latitude }}, lng: {{ f.longitude }}, name: '{{ (f.company_name or f.username)|e }}', username: '{{ f.username|e }}', city: '{{ (f.city or '')|e }}'},
-            {% endif %}
+            {lat: {{ f.latitude or 'null' }}, lng: {{ f.longitude or 'null' }}, name: '{{ (f.company_name or f.username)|e }}', username: '{{ f.username|e }}', city: '{{ (f.city or '')|e }}', province: '{{ (f.province or '')|e }}'},
             {% endfor %}
         ];
-        farmers.forEach(function(f) {
+        function addMarker(f) {
             var m = L.marker([f.lat, f.lng]).addTo(map);
             var html = '<strong>' + f.name + '</strong><br>' + (f.city || '') + '<br>' +
                        '<a href="' + '{{ url_for('profiles.view_profile', username='__USERNAME__') }}'.replace('__USERNAME__', f.username) + '">Vedi profilo</a>';
             m.bindPopup(html);
+        }
+        farmers.forEach(async function(f) {
+            if (f.lat != null && f.lng != null) {
+                addMarker(f);
+            } else if (f.city) {
+                try {
+                    const q = encodeURIComponent((f.city + ' ' + (f.province||'') + ' Italia').trim());
+                    const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + q + '&limit=1');
+                    const data = await res.json();
+                    if (data && data[0]) {
+                        f.lat = parseFloat(data[0].lat);
+                        f.lng = parseFloat(data[0].lon);
+                        addMarker(f);
+                    }
+                } catch(e) { /* ignore */ }
+            }
         });
     } catch(e) {
         console.error('Map init error', e);

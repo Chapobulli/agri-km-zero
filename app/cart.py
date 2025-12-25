@@ -1,7 +1,8 @@
 from flask import Blueprint, session, redirect, url_for, request, flash
 from flask_login import login_required, current_user
 from . import db
-from .models import Product, Message, User
+from .models import Product, Message, User, OrderRequest
+import json
 
 cart = Blueprint('cart', __name__)
 
@@ -92,3 +93,73 @@ def send_order(farmer_id):
     _save_session()
     flash('Ordine inviato all\'azienda via messaggio', 'success')
     return redirect(url_for('messages.conversation', user_id=farmer_id))
+
+@cart.route('/orders/create/<int:farmer_id>', methods=['POST'])
+def create_order(farmer_id):
+    # Allow guests to place orders: collect contact info
+    c = _get_cart()
+    farmer_cart = c.get(str(farmer_id))
+    if not farmer_cart:
+        flash('Il carrello è vuoto', 'warning')
+        farmer = User.query.get_or_404(farmer_id)
+        return redirect(url_for('profiles.view_profile', username=farmer.username))
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
+    phone = request.form.get('phone', '').strip()
+    delivery = request.form.get('delivery', 'off') == 'on'
+    address = request.form.get('address', '').strip()
+    if not (email or phone):
+        flash('Inserisci almeno email o telefono per la conferma', 'warning')
+        farmer = User.query.get_or_404(farmer_id)
+        return redirect(url_for('profiles.view_profile', username=farmer.username))
+    if delivery and not address:
+        flash('Inserisci un indirizzo per la consegna', 'warning')
+        farmer = User.query.get_or_404(farmer_id)
+        return redirect(url_for('profiles.view_profile', username=farmer.username))
+    total = 0.0
+    for _, item in farmer_cart.items():
+        total += float(item['price']) * int(item['qty'])
+    order = OrderRequest(
+        farmer_id=farmer_id,
+        client_id=current_user.id if getattr(current_user, 'is_authenticated', False) else None,
+        client_name=name or (current_user.display_name if getattr(current_user, 'is_authenticated', False) else None),
+        client_email=email,
+        client_phone=phone,
+        delivery_address=address if delivery else None,
+        delivery_requested=delivery,
+        items_json=json.dumps(farmer_cart),
+        total_price=total,
+        status='pending'
+    )
+    db.session.add(order)
+    db.session.commit()
+    # Clear cart after creating order
+    c.pop(str(farmer_id), None)
+    _save_session()
+    flash('Ordine inviato: l\'azienda riceverà i dettagli e potrà rispondere', 'success')
+    farmer = User.query.get_or_404(farmer_id)
+    return redirect(url_for('profiles.view_profile', username=farmer.username))
+
+@cart.route('/orders/accept/<int:order_id>', methods=['POST'])
+@login_required
+def accept_order(order_id):
+    order = OrderRequest.query.get_or_404(order_id)
+    if current_user.id != order.farmer_id:
+        flash('Non autorizzato', 'danger')
+        return redirect(url_for('profiles.view_profile', username=current_user.username))
+    order.status = 'accepted'
+    db.session.commit()
+    flash('Ordine accettato', 'success')
+    return redirect(url_for('profiles.view_profile', username=current_user.username))
+
+@cart.route('/orders/reject/<int:order_id>', methods=['POST'])
+@login_required
+def reject_order(order_id):
+    order = OrderRequest.query.get_or_404(order_id)
+    if current_user.id != order.farmer_id:
+        flash('Non autorizzato', 'danger')
+        return redirect(url_for('profiles.view_profile', username=current_user.username))
+    order.status = 'rejected'
+    db.session.commit()
+    flash('Ordine rifiutato', 'info')
+    return redirect(url_for('profiles.view_profile', username=current_user.username))

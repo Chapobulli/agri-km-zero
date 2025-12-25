@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user
 from . import db
-from .models import User, Product
+from .models import User, Product, OrderRequest
 from .forms import FarmerProfileForm, ClientProfileForm
 from .locations import get_provinces, get_cities
 from werkzeug.utils import secure_filename
@@ -101,7 +101,9 @@ def view_profile(username):
     if user.is_farmer:
         # Load products for company page
         products = Product.query.filter_by(user_id=user.id).all()
-        return render_template('profile.html', user=user, products=products, farmer=True)
+        # Load orders for this farmer (latest first)
+        orders = OrderRequest.query.filter_by(farmer_id=user.id).order_by(OrderRequest.created_at.desc()).all()
+        return render_template('profile.html', user=user, products=products, orders=orders, farmer=True)
     else:
         return render_template('profile.html', user=user, farmer=False)
 
