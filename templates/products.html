@@ -66,10 +66,18 @@
                             
                             {% if current_user.is_authenticated %}
                                 {% if current_user.id != product.user_id %}
-                                    <a href="{{ url_for('messages.conversation', user_id=product.user_id) }}" 
-                                       class="btn btn-success btn-sm btn-block">
-                                        <i class="fas fa-envelope"></i> Contatta Agricoltore
-                                    </a>
+                                    <div class="d-flex">
+                                        <form method="POST" action="{{ url_for('cart.add_to_cart', product_id=product.id) }}" class="form-inline mr-2" style="flex:1;">
+                                            <input type="number" name="qty" min="1" value="1" class="form-control form-control-sm mr-2" style="width:70px;">
+                                            <button class="btn btn-success btn-sm btn-block" type="submit">
+                                                <i class="fas fa-shopping-cart"></i> Aggiungi
+                                            </button>
+                                        </form>
+                                        <a href="{{ url_for('messages.conversation', user_id=product.user_id) }}" 
+                                           class="btn btn-outline-success btn-sm" style="min-width:160px;">
+                                            <i class="fas fa-envelope"></i> Contatta
+                                        </a>
+                                    </div>
                                 {% else %}
                                     <a href="{{ url_for('products.edit_product', product_id=product.id) }}" 
                                        class="btn btn-primary btn-sm btn-block">
@@ -79,7 +87,7 @@
                             {% else %}
                                 <a href="{{ url_for('auth.register') }}" 
                                    class="btn btn-success btn-sm btn-block">
-                                    <i class="fas fa-envelope"></i> Contatta
+                                    <i class="fas fa-user-plus"></i> Registrati per acquistare
                                 </a>
                             {% endif %}
                         </div>
