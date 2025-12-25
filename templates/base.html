@@ -9,26 +9,40 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="{{ url_for('main.index') }}">
-            <img src="/static/images/logo/logo.png" alt="Agri KM Zero Logo" class="mr-2" style="height: 30px;" onerror="this.src='https://via.placeholder.com/30x30/4CAF50/ffffff?text=KM'">
-            Agri KM Zero
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <div class="navbar-nav ml-auto">
-                {% if current_user.is_authenticated %}
-                    <a class="nav-item nav-link" href="{{ url_for('products.list_products') }}"><i class="fas fa-box"></i> Prodotti</a>
-                    <a class="nav-item nav-link" href="{{ url_for('messages.inbox') }}"><i class="fas fa-envelope"></i> Messaggi</a>
-                    <a class="nav-item nav-link" href="{{ url_for('profiles.view_profile', username=current_user.username) }}"><i class="fas fa-id-badge"></i> Profilo</a>
-                    <a class="nav-item nav-link" href="{{ url_for('profiles.companies') }}"><i class="fas fa-building"></i> Aziende</a>
-                    <a class="nav-item nav-link" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                {% else %}
-                    <a class="nav-item nav-link" href="{{ url_for('auth.login') }}"><i class="fas fa-sign-in-alt"></i> Accedi</a>
-                    <a class="nav-item nav-link" href="{{ url_for('auth.register') }}"><i class="fas fa-user-plus"></i> Registrati</a>
-                {% endif %}
+    <nav class="navbar navbar-expand-lg navbar-light main-nav">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                <img src="/static/images/logo/logo.png" alt="Agri KM Zero" onerror="this.src='https://via.placeholder.com/40x40/6B8E23/ffffff?text=AKZ'">
+                agri-km-zero
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto align-items-lg-center">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.index') }}">Home</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="prodottiDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Prodotti</a>
+                        <div class="dropdown-menu" aria-labelledby="prodottiDropdown">
+                            <a class="dropdown-item" href="{{ url_for('products.list_products') }}">Tutti i Prodotti</a>
+                            {% if current_user.is_authenticated and current_user.is_farmer %}
+                            <a class="dropdown-item" href="{{ url_for('products.add_product') }}">Aggiungi Prodotto</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('profiles.companies') }}">Aziende</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% if current_user.is_authenticated %}{{ url_for('messages.inbox') }}{% else %}{{ url_for('auth.register') }}{% endif %}">Contatti</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% if current_user.is_authenticated %}{{ url_for('profiles.view_profile', username=current_user.username) }}{% else %}{{ url_for('auth.login') }}{% endif %}">Carrello</a></li>
+                </ul>
+                <div class="nav-actions ml-lg-3">
+                    {% if current_user.is_authenticated %}
+                        <a class="btn btn-outline-success btn-sm" href="{{ url_for('profiles.view_profile', username=current_user.username) }}">Profilo</a>
+                        <a class="btn btn-success btn-sm ml-2" href="{{ url_for('auth.logout') }}">Esci</a>
+                    {% else %}
+                        <a class="btn btn-outline-success btn-sm" href="{{ url_for('auth.login') }}">Accedi</a>
+                        <a class="btn btn-success btn-sm ml-2" href="{{ url_for('auth.register') }}">Registrati</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
@@ -52,34 +66,43 @@
     <footer class="footer">
         <div class="container">
             <div class="row">
-                <div class="col-md-4 mb-4">
+                <div class="col-md-3 mb-4">
                     <h5>Agri KM Zero</h5>
-                    <p>Connettiamo agricoltori locali e clienti per prodotti freschi a km0. Sosteniamo l'agricoltura sostenibile.</p>
-                    <div>
-                        <a href="#" class="text-white mr-3"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-white mr-3"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5>Link Utili</h5>
                     <ul class="list-unstyled">
-                        <li><a href="{{ url_for('main.terms') }}">Termini e Condizioni</a></li>
-                        <li><a href="{{ url_for('main.privacy') }}">Privacy Policy</a></li>
-                        <li><a href="mailto:info@agrikmzero.it">Contatti</a></li>
+                        <li><a href="{{ url_for('main.index') }}">Home</a></li>
                         <li><a href="{{ url_for('profiles.companies') }}">Aziende</a></li>
+                        <li><a href="{{ url_for('main.terms') }}">Termini</a></li>
+                        <li><a href="{{ url_for('main.privacy') }}">Privacy</a></li>
                     </ul>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h5>Contattaci</h5>
-                    <p><i class="fas fa-envelope"></i> info@agrikmzero.it</p>
-                    <p><i class="fas fa-phone"></i> +39 123 456 7890</p>
-                    <p><i class="fas fa-map-marker-alt"></i> Italia</p>
+                <div class="col-md-3 mb-4">
+                    <h5>Prodotti</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('products.list_products') }}">Catalogo</a></li>
+                        {% if current_user.is_authenticated and current_user.is_farmer %}
+                        <li><a href="{{ url_for('products.add_product') }}">Aggiungi prodotto</a></li>
+                        {% endif %}
+                        <li><a href="{% if current_user.is_authenticated %}{{ url_for('messages.inbox') }}{% else %}{{ url_for('auth.register') }}{% endif %}">Contatti</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Seguici</h5>
+                    <div class="mb-3">
+                        <a href="#" class="mr-3"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="#" class="mr-3"><i class="fab fa-instagram fa-lg"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Newsletter</h5>
+                    <p style="font-size: 0.9rem;">Novità su prodotti locali e offerte</p>
+                    <form class="form-inline">
+                        <input type="email" class="form-control mb-2 mr-2" placeholder="Email" style="border-radius: 4px;">
+                        <button type="submit" class="btn btn-success mb-2" style="border-radius: 4px;">→</button>
+                    </form>
                 </div>
             </div>
-            <hr class="bg-light">
-            <div class="text-center">
-                <p>&copy; 2025 Agri KM Zero. Tutti i diritti riservati. <i class="fas fa-heart text-danger"></i> Fatto con amore per l'agricoltura locale.</p>
+            <div class="footer-bottom">
+                <p class="mb-0">&copy; 2022 agri-km-zero. All Rights Reserved</p>
             </div>
         </div>
     </footer>
