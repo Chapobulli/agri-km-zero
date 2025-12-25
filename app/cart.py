@@ -174,10 +174,16 @@ def create_order(farmer_id):
             send_email(farmer.email, "Agri KM Zero: nuovo ordine", html)
         # Send confirmation to client if email provided
         if order.client_email:
+            client_items = []
+            for _, item in farmer_cart.items():
+                client_items.append(f"<li><strong>{item['name']}</strong> x{item['qty']} {item['unit']} — {float(item['price'])*int(item['qty']):.2f} €</li>")
             send_email(order.client_email, "Conferma ordine inviato", f"""
                 <h3>Ordine inviato a {farmer.company_name or farmer.username}</h3>
-                <p>Totale: <strong>{order.total_price:.2f} €</strong></p>
-                <p>Riceverai conferma dall'azienda.</p>
+                <p><strong>Dettaglio ordine:</strong></p>
+                <ul>{''.join(client_items)}</ul>
+                <p><strong>Totale:</strong> {order.total_price:.2f} €</p>
+                {'<p><strong>Consegna richiesta a:</strong> ' + (order.delivery_address or '') + '</p>' if order.delivery_requested else '<p><strong>Ritiro presso azienda</strong></p>'}
+                <p>Riceverai conferma dall'azienda appena l'ordine verrà accettato.</p>
             """)
     except Exception:
         pass
