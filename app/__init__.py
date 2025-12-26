@@ -21,9 +21,16 @@ def create_app():
         db_url = db_url.replace('postgres://', 'postgresql://', 1)
     if db_url.startswith('postgresql://') and 'sslmode=' not in db_url and 'localhost' not in db_url:
         separator = '&' if '?' in db_url else '?'
-        db_url = f"{db_url}{separator}sslmode=require"
+        db_url = f"{db_url}{separator}sslmode=prefer"
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # Pool configuration for better connection handling
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'pool_pre_ping': True,  # Check connections before using them
+        'pool_recycle': 300,    # Recycle connections after 5 minutes
+        'pool_size': 10,
+        'max_overflow': 20
+    }
 
     # Configure Cloudinary
     cloudinary.config(

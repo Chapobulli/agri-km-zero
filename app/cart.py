@@ -153,7 +153,20 @@ def create_order(farmer_id):
         status='pending'
     )
     db.session.add(order)
-    db.session.commit()
+    # Retry logic for intermittent SSL errors
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            db.session.commit()
+            break
+        except Exception as e:
+            db.session.rollback()
+            if attempt == max_retries - 1:
+                flash('Errore temporaneo nel salvare l\'ordine. Riprova tra poco.', 'danger')
+                farmer = User.query.get_or_404(farmer_id)
+                return redirect(url_for('profiles.view_profile', username=farmer.username))
+            import time
+            time.sleep(0.5 * (attempt + 1))
     # Notify farmer via email (if available)
     try:
         farmer = User.query.get_or_404(farmer_id)
