@@ -1,86 +1,47 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Hero Split Layout inspired by reference -->
+<!-- Hero full width -->
 <section class="hero-split">
-    <div class="container-fluid p-0">
-        <div class="row no-gutters">
-            <div class="col-lg-7 hero-visual" style="background-image: url('/static/images/hero/hero.png');">
-                <div class="hero-overlay">
-                    <span class="badge badge-pill badge-light text-success mb-3">Filiera corta e sostenibile</span>
-                    <h1 class="mb-3">Scopri, ordina, parla con l'azienda</h1>
-                    <p class="lead mb-4">Scegli i prodotti freschi vicino a te e organizza consegna o ritiro con un messaggio diretto al produttore.</p>
-                    <div class="d-flex flex-wrap mb-4">
-                        <a href="{{ url_for('profiles.companies') }}" class="btn btn-success btn-lg mr-2 mb-2">Esplora aziende</a>
-                        {% if not current_user.is_authenticated %}
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-lg mb-2">Apri la tua vetrina</a>
-                        {% endif %}
-                    </div>
-                    <form class="hero-filters" method="get" action="{{ url_for('main.index') }}">
-                        <div class="form-row">
-                            <div class="form-group col-md-5 mb-2">
-                                <label class="small text-white-50 mb-1" for="provinceSelect">Provincia</label>
-                                <select class="form-control form-control-lg" id="provinceSelect" name="province" onchange="updateCitiesFilter()">
-                                    <option value="">Tutte le Province</option>
-                                    {% for p in provinces %}
-                                    <option value="{{ p }}" {% if p == selected_province %}selected{% endif %}>{{ p }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="form-group col-md-5 mb-2">
-                                <label class="small text-white-50 mb-1" for="citySelect">Comune</label>
-                                <select class="form-control form-control-lg" id="citySelect" name="city">
-                                    <option value="">Tutti i Comuni</option>
-                                    {% for c in cities %}
-                                    <option value="{{ c }}" {% if c == selected_city %}selected{% endif %}>{{ c }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="form-group col-md-2 mb-2 d-flex align-items-end">
-                                <button class="btn btn-success btn-lg btn-block" type="submit">Cerca</button>
-                            </div>
-                        </div>
-                    </form>
-                    <div class="d-flex flex-wrap align-items-center mt-3 text-white-50">
-                        <span class="mr-3"><i class="fas fa-map-marker-alt"></i> Prodotti locali</span>
-                        <span class="mr-3"><i class="fas fa-leaf"></i> Stagionali</span>
-                        <span class="mr-3"><i class="fas fa-handshake"></i> Con filiera corta</span>
-                        <span><i class="fas fa-comments"></i> Messaggi rapidi</span>
-                    </div>
-                </div>
+    <div class="hero-visual" style="background-image: url('/static/images/hero/hero.png');">
+        <div class="hero-overlay">
+            <span class="badge badge-pill badge-light text-success mb-3">Filiera corta e sostenibile</span>
+            <h1 class="mb-3">Scopri i prodotti locali</h1>
+            <p class="lead mb-4">Acquista direttamente dai produttori vicino a te: ritiro in azienda o consegna dove disponibile.</p>
+            <div class="d-flex flex-wrap mb-4">
+                <a href="{{ url_for('products.list_products') }}" class="btn btn-success btn-lg mr-2 mb-2">Vedi prodotti</a>
+                <a href="{{ url_for('profiles.companies') }}" class="btn btn-outline-light btn-lg mb-2">Visita le aziende</a>
             </div>
-            <div class="col-lg-5 hero-panel">
-                <div class="hero-panel-inner">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="mb-0">Prodotti di stagione</h4>
-                        <a class="text-success font-weight-bold" href="{{ url_for('products.list_products') }}">Vedi tutti</a>
+            <form class="hero-filters" method="get" action="{{ url_for('main.index') }}">
+                <div class="form-row">
+                    <div class="form-group col-md-5 mb-2">
+                        <label class="small text-white-50 mb-1" for="provinceSelect">Provincia</label>
+                        <select class="form-control form-control-lg" id="provinceSelect" name="province" onchange="updateCitiesFilter()">
+                            <option value="">Tutte le Province</option>
+                            {% for p in provinces %}
+                            <option value="{{ p }}" {% if p == selected_province %}selected{% endif %}>{{ p }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    {% if products_data %}
-                    <div class="row">
-                        {% for item in products_data[:4] %}
-                        <div class="col-sm-6 mb-4">
-                            <div class="card product-card h-100">
-                                {% if item.image_path %}
-                                <img src="{{ item.image_path|url_or_local }}" class="card-img-top" alt="{{ item.name }}">
-                                {% else %}
-                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 160px;">
-                                    <i class="fas fa-leaf fa-2x text-success"></i>
-                                </div>
-                                {% endif %}
-                                <div class="card-body">
-                                    <h6 class="card-title mb-1">{{ item.name }}</h6>
-                                    <p class="product-price mb-2">{{ '%.2f'|format(item.price|float) }} €</p>
-                                    <p class="small text-muted mb-3">{{ item.farmer_name }}{% if item.farmer_city %} · {{ item.farmer_city }}{% endif %}</p>
-                                    <a href="{{ url_for('profiles.view_company', slug=item.farmer_slug) }}" class="btn btn-success btn-block btn-sm">Vai all'azienda</a>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
+                    <div class="form-group col-md-5 mb-2">
+                        <label class="small text-white-50 mb-1" for="citySelect">Comune</label>
+                        <select class="form-control form-control-lg" id="citySelect" name="city">
+                            <option value="">Tutti i Comuni</option>
+                            {% for c in cities %}
+                            <option value="{{ c }}" {% if c == selected_city %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    {% else %}
-                    <div class="alert alert-info mb-0">Nessun prodotto disponibile al momento.</div>
-                    {% endif %}
+                    <div class="form-group col-md-2 mb-2 d-flex align-items-end">
+                        <button class="btn btn-success btn-lg btn-block" type="submit">Cerca</button>
+                    </div>
                 </div>
+            </form>
+            <div class="d-flex flex-wrap align-items-center mt-3 text-white-50">
+                <span class="mr-3"><i class="fas fa-map-marker-alt"></i> Prodotti locali</span>
+                <span class="mr-3"><i class="fas fa-leaf"></i> Stagionali</span>
+                <span class="mr-3"><i class="fas fa-handshake"></i> Filiera corta</span>
+                <span><i class="fas fa-comments"></i> Messaggia l'azienda</span>
             </div>
         </div>
     </div>
@@ -91,17 +52,16 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0"><i class="fas fa-map-marked-alt text-success"></i> Mappa degli agricoltori</h4>
-            <small class="text-muted">Centro: Oristano se non selezionato</small>
         </div>
         <div id="farmersMap" style="height:380px;border-radius:8px;overflow:hidden;border:1px solid #eee;"></div>
     </div>
 </section>
 
-<!-- Products Grid -->
+<!-- Prodotti di stagione sotto la mappa -->
 <section class="py-5" style="background-color: #f5efe3;">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="section-title mb-0 text-left">Prodotti di Stagione in Evidenza</h2>
+            <h2 class="section-title mb-0 text-left">Prodotti di stagione</h2>
             <a class="text-success font-weight-bold" href="{{ url_for('products.list_products') }}">Vedi tutti</a>
         </div>
         {% if products_data %}
@@ -112,7 +72,7 @@
                     {% if item.image_path %}
                     <img src="{{ item.image_path|url_or_local }}" class="card-img-top" alt="{{ item.name }}">
                     {% else %}
-                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
                         <i class="fas fa-leaf fa-3x text-success"></i>
                     </div>
                     {% endif %}
