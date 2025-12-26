@@ -1,0 +1,1 @@
+web: gunicorn main:app --workers ${WEB_CONCURRENCY:-1} --timeout 120 --log-level info
