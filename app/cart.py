@@ -91,38 +91,6 @@ def clear_cart(farmer_id):
     farmer = User.query.get_or_404(farmer_id)
     return redirect(_profile_url_for_farmer(farmer))
 
-@cart.route('/cart/send/<int:farmer_id>', methods=['POST'])
-@login_required
-def send_order(farmer_id):
-    c = _get_cart()
-    farmer_cart = c.get(str(farmer_id))
-    if not farmer_cart:
-        flash('Il carrello è vuoto', 'warning')
-        farmer = User.query.get_or_404(farmer_id)
-        return redirect(_profile_url_for_farmer(farmer))
-    # Compose order summary
-    lines = [f"Nuovo ordine da {current_user.display_name or current_user.username}"]
-    total = 0.0
-    for pid, item in farmer_cart.items():
-        subtotal = float(item['price']) * int(item['qty'])
-        total += subtotal
-        lines.append(f"- {item['name']} x{item['qty']} ({item['unit']}) → {subtotal:.2f} €")
-    lines.append(f"Totale: {total:.2f} €")
-    if current_user.address:
-        lines.append(f"Indirizzo: {current_user.address}")
-    if current_user.city or current_user.province:
-        lines.append(f"Località: {current_user.city or ''} {('('+current_user.province+')') if current_user.province else ''}")
-    content = "\n".join(lines)
-    # Persist as message
-    msg = Message(content=content, sender_id=current_user.id, recipient_id=farmer_id)
-    db.session.add(msg)
-    db.session.commit()
-    # Clear cart after sending
-    c.pop(str(farmer_id), None)
-    _save_session()
-    flash('Ordine inviato all\'azienda via messaggio', 'success')
-    return redirect(url_for('messages.conversation', user_id=farmer_id))
-
 
 @cart.route('/cart/whatsapp/<int:farmer_id>', methods=['GET'])
 def whatsapp_order(farmer_id):
@@ -186,10 +154,11 @@ def create_order(farmer_id):
     total = 0.0
     for _, item in farmer_cart.items():
         total += float(item['price']) * int(item['qty'])
+    is_auth = hasattr(current_user, 'is_authenticated') and current_user.is_authenticated
     order = OrderRequest(
         farmer_id=farmer_id,
-        client_id=current_user.id if getattr(current_user, 'is_authenticated', False) else None,
-        client_name=name or (current_user.display_name if getattr(current_user, 'is_authenticated', False) else None),
+        client_id=current_user.id if is_auth else None,
+        client_name=name or (current_user.display_name or current_user.username if is_auth else None),
         client_email=email,
         client_phone=phone,
         delivery_address=address if delivery else None,
@@ -268,7 +237,9 @@ def create_order(farmer_id):
     # Clear cart after creating order
     c.pop(str(farmer_id), None)
     _save_session()
-    flash('Ordine inviato: l\'azienda riceverà i dettagli e potrà rispondere', 'success')
+    flash('Ordine inviato: l\'azienda riceverà i dettagli e ti contatterà', 'success')
+    if is_auth:
+        return redirect(url_for('profiles.my_client_orders'))
     return redirect(_profile_url_for_farmer(farmer))
 
 @cart.route('/orders/accept/<int:order_id>', methods=['POST'])
@@ -280,6 +251,18 @@ def accept_order(order_id):
         return redirect(url_for('profiles.view_profile', username=current_user.username))
     order.status = 'accepted'
     db.session.commit()
+    # Send in-app message if client is registered
+    if order.client_id:
+        try:
+            msg = Message(
+                content=f"Il tuo ordine #{order.id} è stato accettato! L'azienda ti contatterà a breve per i dettagli.",
+                sender_id=current_user.id,
+                recipient_id=order.client_id
+            )
+            db.session.add(msg)
+            db.session.commit()
+        except Exception:
+            pass
     # Send acceptance email to client
     if order.client_email:
         try:
@@ -304,6 +287,18 @@ def reject_order(order_id):
         return redirect(url_for('profiles.view_profile', username=current_user.username))
     order.status = 'rejected'
     db.session.commit()
+    # Send in-app message if client is registered
+    if order.client_id:
+        try:
+            msg = Message(
+                content=f"Il tuo ordine #{order.id} non può essere evaso al momento. Contatta l'azienda per maggiori informazioni.",
+                sender_id=current_user.id,
+                recipient_id=order.client_id
+            )
+            db.session.add(msg)
+            db.session.commit()
+        except Exception:
+            pass
     # Send rejection email to client
     if order.client_email:
         try:
@@ -316,4 +311,85 @@ def reject_order(order_id):
         except Exception:
             pass
     flash('Ordine rifiutato', 'info')
+    return redirect(request.referrer or url_for('profiles.my_orders'))
+
+
+@cart.route('/orders/bulk', methods=['POST'])
+@login_required
+def bulk_update_orders():
+    if not current_user.is_farmer:
+        flash('Solo gli agricoltori possono gestire gli ordini', 'warning')
+        return redirect(url_for('main.index'))
+
+    order_ids = request.form.getlist('order_ids')
+    action = request.form.get('action')
+
+    if not order_ids:
+        flash('Seleziona almeno un ordine', 'warning')
+        return redirect(request.referrer or url_for('profiles.my_orders'))
+
+    valid_actions = {'accept': 'accepted', 'reject': 'rejected'}
+    if action not in valid_actions:
+        flash('Azione non valida', 'danger')
+        return redirect(request.referrer or url_for('profiles.my_orders'))
+
+    orders = OrderRequest.query.filter(
+        OrderRequest.id.in_(order_ids),
+        OrderRequest.farmer_id == current_user.id,
+        OrderRequest.status == 'pending'
+    ).all()
+
+    for order in orders:
+        order.status = valid_actions[action]
+        if order.client_email:
+            try:
+                status_subject = "Ordine accettato" if action == 'accept' else "Ordine non accettato"
+                status_body = "Il tuo ordine è stato accettato!" if action == 'accept' else "L'ordine non può essere evaso al momento."
+                send_email(order.client_email, status_subject, f"""
+                    <h3>{status_body}</h3>
+                    <p><strong>Azienda:</strong> {current_user.company_name or current_user.username}</p>
+                    <p><strong>Totale:</strong> {order.total_price:.2f} €</p>
+                """)
+            except Exception:
+                pass
+    db.session.commit()
+    flash(f"Aggiornati {len(orders)} ordini", 'success')
+    return redirect(request.referrer or url_for('profiles.my_orders'))
+
+
+@cart.route('/orders/reply/<int:order_id>', methods=['POST'])
+@login_required
+def reply_order(order_id):
+    order = OrderRequest.query.get_or_404(order_id)
+    if current_user.id != order.farmer_id:
+        flash('Non autorizzato', 'danger')
+        return redirect(url_for('main.index'))
+
+    message_text = (request.form.get('message') or '').strip()
+    if not message_text:
+        flash('Il messaggio non può essere vuoto', 'warning')
+        return redirect(request.referrer or url_for('profiles.my_orders'))
+
+    # Prefer in-app messages se il cliente è registrato, altrimenti email
+    if order.client_id:
+        msg = Message(
+            content=f"Risposta ordine #{order.id}: {message_text}",
+            sender_id=current_user.id,
+            recipient_id=order.client_id
+        )
+        db.session.add(msg)
+        db.session.commit()
+        flash('Risposta inviata al cliente', 'success')
+    elif order.client_email:
+        try:
+            send_email(order.client_email, f"Risposta al tuo ordine #{order.id}", f"""
+                <p><strong>{current_user.company_name or current_user.username}</strong> ha risposto al tuo ordine:</p>
+                <blockquote>{message_text}</blockquote>
+            """)
+            flash('Risposta inviata via email al cliente', 'success')
+        except Exception:
+            flash('Impossibile inviare il messaggio', 'danger')
+    else:
+        flash('Mancano i contatti del cliente', 'warning')
+
     return redirect(request.referrer or url_for('profiles.my_orders'))

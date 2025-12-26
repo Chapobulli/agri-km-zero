@@ -173,9 +173,6 @@ def my_orders():
 @profiles.route('/my-client-orders')
 @login_required
 def my_client_orders():
-    if current_user.is_farmer:
-        flash('Questa pagina è per i clienti', 'warning')
-        return redirect(url_for('main.index'))
     orders = OrderRequest.query.filter_by(client_id=current_user.id).order_by(OrderRequest.created_at.desc()).all()
     return render_template('my_client_orders.html', orders=orders)
 

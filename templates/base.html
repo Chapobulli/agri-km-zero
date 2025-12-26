@@ -9,7 +9,7 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light main-nav">
+    <nav class="navbar navbar-expand-lg navbar-light main-nav shadow-sm sticky-top" style="background:#fdfdfb;">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
                 <img src="/static/images/logo/logo.png" alt="Agri KM Zero" onerror="this.src='https://via.placeholder.com/40x40/6B8E23/ffffff?text=AKZ'">
@@ -31,7 +31,7 @@
                         </div>
                     </li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('profiles.companies') }}">Aziende</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% if current_user.is_authenticated %}{{ url_for('messages.inbox') }}{% else %}{{ url_for('auth.register') }}{% endif %}">Contatti</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% if current_user.is_authenticated %}{{ url_for('messages.inbox') }}{% else %}{{ url_for('auth.register') }}{% endif %}">Messaggi</a></li>
                     {% if current_user.is_authenticated and current_user.is_farmer %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('profiles.my_orders') }}">
@@ -41,10 +41,10 @@
                             {% endif %}
                         </a>
                     </li>
-                    {% elif current_user.is_authenticated and not current_user.is_farmer %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('profiles.my_client_orders') }}">I miei ordini</a></li>
                     {% endif %}
-                    <li class="nav-item"><a class="nav-link" href="{% if current_user.is_authenticated and current_user.is_farmer %}{{ url_for('profiles.view_company', slug=current_user.company_slug or current_user.compute_company_slug()) }}{% elif current_user.is_authenticated %}{{ url_for('profiles.view_profile', username=current_user.username) }}{% else %}{{ url_for('auth.login') }}{% endif %}">Carrello</a></li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('profiles.my_client_orders') }}">Acquisti</a></li>
+                    {% endif %}
                 </ul>
                 <div class="nav-actions ml-lg-3">
                     {% if current_user.is_authenticated %}
@@ -94,7 +94,7 @@
                         {% if current_user.is_authenticated and current_user.is_farmer %}
                         <li><a href="{{ url_for('products.add_product') }}">Aggiungi prodotto</a></li>
                         {% endif %}
-                        <li><a href="{% if current_user.is_authenticated %}{{ url_for('messages.inbox') }}{% else %}{{ url_for('auth.register') }}{% endif %}">Contatti</a></li>
+                        <li><a href="{% if current_user.is_authenticated %}{{ url_for('messages.inbox') }}{% else %}{{ url_for('auth.register') }}{% endif %}">Messaggi</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3 mb-4">

@@ -3,50 +3,99 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="mb-0"><i class="fas fa-receipt"></i> I miei ordini</h3>
-    <a href="{% if current_user.is_farmer %}{{ url_for('profiles.view_company', slug=current_user.company_slug or current_user.compute_company_slug()) }}{% else %}{{ url_for('profiles.view_profile', username=current_user.username) }}{% endif %}" class="btn btn-outline-secondary btn-sm">Torna alla pagina</a>
+    <div class="d-flex align-items-center">
+      <a href="{% if current_user.is_farmer %}{{ url_for('profiles.view_company', slug=current_user.company_slug or current_user.compute_company_slug()) }}{% else %}{{ url_for('profiles.view_profile', username=current_user.username) }}{% endif %}" class="btn btn-outline-secondary btn-sm mr-2">Pagina azienda</a>
+      <a href="{{ url_for('messages.inbox') }}" class="btn btn-outline-primary btn-sm">Messaggi</a>
+    </div>
   </div>
   {% if orders %}
-  <div class="table-responsive">
-    <table class="table table-sm">
-      <thead>
-        <tr>
-          <th>#</th><th>Cliente</th><th>Contatti</th><th>Totale</th><th>Stato</th><th>Azione</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for o in orders %}
-        <tr>
-          <td>{{ o.id }}</td>
-          <td>{{ o.client_name or '—' }}</td>
-          <td>
-            {% if o.client_phone %}<div><i class="fas fa-phone"></i> {{ o.client_phone }}</div>{% endif %}
-            {% if o.client_email %}<div><i class="fas fa-envelope"></i> {{ o.client_email }}</div>{% endif %}
-            {% if o.delivery_requested %}<div><i class="fas fa-map-marker-alt"></i> {{ o.delivery_address }}</div>{% endif %}
-          </td>
-          <td class="text-success"><strong>{{ '%.2f'|format(o.total_price) }} €</strong></td>
-          <td>
-            {% if o.status == 'pending' %}<span class="badge badge-warning">In attesa</span>
-            {% elif o.status == 'accepted' %}<span class="badge badge-success">Accettato</span>
-            {% else %}<span class="badge badge-secondary">Rifiutato</span>
-            {% endif %}
-          </td>
-          <td>
-            {% if o.status == 'pending' %}
-            <form method="POST" action="{{ url_for('cart.accept_order', order_id=o.id) }}" class="d-inline">
-              <button class="btn btn-sm btn-success">Accetta</button>
-            </form>
-            <form method="POST" action="{{ url_for('cart.reject_order', order_id=o.id) }}" class="d-inline">
-              <button class="btn btn-sm btn-outline-danger">Rifiuta</button>
-            </form>
-            {% else %}
-              <small class="text-muted">Nessuna azione</small>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+  <form method="POST" action="{{ url_for('cart.bulk_update_orders') }}">
+    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+      <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="selectAll">
+        <label class="custom-control-label" for="selectAll">Seleziona tutti</label>
+      </div>
+      <div>
+        <button type="submit" name="action" value="accept" class="btn btn-sm btn-success mr-2">Accetta selezionati</button>
+        <button type="submit" name="action" value="reject" class="btn btn-sm btn-outline-danger">Rifiuta selezionati</button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th style="width:40px;"></th><th>#</th><th>Cliente</th><th>Contatti</th><th>Totale</th><th>Stato</th><th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in orders %}
+          <tr class="{% if o.status == 'accepted' %}table-success{% elif o.status == 'rejected' %}table-light{% endif %}">
+            <td>
+              {% if o.status == 'pending' %}
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input order-checkbox" id="order-{{ o.id }}" name="order_ids" value="{{ o.id }}">
+                <label class="custom-control-label" for="order-{{ o.id }}"></label>
+              </div>
+              {% endif %}
+            </td>
+            <td class="font-weight-bold">#{{ o.id }}</td>
+            <td>
+              {% if o.client_id %}
+              <a href="{{ url_for('messages.conversation', user_id=o.client_id) }}">{{ o.client_name or '—' }}</a>
+              {% else %}
+              {{ o.client_name or 'Ospite' }}
+              {% endif %}
+            </td>
+            <td>
+              {% if o.client_phone %}<div><i class="fas fa-phone"></i> {{ o.client_phone }}</div>{% endif %}
+              {% if o.client_email %}<div><i class="fas fa-envelope"></i> {{ o.client_email }}</div>{% endif %}
+              {% if o.delivery_requested %}<div><i class="fas fa-map-marker-alt"></i> {{ o.delivery_address }}</div>{% else %}<div><i class="fas fa-store"></i> Ritiro</div>{% endif %}
+            </td>
+            <td class="text-success"><strong>{{ '%.2f'|format(o.total_price) }} €</strong></td>
+            <td>
+              {% if o.status == 'pending' %}<span class="badge badge-warning">In attesa</span>
+              {% elif o.status == 'accepted' %}<span class="badge badge-success">Accettato</span>
+              {% else %}<span class="badge badge-secondary">Rifiutato</span>
+              {% endif %}
+            </td>
+            <td style="min-width:260px;">
+              {% if o.status == 'pending' %}
+              <form method="POST" action="{{ url_for('cart.accept_order', order_id=o.id) }}" class="d-inline">
+                <button class="btn btn-sm btn-success">Accetta</button>
+              </form>
+              <form method="POST" action="{{ url_for('cart.reject_order', order_id=o.id) }}" class="d-inline">
+                <button class="btn btn-sm btn-outline-danger">Rifiuta</button>
+              </form>
+              {% else %}
+                <small class="text-muted mr-3">Gestito</small>
+              {% endif %}
+              <form method="POST" action="{{ url_for('cart.reply_order', order_id=o.id) }}" class="mt-2">
+                <div class="input-group input-group-sm">
+                  <input type="text" name="message" class="form-control" placeholder="Rispondi al cliente" {% if not o.client_id and not o.client_email %}disabled{% endif %}>
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-primary" type="submit" {% if not o.client_id and not o.client_email %}disabled{% endif %}>Invia</button>
+                  </div>
+                </div>
+                {% if not o.client_id and not o.client_email %}
+                  <small class="text-muted">Nessun contatto disponibile</small>
+                {% endif %}
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
+  <script>
+    // Seleziona tutti i checkbox
+    const selectAll = document.getElementById('selectAll');
+    if (selectAll) {
+      selectAll.addEventListener('change', function() {
+        document.querySelectorAll('.order-checkbox').forEach(cb => cb.checked = selectAll.checked);
+      });
+    }
+  </script>
   {% else %}
     <div class="alert alert-info">Nessun ordine al momento.</div>
   {% endif %}

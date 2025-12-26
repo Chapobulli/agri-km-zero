@@ -33,7 +33,10 @@
           {% else %}
           <p class="mb-2"><small><i class="fas fa-store"></i> Ritiro in azienda</small></p>
           {% endif %}
-          <p class="mb-0"><small class="text-muted">{{ o.created_at.strftime('%d/%m/%Y %H:%M') }}</small></p>
+          <p class="mb-2"><small class="text-muted">{{ o.created_at.strftime('%d/%m/%Y %H:%M') }}</small></p>
+          <a class="btn btn-outline-primary btn-sm btn-block" href="{{ url_for('messages.conversation', user_id=o.farmer_id) }}">
+            <i class="fas fa-comments"></i> Scrivi all'azienda
+          </a>
         </div>
       </div>
     </div>

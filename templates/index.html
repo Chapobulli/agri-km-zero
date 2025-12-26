@@ -8,8 +8,14 @@
             <div class="col-lg-7 hero-visual" style="background-image: url('/static/images/hero/hero.png');">
                 <div class="hero-overlay">
                     <span class="badge badge-pill badge-light text-success mb-3">Filiera corta e sostenibile</span>
-                    <h1 class="mb-3">Dal campo alla tavola</h1>
-                    <p class="lead mb-4">Acquista prodotti freschi e locali direttamente dagli agricoltori vicino a te. Nessun intermediario, solo qualità.</p>
+                    <h1 class="mb-3">Scopri, ordina, parla con l'azienda</h1>
+                    <p class="lead mb-4">Scegli i prodotti freschi vicino a te e organizza consegna o ritiro con un messaggio diretto al produttore.</p>
+                    <div class="d-flex flex-wrap mb-4">
+                        <a href="{{ url_for('profiles.companies') }}" class="btn btn-success btn-lg mr-2 mb-2">Esplora aziende</a>
+                        {% if not current_user.is_authenticated %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-lg mb-2">Apri la tua vetrina</a>
+                        {% endif %}
+                    </div>
                     <form class="hero-filters" method="get" action="{{ url_for('main.index') }}">
                         <div class="form-row">
                             <div class="form-group col-md-5 mb-2">
@@ -38,7 +44,8 @@
                     <div class="d-flex flex-wrap align-items-center mt-3 text-white-50">
                         <span class="mr-3"><i class="fas fa-map-marker-alt"></i> Prodotti locali</span>
                         <span class="mr-3"><i class="fas fa-leaf"></i> Stagionali</span>
-                        <span><i class="fas fa-handshake"></i> Con filiera corta</span>
+                        <span class="mr-3"><i class="fas fa-handshake"></i> Con filiera corta</span>
+                        <span><i class="fas fa-comments"></i> Messaggi rapidi</span>
                     </div>
                 </div>
             </div>

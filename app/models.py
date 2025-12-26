@@ -87,3 +87,6 @@ class OrderRequest(db.Model):
     total_price = db.Column(db.Float, default=0.0)
     status = db.Column(db.String(20), default='pending')  # pending|accepted|rejected
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    
+    farmer = db.relationship('User', foreign_keys=[farmer_id], backref='received_orders')
+    client = db.relationship('User', foreign_keys=[client_id], backref='placed_orders')
