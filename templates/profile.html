@@ -2,9 +2,9 @@
 {% block content %}
 {% if farmer %}
 <div class="company-header" style="position:relative;">
-    <img src="{{ (user.company_cover | url_or_local) or '/static/images/hero/hero.png' }}" alt="Cover" class="img-fluid w-100" style="max-height:300px;object-fit:cover;" onerror="this.src='https://via.placeholder.com/1200x300/cccccc/000?text=Copertina'">
+    <img src="{{ (user.company_cover | url_or_local) or 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=300&fit=crop' }}" alt="Cover" class="img-fluid w-100" style="max-height:300px;object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=300&fit=crop'">
     <div class="d-flex align-items-center p-3" style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.4);border-radius:8px;">
-        <img src="{{ (user.company_logo | url_or_local) or '/static/images/logo/logo.png' }}" alt="Logo" class="mr-3" style="height:60px;width:60px;object-fit:cover;border-radius:8px;" onerror="this.src='https://via.placeholder.com/60x60/4CAF50/ffffff?text=Logo'">
+        <img src="{{ (user.company_logo | url_or_local) or 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=60&h=60&fit=crop' }}" alt="Logo" class="mr-3" style="height:60px;width:60px;object-fit:cover;border-radius:8px;" onerror="this.src='https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=60&h=60&fit=crop'">
         <div class="text-white">
             <h2 class="m-0">{{ user.company_name or user.username }}</h2>
             <small><i class="fas fa-map-marker-alt"></i> {{ user.address or 'Posizione non impostata' }}</small>
@@ -29,7 +29,7 @@
                     {% for p in products %}
                     <div class="col-md-4 mb-4">
                         <div class="card h-100 shadow-sm">
-                            <img src="{{ (p.image_path | url_or_local) or 'https://via.placeholder.com/400x250/eeeeee/555?text=Foto+prodotto' }}" class="card-img-top" alt="Prodotto" style="height: 200px; object-fit: cover;">
+                            <img src="{{ (p.image_path | url_or_local) or 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=250&fit=crop' }}" class="card-img-top" alt="Prodotto" style="height: 200px; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=250&fit=crop'">
                             <div class="card-body">
                                 <h6 class="card-title font-weight-bold">{{ p.name }}</h6>
                                 <p class="small text-muted">{{ p.description or 'Nessuna descrizione' }}</p>
