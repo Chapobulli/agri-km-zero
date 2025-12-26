@@ -116,11 +116,27 @@ def ensure_unique_slug(base_slug, user_id):
     return base_slug
 
 
+def get_farmer_by_slug(slug):
+    # Try direct match on stored slug
+    farmer = User.query.filter_by(company_slug=slug, is_farmer=True).first()
+    if farmer:
+        return farmer
+    # Try to compute slug for farmers missing the field
+    missing_slug_farmers = User.query.filter_by(is_farmer=True, company_slug=None).all()
+    for f in missing_slug_farmers:
+        computed = ensure_unique_slug(slugify(f.company_name or f.username), f.id)
+        if computed == slug:
+            f.company_slug = computed
+            db.session.commit()
+            return f
+    return None
+
+
 @profiles.route('/c/<slug>')
 def view_company(slug):
-    user = User.query.filter_by(company_slug=slug, is_farmer=True).first()
+    user = get_farmer_by_slug(slug)
     if not user:
-        # fallback: maybe passed username
+        # fallback: maybe passed username directly
         user = User.query.filter_by(username=slug, is_farmer=True).first_or_404()
         if not user.company_slug:
             user.company_slug = ensure_unique_slug(slugify(user.company_name or user.username), user.id)
@@ -167,4 +183,11 @@ def my_client_orders():
 @profiles.route('/companies')
 def companies():
     farmers = User.query.filter_by(is_farmer=True).all()
+    updated = False
+    for f in farmers:
+        if not f.company_slug:
+            f.company_slug = ensure_unique_slug(slugify(f.company_name or f.username), f.id)
+            updated = True
+    if updated:
+        db.session.commit()
     return render_template('companies.html', farmers=farmers)
