@@ -163,13 +163,15 @@
                                     <input type="text" name="address" class="form-control" placeholder="Via, numero, città">
                                 </div>
                             </div>
-                            <button class="btn btn-success btn-block mt-2" type="submit"><i class="fas fa-paper-plane"></i> Invia Ordine</button>
+                            <div class="d-flex flex-column flex-sm-row mt-2">
+                                <button class="btn btn-success btn-block mr-sm-2 mb-2 mb-sm-0" type="submit"><i class="fas fa-paper-plane"></i> Invia Ordine</button>
+                                {% if user.phone %}
+                                <button class="btn btn-outline-success btn-block" type="submit" formmethod="POST" formaction="{{ url_for('cart.whatsapp_order', farmer_id=user.id) }}">
+                                    <i class="fab fa-whatsapp"></i> Prepara WhatsApp
+                                </button>
+                                {% endif %}
+                            </div>
                         </form>
-                        {% if user.phone %}
-                        <a class="btn btn-outline-success btn-block mt-2" href="{{ url_for('cart.whatsapp_order', farmer_id=user.id) }}">
-                            <i class="fab fa-whatsapp"></i> Invia su WhatsApp
-                        </a>
-                        {% endif %}
                     {% else %}
                         <p class="text-muted mb-0">Il carrello è vuoto. Aggiungi prodotti per inviare un ordine.</p>
                     {% endif %}

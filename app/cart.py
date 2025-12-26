@@ -92,7 +92,7 @@ def clear_cart(farmer_id):
     return redirect(_profile_url_for_farmer(farmer))
 
 
-@cart.route('/cart/whatsapp/<int:farmer_id>', methods=['GET'])
+@cart.route('/cart/whatsapp/<int:farmer_id>', methods=['GET', 'POST'])
 def whatsapp_order(farmer_id):
     c = _get_cart()
     farmer_cart = c.get(str(farmer_id))
@@ -103,6 +103,13 @@ def whatsapp_order(farmer_id):
     if not farmer.phone:
         flash('Questo venditore non ha ancora aggiunto un numero WhatsApp', 'warning')
         return redirect(_profile_url_for_farmer(farmer))
+    # Prefer data from submitted form (guests) and fallback to logged user data
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
+    phone_client = request.form.get('phone', '').strip()
+    delivery = request.form.get('delivery', 'off') in ['on', 'true', '1']
+    address = request.form.get('address', '').strip()
+
     lines = [f"Ordine per {farmer.company_name or farmer.username}"]
     total = 0.0
     for _, item in farmer_cart.items():
@@ -119,7 +126,13 @@ def whatsapp_order(farmer_id):
         if current_user.phone:
             lines.append(f"Telefono: {current_user.phone}")
     else:
-        lines.append("Cliente: ospite")
+        lines.append(f"Cliente: {name or 'ospite'}")
+        if email:
+            lines.append(f"Email: {email}")
+        if phone_client:
+            lines.append(f"Telefono: {phone_client}")
+        if delivery and address:
+            lines.append(f"Consegna: {address}")
     # Sanitize phone (strip spaces/+)
     phone_digits = ''.join(ch for ch in farmer.phone if ch.isdigit() or ch == '+')
     if phone_digits.startswith('00'):
