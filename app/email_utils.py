@@ -39,7 +39,7 @@ def _send_via_sendgrid(to_email: str, subject: str, html_content: str) -> bool:
         'from': {'email': MAIL_FROM, 'name': 'Agri KM Zero'},
         'content': [{'type': 'text/html', 'value': html_content}]
     }
-    resp = requests.post(SENDGRID_URL, headers=headers, json=data, timeout=15)
+    resp = requests.post(SENDGRID_URL, headers=headers, json=data, timeout=8)
     if 200 <= resp.status_code < 300:
         return True
     logging.error("SendGrid error %s: %s", resp.status_code, resp.text)
@@ -57,7 +57,7 @@ def _send_via_smtp(to_email: str, subject: str, html_content: str) -> bool:
     msg.set_content("This email requires an HTML-compatible client.")
     msg.add_alternative(html_content, subtype='html')
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=20) as server:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=5) as server:
             if SMTP_STARTTLS:
                 server.starttls()
             server.login(SMTP_USER, SMTP_PASS)

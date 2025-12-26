@@ -131,10 +131,10 @@ def whatsapp_order(farmer_id):
     farmer = User.query.get_or_404(farmer_id)
     if not farmer_cart:
         flash('Il carrello è vuoto', 'warning')
-        return redirect(url_for('profiles.view_profile', username=farmer.username))
+        return redirect(_profile_url_for_farmer(farmer))
     if not farmer.phone:
         flash('Questo venditore non ha ancora aggiunto un numero WhatsApp', 'warning')
-        return redirect(url_for('profiles.view_profile', username=farmer.username))
+        return redirect(_profile_url_for_farmer(farmer))
     lines = [f"Ordine per {farmer.company_name or farmer.username}"]
     total = 0.0
     for _, item in farmer_cart.items():
@@ -148,8 +148,18 @@ def whatsapp_order(farmer_id):
             lines.append(f"Email: {current_user.email}")
         if current_user.address:
             lines.append(f"Indirizzo: {current_user.address}")
+        if current_user.phone:
+            lines.append(f"Telefono: {current_user.phone}")
+    else:
+        lines.append("Cliente: ospite")
+    # Sanitize phone (strip spaces/+)
+    phone_digits = ''.join(ch for ch in farmer.phone if ch.isdigit() or ch == '+')
+    if phone_digits.startswith('00'):
+        phone_digits = phone_digits[2:]
+    if phone_digits.startswith('+'):
+        phone_digits = phone_digits[1:]
     whatsapp_text = quote("\n".join(lines))
-    return redirect(f"https://wa.me/{farmer.phone}?text={whatsapp_text}")
+    return redirect(f"https://wa.me/{phone_digits}?text={whatsapp_text}")
 
 @cart.route('/orders/create/<int:farmer_id>', methods=['POST'])
 def create_order(farmer_id):
