@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from . import db
 from .models import Product, Message, User, OrderRequest
 from .email_utils import send_email
+from urllib.parse import quote
 import json
 
 cart = Blueprint('cart', __name__)
@@ -115,6 +116,34 @@ def send_order(farmer_id):
     flash('Ordine inviato all\'azienda via messaggio', 'success')
     return redirect(url_for('messages.conversation', user_id=farmer_id))
 
+
+@cart.route('/cart/whatsapp/<int:farmer_id>', methods=['GET'])
+def whatsapp_order(farmer_id):
+    c = _get_cart()
+    farmer_cart = c.get(str(farmer_id))
+    farmer = User.query.get_or_404(farmer_id)
+    if not farmer_cart:
+        flash('Il carrello è vuoto', 'warning')
+        return redirect(url_for('profiles.view_profile', username=farmer.username))
+    if not farmer.phone:
+        flash('Questo venditore non ha ancora aggiunto un numero WhatsApp', 'warning')
+        return redirect(url_for('profiles.view_profile', username=farmer.username))
+    lines = [f"Ordine per {farmer.company_name or farmer.username}"]
+    total = 0.0
+    for _, item in farmer_cart.items():
+        subtotal = float(item['price']) * int(item['qty'])
+        total += subtotal
+        lines.append(f"- {item['name']} x{item['qty']} {item['unit']} → {subtotal:.2f} €")
+    lines.append(f"Totale: {total:.2f} €")
+    if getattr(current_user, 'is_authenticated', False):
+        lines.append(f"Cliente: {current_user.display_name or current_user.username}")
+        if current_user.email:
+            lines.append(f"Email: {current_user.email}")
+        if current_user.address:
+            lines.append(f"Indirizzo: {current_user.address}")
+    whatsapp_text = quote("\n".join(lines))
+    return redirect(f"https://wa.me/{farmer.phone}?text={whatsapp_text}")
+
 @cart.route('/orders/create/<int:farmer_id>', methods=['POST'])
 def create_order(farmer_id):
     # Allow guests to place orders: collect contact info
@@ -167,6 +196,25 @@ def create_order(farmer_id):
                 return redirect(url_for('profiles.view_profile', username=farmer.username))
             import time
             time.sleep(0.5 * (attempt + 1))
+
+    # If l'utente è registrato, invia anche un messaggio privato al venditore
+    if order.client_id:
+        try:
+            lines = [f"Nuovo ordine da {order.client_name or 'Cliente'}"]
+            for _, item in farmer_cart.items():
+                lines.append(f"- {item['name']} x{item['qty']} {item['unit']}")
+            lines.append(f"Totale: {order.total_price:.2f} €")
+            if order.delivery_requested and order.delivery_address:
+                lines.append(f"Consegna: {order.delivery_address}")
+            if order.client_phone:
+                lines.append(f"Telefono: {order.client_phone}")
+            if order.client_email:
+                lines.append(f"Email: {order.client_email}")
+            msg = Message(content="\n".join(lines), sender_id=order.client_id, recipient_id=farmer_id)
+            db.session.add(msg)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
     # Notify farmer via email (if available)
     try:
         farmer = User.query.get_or_404(farmer_id)

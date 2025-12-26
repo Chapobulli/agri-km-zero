@@ -64,7 +64,7 @@
                                     <h6 class="card-title mb-1">{{ item.name }}</h6>
                                     <p class="product-price mb-2">{{ '%.2f'|format(item.price|float) }} €</p>
                                     <p class="small text-muted mb-3">{{ item.farmer_name }}{% if item.farmer_city %} · {{ item.farmer_city }}{% endif %}</p>
-                                    <a href="{% if current_user.is_authenticated %}{{ url_for('messages.conversation', user_id=item.user_id) }}{% else %}{{ url_for('auth.register') }}{% endif %}" class="btn btn-success btn-block btn-sm">Contatta</a>
+                                    <a href="{{ url_for('profiles.view_profile', username=item.farmer_username) }}" class="btn btn-success btn-block btn-sm">Vai all'azienda</a>
                                 </div>
                             </div>
                         </div>
@@ -113,7 +113,7 @@
                         <h5 class="card-title">{{ item.name }}</h5>
                         <p class="product-price">{{ '%.2f'|format(item.price|float) }} €</p>
                         <p class="small text-muted mb-2">{{ item.farmer_name }}{% if item.farmer_city %} · {{ item.farmer_city }}{% endif %}</p>
-                        <a href="{% if current_user.is_authenticated %}{{ url_for('messages.conversation', user_id=item.user_id) }}{% else %}{{ url_for('auth.register') }}{% endif %}" class="btn btn-success btn-block">Contatta l'Azienda</a>
+                        <a href="{{ url_for('profiles.view_profile', username=item.farmer_username) }}" class="btn btn-success btn-block">Vai all'azienda</a>
                     </div>
                 </div>
             </div>

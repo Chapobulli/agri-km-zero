@@ -21,6 +21,7 @@ class User(UserMixin, db.Model):
     # Profile fields (client)
     bio = db.Column(db.Text)
     profile_photo = db.Column(db.String(300))
+    phone = db.Column(db.String(50))
     # Company page fields (farmer)
     company_name = db.Column(db.String(200))
     company_description = db.Column(db.Text)

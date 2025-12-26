@@ -33,6 +33,11 @@
                         {{ form.company_name(class="form-control form-control-lg") }}
                     </div>
                     <div class="form-group mb-3">
+                        {{ form.phone.label(class="font-weight-bold") }}
+                        {{ form.phone(class="form-control", placeholder="Es: +393201234567") }}
+                        <small class="form-text text-muted">Usato per contatto diretto e WhatsApp</small>
+                    </div>
+                    <div class="form-group mb-3">
                         {{ form.company_description.label(class="font-weight-bold") }}
                         {{ form.company_description(class="form-control", rows="4", placeholder="Descrivi la tua azienda agricola...") }}
                         <small class="form-text text-muted">Lascia vuoto per mantenere il valore attuale</small>

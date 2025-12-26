@@ -34,6 +34,7 @@ def edit_profile():
         if request.method == 'GET':
             form.username.data = current_user.username
             form.display_name.data = current_user.display_name
+            form.phone.data = current_user.phone
             form.company_name.data = current_user.company_name
             form.company_description.data = current_user.company_description
             form.province.data = current_user.province
@@ -52,6 +53,7 @@ def edit_profile():
             current_user.username = form.username.data
             if form.display_name.data:
                 current_user.display_name = form.display_name.data
+            current_user.phone = form.phone.data
             current_user.company_name = form.company_name.data
             current_user.province = form.province.data
             current_user.city = form.city.data

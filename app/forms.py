@@ -31,6 +31,7 @@ class MessageForm(FlaskForm):
 class FarmerProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=150)])
     display_name = StringField('Nome Visualizzato', validators=[Optional(), Length(max=150)])
+    phone = StringField('Telefono / WhatsApp', validators=[Optional(), Length(max=50)])
     company_name = StringField('Nome Azienda', validators=[DataRequired(), Length(max=200)])
     company_description = TextAreaField('Descrizione Azienda', validators=[Optional()])
     province = SelectField('Provincia', choices=[], validators=[DataRequired()])
