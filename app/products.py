@@ -10,12 +10,18 @@ products = Blueprint('products', __name__)
 
 @products.route('/products')
 def list_products():
-    # Pagina pubblica - mostra tutti i prodotti
-    all_products = Product.query.all()
-    # Add farmer info to each product
+    province = request.args.get('province', '').strip()
+    city = request.args.get('city', '').strip()
+
+    query = db.session.query(Product, User).join(User, Product.user_id == User.id).filter(User.is_farmer == True)
+    if province:
+        query = query.filter(User.province == province)
+    if city:
+        query = query.filter(User.city == city)
+
+    rows = query.all()
     products_data = []
-    for p in all_products:
-        farmer = db.session.get(User, p.user_id)
+    for p, farmer in rows:
         products_data.append({
             'id': p.id,
             'name': p.name,
@@ -30,7 +36,15 @@ def list_products():
             'farmer_city': farmer.city if farmer else None,
             'farmer_province': farmer.province if farmer else None
         })
-    return render_template('products.html', products=products_data)
+
+    province_options = sorted({f.province for f in User.query.filter(User.is_farmer == True, User.province.isnot(None)).all()})
+    city_options = []
+    if province:
+        city_options = sorted({f.city for f in User.query.filter(User.is_farmer == True, User.province == province, User.city.isnot(None)).all()})
+    else:
+        city_options = sorted({f.city for f in User.query.filter(User.is_farmer == True, User.city.isnot(None)).all()})
+
+    return render_template('products.html', products=products_data, provinces=province_options, cities=city_options, selected_province=province, selected_city=city)
 
 @products.route('/add_product', methods=['GET', 'POST'])
 @login_required

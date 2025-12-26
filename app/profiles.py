@@ -179,7 +179,16 @@ def my_client_orders():
 
 @profiles.route('/companies')
 def companies():
-    farmers = User.query.filter_by(is_farmer=True).all()
+    province = request.args.get('province', '').strip()
+    city = request.args.get('city', '').strip()
+
+    query = User.query.filter_by(is_farmer=True)
+    if province:
+        query = query.filter_by(province=province)
+    if city:
+        query = query.filter_by(city=city)
+
+    farmers = query.all()
     updated = False
     for f in farmers:
         if not f.company_slug:
@@ -187,4 +196,12 @@ def companies():
             updated = True
     if updated:
         db.session.commit()
-    return render_template('companies.html', farmers=farmers)
+
+    province_options = sorted({f.province for f in User.query.filter_by(is_farmer=True).filter(User.province.isnot(None)).all()})
+    city_options = []
+    if province:
+        city_options = sorted({f.city for f in User.query.filter_by(is_farmer=True, province=province).filter(User.city.isnot(None)).all()})
+    else:
+        city_options = sorted({f.city for f in User.query.filter_by(is_farmer=True).filter(User.city.isnot(None)).all()})
+
+    return render_template('companies.html', farmers=farmers, provinces=province_options, cities=city_options, selected_province=province, selected_city=city)

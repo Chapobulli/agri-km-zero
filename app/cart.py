@@ -139,6 +139,8 @@ def whatsapp_order(farmer_id):
         phone_digits = phone_digits[2:]
     if phone_digits.startswith('+'):
         phone_digits = phone_digits[1:]
+    if not phone_digits.startswith('39'):
+        phone_digits = '39' + phone_digits
     whatsapp_text = quote("\n".join(lines))
     return redirect(f"https://wa.me/{phone_digits}?text={whatsapp_text}")
 
