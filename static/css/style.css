@@ -430,6 +430,19 @@ body {
         font-size: 0.9rem;
     }
     
+    .hero-title {
+        font-size: 1.75rem !important;
+    }
+    
+    .hero-full {
+        min-height: 60vh !important;
+    }
+    
+    .btn-lg {
+        padding: 12px 24px !important;
+        font-size: 0.95rem !important;
+    }
+    
     .hero-image-large {
         max-height: 200px;
         border-radius: 10px;
