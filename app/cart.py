@@ -233,7 +233,7 @@ def create_order(farmer_id):
                 {'<p><strong>Consegna:</strong> ' + (order.delivery_address or '') + '</p>' if order.delivery_requested else ''}
                 <p>Accedi alla tua pagina per <strong>accettare</strong> o <strong>rifiutare</strong> l'ordine.</p>
             """
-            send_email(farmer.email, "Agri KM Zero: nuovo ordine", html)
+            send_email(farmer.email, "OrtoVicino: nuovo ordine", html)
         # Send confirmation to client if email provided
         if order.client_email:
             client_items = []
