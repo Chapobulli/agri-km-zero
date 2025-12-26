@@ -6,6 +6,7 @@ from .forms import FarmerProfileForm, ClientProfileForm
 from .locations import get_provinces, get_cities
 from werkzeug.utils import secure_filename
 import os
+import re
 
 profiles = Blueprint('profiles', __name__)
 
@@ -63,6 +64,10 @@ def edit_profile():
             if form.address.data:
                 current_user.address = form.address.data
             current_user.delivery = form.delivery.data
+            # Aggiorna slug azienda (unico, basato su nome azienda)
+            if current_user.is_farmer:
+                base_slug = slugify(current_user.company_name or current_user.username)
+                current_user.company_slug = ensure_unique_slug(base_slug, current_user.id)
             logo_path = save_upload(form.company_logo.data, 'profiles')
             cover_path = save_upload(form.company_cover.data, 'profiles')
             if logo_path:
@@ -71,7 +76,7 @@ def edit_profile():
                 current_user.company_cover = cover_path
             db.session.commit()
             flash('✓ Profilo azienda aggiornato con successo!', 'success')
-            return redirect(url_for('profiles.view_profile', username=current_user.username))
+            return redirect(url_for('profiles.view_company', slug=current_user.company_slug))
         return render_template('profile_edit.html', farmer=True, form=form)
     else:
         form = ClientProfileForm()
@@ -97,17 +102,48 @@ def edit_profile():
         return render_template('profile_edit.html', farmer=False, form=form)
 
 
+def slugify(value):
+    slug = re.sub(r'[^a-zA-Z0-9]+', '-', value or '').strip('-').lower()
+    return slug or None
+
+
+def ensure_unique_slug(base_slug, user_id):
+    if not base_slug:
+        base_slug = f"azienda-{user_id}"
+    existing = User.query.filter(User.company_slug == base_slug, User.id != user_id).first()
+    if existing:
+        return f"{base_slug}-{user_id}"
+    return base_slug
+
+
+@profiles.route('/c/<slug>')
+def view_company(slug):
+    user = User.query.filter_by(company_slug=slug, is_farmer=True).first()
+    if not user:
+        # fallback: maybe passed username
+        user = User.query.filter_by(username=slug, is_farmer=True).first_or_404()
+        if not user.company_slug:
+            user.company_slug = ensure_unique_slug(slugify(user.company_name or user.username), user.id)
+            db.session.commit()
+        return redirect(url_for('profiles.view_company', slug=user.company_slug))
+    products = Product.query.filter_by(user_id=user.id).all()
+    orders = OrderRequest.query.filter_by(farmer_id=user.id).order_by(OrderRequest.created_at.desc()).all()
+    return render_template('profile.html', user=user, products=products, orders=orders, farmer=True)
+
+
 @profiles.route('/u/<username>')
 def view_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     if user.is_farmer:
-        # Load products for company page
-        products = Product.query.filter_by(user_id=user.id).all()
-        # Load orders for this farmer (latest first)
-        orders = OrderRequest.query.filter_by(farmer_id=user.id).order_by(OrderRequest.created_at.desc()).all()
-        return render_template('profile.html', user=user, products=products, orders=orders, farmer=True)
-    else:
-        return render_template('profile.html', user=user, farmer=False)
+        if user.company_slug:
+            return redirect(url_for('profiles.view_company', slug=user.company_slug))
+        else:
+            # generate slug on the fly
+            user.company_slug = ensure_unique_slug(slugify(user.company_name or user.username), user.id)
+            db.session.commit()
+            return redirect(url_for('profiles.view_company', slug=user.company_slug))
+    # non farmer profile
+    return render_template('profile.html', user=user, farmer=False)
 
 @profiles.route('/my-orders')
 @login_required

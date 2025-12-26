@@ -23,7 +23,7 @@
           </div>
           <hr>
           <p class="mb-2"><strong>Azienda:</strong> 
-            <a href="{{ url_for('profiles.view_profile', username=o.farmer.username) }}">
+            <a href="{{ url_for('profiles.view_company', slug=o.farmer.company_slug or o.farmer.compute_company_slug()) }}">
               {{ o.farmer.company_name or o.farmer.username }}
             </a>
           </p>

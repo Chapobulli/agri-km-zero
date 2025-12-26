@@ -47,8 +47,8 @@
                             <div class="border-top pt-2 mb-2">
                                 <small class="text-muted">
                                     <i class="fas fa-store"></i> 
-                                    {% if product.farmer_username %}
-                                        <a href="{{ url_for('profiles.view_profile', username=product.farmer_username) }}" 
+                                    {% if product.farmer_slug %}
+                                        <a href="{{ url_for('profiles.view_company', slug=product.farmer_slug) }}" 
                                            class="text-decoration-none">
                                             {{ product.farmer_name }}
                                         </a>

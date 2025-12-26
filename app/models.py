@@ -2,6 +2,7 @@ from . import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
+import re
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,6 +28,7 @@ class User(UserMixin, db.Model):
     company_description = db.Column(db.Text)
     company_logo = db.Column(db.String(300))
     company_cover = db.Column(db.String(300))
+    company_slug = db.Column(db.String(200))
     # Email verification and password reset
     email_verified = db.Column(db.Boolean, default=False)
     verification_token = db.Column(db.String(100))
@@ -49,6 +51,11 @@ class User(UserMixin, db.Model):
     def generate_reset_token(self):
         self.reset_token = secrets.token_urlsafe(32)
         return self.reset_token
+
+    def compute_company_slug(self):
+        base = self.company_name or self.username or f"user-{self.id}"
+        slug = re.sub(r'[^a-zA-Z0-9]+', '-', base).strip('-').lower()
+        return slug or f"azienda-{self.id}"
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)

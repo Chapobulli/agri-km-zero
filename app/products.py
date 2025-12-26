@@ -26,6 +26,7 @@ def list_products():
             'user_id': p.user_id,
             'farmer_name': farmer.company_name if farmer and farmer.company_name else (farmer.username if farmer else 'Sconosciuto'),
             'farmer_username': farmer.username if farmer else None,
+            'farmer_slug': farmer.company_slug if farmer else None,
             'farmer_city': farmer.city if farmer else None,
             'farmer_province': farmer.province if farmer else None
         })
@@ -55,7 +56,7 @@ def add_product():
         db.session.add(product)
         db.session.commit()
         flash('✓ Prodotto aggiunto con successo!', 'success')
-        return redirect(url_for('profiles.view_profile', username=current_user.username))
+        return redirect(url_for('profiles.view_company', slug=current_user.company_slug or current_user.compute_company_slug()))
     return render_template('add_product.html', form=form)
 
 @products.route('/product/<int:product_id>/edit', methods=['GET', 'POST'])
@@ -84,7 +85,7 @@ def edit_product(product_id):
             product.image_path = upload_result['secure_url']
         db.session.commit()
         flash('✓ Prodotto aggiornato con successo!', 'success')
-        return redirect(url_for('profiles.view_profile', username=current_user.username))
+        return redirect(url_for('profiles.view_company', slug=current_user.company_slug or current_user.compute_company_slug()))
     return render_template('edit_product.html', form=form, product=product)
 
 @products.route('/product/<int:product_id>/delete', methods=['POST'])
@@ -97,4 +98,4 @@ def delete_product(product_id):
     db.session.delete(product)
     db.session.commit()
     flash('✓ Prodotto eliminato con successo!', 'success')
-    return redirect(url_for('profiles.view_profile', username=current_user.username))
+    return redirect(url_for('profiles.view_company', slug=current_user.company_slug or current_user.compute_company_slug()))

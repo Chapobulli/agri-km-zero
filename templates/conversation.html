@@ -26,9 +26,9 @@
                     {% endif %}
                 </div>
             </div>
-            <a href="{{ url_for('profiles.view_profile', username=other_user.username) }}" 
-               class="btn btn-sm btn-light">
-                <i class="fas fa-user"></i> Profilo
+                <a href="{% if other_user.is_farmer %}{{ url_for('profiles.view_company', slug=other_user.company_slug or other_user.compute_company_slug()) }}{% else %}{{ url_for('profiles.view_profile', username=other_user.username) }}{% endif %}" 
+                    class="btn btn-sm btn-light">
+                    <i class="fas fa-user"></i> Profilo
             </a>
         </div>
         

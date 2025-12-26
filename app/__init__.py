@@ -111,6 +111,7 @@ def create_app():
                         ('bio', 'TEXT'),
                         ('profile_photo', 'VARCHAR(300)'),
                         ('display_name', 'VARCHAR(150)'),
+                        ('company_slug', 'VARCHAR(200)'),
                         ('phone', 'VARCHAR(50)'),
                         ('company_name', 'VARCHAR(200)'),
                         ('company_description', 'TEXT'),

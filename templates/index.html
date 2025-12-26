@@ -64,7 +64,7 @@
                                     <h6 class="card-title mb-1">{{ item.name }}</h6>
                                     <p class="product-price mb-2">{{ '%.2f'|format(item.price|float) }} €</p>
                                     <p class="small text-muted mb-3">{{ item.farmer_name }}{% if item.farmer_city %} · {{ item.farmer_city }}{% endif %}</p>
-                                    <a href="{{ url_for('profiles.view_profile', username=item.farmer_username) }}" class="btn btn-success btn-block btn-sm">Vai all'azienda</a>
+                                    <a href="{{ url_for('profiles.view_company', slug=item.farmer_slug) }}" class="btn btn-success btn-block btn-sm">Vai all'azienda</a>
                                 </div>
                             </div>
                         </div>
@@ -113,7 +113,7 @@
                         <h5 class="card-title">{{ item.name }}</h5>
                         <p class="product-price">{{ '%.2f'|format(item.price|float) }} €</p>
                         <p class="small text-muted mb-2">{{ item.farmer_name }}{% if item.farmer_city %} · {{ item.farmer_city }}{% endif %}</p>
-                        <a href="{{ url_for('profiles.view_profile', username=item.farmer_username) }}" class="btn btn-success btn-block">Vai all'azienda</a>
+                        <a href="{{ url_for('profiles.view_company', slug=item.farmer_slug) }}" class="btn btn-success btn-block">Vai all'azienda</a>
                     </div>
                 </div>
             </div>
@@ -204,7 +204,7 @@
                         {% if farmer.delivery %}
                         <span class="badge badge-success mb-2"><i class="fas fa-truck"></i> Consegna</span>
                         {% endif %}
-                        <a href="{{ url_for('profiles.view_profile', username=farmer.username) }}" class="btn btn-success btn-sm btn-block mt-2">
+                        <a href="{{ url_for('profiles.view_company', slug=farmer.company_slug or farmer.compute_company_slug()) }}" class="btn btn-success btn-sm btn-block mt-2">
                             <i class="fas fa-store"></i> Vedi Azienda
                         </a>
                     </div>
@@ -282,13 +282,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }).addTo(map);
         var farmers = [
             {% for f in farmers %}
-            {lat: {{ f.latitude or 'null' }}, lng: {{ f.longitude or 'null' }}, name: '{{ (f.company_name or f.username)|e }}', username: '{{ f.username|e }}', city: '{{ (f.city or '')|e }}', province: '{{ (f.province or '')|e }}'},
+            {lat: {{ f.latitude or 'null' }}, lng: {{ f.longitude or 'null' }}, name: '{{ (f.company_name or f.username)|e }}', slug: '{{ (f.company_slug or f.compute_company_slug())|e }}', city: '{{ (f.city or '')|e }}', province: '{{ (f.province or '')|e }}'},
             {% endfor %}
         ];
         function addMarker(f) {
             var m = L.marker([f.lat, f.lng]).addTo(map);
             var html = '<strong>' + f.name + '</strong><br>' + (f.city || '') + '<br>' +
-                       '<a href="' + '{{ url_for('profiles.view_profile', username='__USERNAME__') }}'.replace('__USERNAME__', f.username) + '">Vedi profilo</a>';
+                       '<a href="' + '{{ url_for('profiles.view_company', slug='__SLUG__') }}'.replace('__SLUG__', f.slug) + '">Vedi profilo</a>';
             m.bindPopup(html);
         }
         farmers.forEach(async function(f) {

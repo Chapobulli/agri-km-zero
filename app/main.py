@@ -56,6 +56,7 @@ def index():
                 'image_path': product.image_path,
                 'farmer_name': farmer.company_name or farmer.username,
                 'farmer_username': farmer.username,
+                'farmer_slug': farmer.company_slug or farmer.compute_company_slug(),
                 'farmer_city': farmer.city,
                 'farmer_province': farmer.province,
                 'farmer_address': farmer.address,

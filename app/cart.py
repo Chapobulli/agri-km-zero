@@ -14,6 +14,13 @@ def _get_cart():
 def _save_session():
     session.modified = True
 
+
+def _profile_url_for_farmer(farmer):
+    if farmer.is_farmer:
+        slug = farmer.company_slug or farmer.compute_company_slug()
+        return url_for('profiles.view_company', slug=slug)
+    return url_for('profiles.view_profile', username=farmer.username)
+
 @cart.route('/cart/add/<int:product_id>', methods=['POST'])
 def add_to_cart(product_id):
     product = Product.query.get_or_404(product_id)
@@ -35,7 +42,7 @@ def add_to_cart(product_id):
     _save_session()
     flash('✓ Prodotto aggiunto al carrello', 'success')
     farmer = User.query.get(farmer_id)
-    return redirect(url_for('profiles.view_profile', username=farmer.username))
+    return redirect(_profile_url_for_farmer(farmer))
 
 @cart.route('/cart/remove/<int:product_id>', methods=['POST'])
 def remove_from_cart(product_id):
@@ -50,7 +57,7 @@ def remove_from_cart(product_id):
         _save_session()
         flash('Prodotto rimosso dal carrello', 'info')
     farmer = User.query.get(farmer_id)
-    return redirect(url_for('profiles.view_profile', username=farmer.username))
+    return redirect(_profile_url_for_farmer(farmer))
 
 @cart.route('/cart/update/<int:product_id>', methods=['POST'])
 def update_cart(product_id):
@@ -82,7 +89,7 @@ def clear_cart(farmer_id):
     _save_session()
     flash('Carrello svuotato', 'info')
     farmer = User.query.get_or_404(farmer_id)
-    return redirect(url_for('profiles.view_profile', username=farmer.username))
+    return redirect(_profile_url_for_farmer(farmer))
 
 @cart.route('/cart/send/<int:farmer_id>', methods=['POST'])
 @login_required
@@ -92,7 +99,7 @@ def send_order(farmer_id):
     if not farmer_cart:
         flash('Il carrello è vuoto', 'warning')
         farmer = User.query.get_or_404(farmer_id)
-        return redirect(url_for('profiles.view_profile', username=farmer.username))
+        return redirect(_profile_url_for_farmer(farmer))
     # Compose order summary
     lines = [f"Nuovo ordine da {current_user.display_name or current_user.username}"]
     total = 0.0
@@ -152,7 +159,7 @@ def create_order(farmer_id):
     if not farmer_cart:
         flash('Il carrello è vuoto', 'warning')
         farmer = User.query.get_or_404(farmer_id)
-        return redirect(url_for('profiles.view_profile', username=farmer.username))
+        return redirect(_profile_url_for_farmer(farmer))
     name = request.form.get('name', '').strip()
     email = request.form.get('email', '').strip()
     phone = request.form.get('phone', '').strip()
@@ -252,7 +259,7 @@ def create_order(farmer_id):
     c.pop(str(farmer_id), None)
     _save_session()
     flash('Ordine inviato: l\'azienda riceverà i dettagli e potrà rispondere', 'success')
-    return redirect(url_for('profiles.view_profile', username=farmer.username))
+    return redirect(_profile_url_for_farmer(farmer))
 
 @cart.route('/orders/accept/<int:order_id>', methods=['POST'])
 @login_required
