@@ -115,10 +115,60 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p class="mb-0">&copy; 2025 OrtoVicino. Tutti i diritti riservati</p>
+                <p class="mb-0">&copy; 2025 OrtoVicino. Tutti i diritti riservati · <a href="#" id="manageCookiesLink" class="text-light">Gestisci cookie</a></p>
             </div>
         </div>
     </footer>
+    <!-- Cookie Banner -->
+    <div id="cookieBanner" class="cookie-banner d-none">
+        <div class="cookie-content">
+            <div>
+                <strong>Usiamo solo cookie essenziali e opzionali</strong>
+                <p class="mb-1 small">Puoi accettare tutti, rifiutare quelli non necessari o scegliere le preferenze.</p>
+            </div>
+            <div class="cookie-actions">
+                <button type="button" class="btn btn-link text-muted" id="cookieReject">Rifiuta non necessari</button>
+                <button type="button" class="btn btn-outline-secondary" id="cookiePrefs">Preferenze</button>
+                <button type="button" class="btn btn-success" id="cookieAccept">Accetta tutti</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cookie Preferences Modal -->
+    <div class="modal fade" id="cookiePreferencesModal" tabindex="-1" role="dialog" aria-labelledby="cookiePreferencesLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cookiePreferencesLabel">Preferenze Cookie</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="custom-control custom-checkbox mb-2">
+              <input type="checkbox" class="custom-control-input" id="cookieNecessary" checked disabled>
+              <label class="custom-control-label" for="cookieNecessary">Necessari (sempre attivi)</label>
+              <p class="small text-muted mb-0">Login, sicurezza, funzionalità di base del sito.</p>
+            </div>
+            <div class="custom-control custom-checkbox mb-2">
+              <input type="checkbox" class="custom-control-input" id="cookieAnalytics">
+              <label class="custom-control-label" for="cookieAnalytics">Analitici</label>
+              <p class="small text-muted mb-0">Statistiche anonime per migliorare l'esperienza.</p>
+            </div>
+            <div class="custom-control custom-checkbox mb-2">
+              <input type="checkbox" class="custom-control-input" id="cookieMarketing">
+              <label class="custom-control-label" for="cookieMarketing">Marketing</label>
+              <p class="small text-muted mb-0">Contenuti personalizzati o retargeting.</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Annulla</button>
+            <button type="button" class="btn btn-success" id="saveCookiePrefs">Salva preferenze</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -134,6 +184,83 @@
                 }, 5000);
             });
         });
+
+        // Simple cookie consent storage (no non-essentials loaded by default)
+        (function() {
+            const CONSENT_KEY = 'cookieConsent';
+
+            function getConsent() {
+                try {
+                    return JSON.parse(localStorage.getItem(CONSENT_KEY)) || null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function saveConsent(consent) {
+                localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
+            }
+
+            function hideBanner() {
+                const banner = document.getElementById('cookieBanner');
+                if (banner) banner.classList.add('d-none');
+            }
+
+            function showBanner() {
+                const banner = document.getElementById('cookieBanner');
+                if (banner) banner.classList.remove('d-none');
+            }
+
+            function openPrefs(consent) {
+                document.getElementById('cookieAnalytics').checked = !!(consent && consent.analytics);
+                document.getElementById('cookieMarketing').checked = !!(consent && consent.marketing);
+                $('#cookiePreferencesModal').modal('show');
+            }
+
+            function setConsent(consent) {
+                saveConsent(Object.assign({ timestamp: Date.now(), necessary: true }, consent));
+                hideBanner();
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const current = getConsent();
+                if (!current) {
+                    showBanner();
+                }
+
+                const acceptBtn = document.getElementById('cookieAccept');
+                const rejectBtn = document.getElementById('cookieReject');
+                const prefsBtn = document.getElementById('cookiePrefs');
+                const manageLink = document.getElementById('manageCookiesLink');
+                const savePrefsBtn = document.getElementById('saveCookiePrefs');
+
+                if (acceptBtn) acceptBtn.addEventListener('click', function() {
+                    setConsent({ analytics: true, marketing: true });
+                });
+
+                if (rejectBtn) rejectBtn.addEventListener('click', function() {
+                    setConsent({ analytics: false, marketing: false });
+                });
+
+                if (prefsBtn) prefsBtn.addEventListener('click', function() {
+                    openPrefs(current);
+                });
+
+                if (manageLink) manageLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openPrefs(getConsent());
+                });
+
+                if (savePrefsBtn) savePrefsBtn.addEventListener('click', function() {
+                    const consent = {
+                        analytics: document.getElementById('cookieAnalytics').checked,
+                        marketing: document.getElementById('cookieMarketing').checked
+                    };
+                    setConsent(consent);
+                    $('#cookiePreferencesModal').modal('hide');
+                });
+            });
+        })();
     </script>
 </body>
 </html>
