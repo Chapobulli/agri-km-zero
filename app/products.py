@@ -86,6 +86,7 @@ def edit_product(product_id):
         form.description.data = product.description
         form.price.data = product.price
         form.unit.data = product.unit
+        form.safety_ack.data = True
     if form.validate_on_submit():
         product.name = form.name.data
         if form.description.data:
