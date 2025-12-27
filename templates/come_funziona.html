@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Come Funziona OrtoVicino</h1>
+        <p class="lead text-muted">Porta in tavola i prodotti locali in tre semplici passi</p>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-4 text-center mb-4">
+            <div class="mb-3">
+                <div style="width: 100px; height: 100px; margin: 0 auto; background: #6B8E23; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-search fa-3x text-white"></i>
+                </div>
+            </div>
+            <h3 class="h4 mb-3">1. Esplora i Prodotti</h3>
+            <p class="text-muted">Scopri i prodotti freschi e locali degli agricoltori della tua zona. Usa i filtri per trovare quello che cerchi: frutta, verdura, vino, olio e molto altro.</p>
+        </div>
+        
+        <div class="col-md-4 text-center mb-4">
+            <div class="mb-3">
+                <div style="width: 100px; height: 100px; margin: 0 auto; background: #6B8E23; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-comments fa-3x text-white"></i>
+                </div>
+            </div>
+            <h3 class="h4 mb-3">2. Contatta l'Agricoltore</h3>
+            <p class="text-muted">Invia un messaggio o chiama direttamente il produttore per concordare modalità di ritiro, consegna e pagamento. OrtoVicino è una vetrina: ogni accordo è tra te e l'agricoltore.</p>
+        </div>
+        
+        <div class="col-md-4 text-center mb-4">
+            <div class="mb-3">
+                <div style="width: 100px; height: 100px; margin: 0 auto; background: #6B8E23; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-leaf fa-3x text-white"></i>
+                </div>
+            </div>
+            <h3 class="h4 mb-3">3. Ritira e Gusta</h3>
+            <p class="text-muted">Ritira o ricevi i tuoi prodotti freschi direttamente dal produttore. Sostieni l'economia locale e porta in tavola la freschezza autentica del territorio!</p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h3 class="mb-3"><i class="fas fa-info-circle text-success"></i> Dettagli Importanti</h3>
+            <ul class="mb-0">
+                <li class="mb-2"><strong>OrtoVicino è solo una vetrina:</strong> gli accordi su ritiro, consegna e pagamento avvengono direttamente tra cliente e agricoltore.</li>
+                <li class="mb-2"><strong>Nessuna commissione nascosta:</strong> OrtoVicino non trattiene percentuali sulle vendite. I prezzi che vedi sono quelli stabiliti dai produttori.</li>
+                <li class="mb-2"><strong>Contatto diretto:</strong> puoi inviare messaggi in-app o chiamare/contattare su WhatsApp i produttori se disponibile.</li>
+                <li class="mb-2"><strong>Filiera corta:</strong> acquisti direttamente dal produttore, senza intermediari. Sostieni l'economia locale e riduci l'impatto ambientale.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="{{ url_for('products.list_products') }}" class="btn btn-success btn-lg mr-2">Scopri i Prodotti</a>
+        <a href="{{ url_for('profiles.companies') }}" class="btn btn-outline-success btn-lg">Vedi le Aziende</a>
+    </div>
+</div>
+{% endblock %}

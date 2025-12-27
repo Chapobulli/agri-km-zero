@@ -63,6 +63,7 @@ class Product(db.Model):
     description = db.Column(db.Text)
     price = db.Column(db.Float)
     unit = db.Column(db.String(20))  # 'kg', 'pezzo', 'cassetta'
+    category = db.Column(db.String(50), default='altro')  # frutta, verdura, vino, olio, latticini, altro
     image_path = db.Column(db.String(300))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 

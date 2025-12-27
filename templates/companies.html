@@ -53,4 +53,47 @@
     <div class="col-12"><div class="text-center py-5 text-muted">Nessuna azienda disponibile.</div></div>
     {% endif %}
 </div>
+
+{% if total_pages > 1 %}
+<nav aria-label="Paginazione aziende" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page > 1 %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('profiles.companies', page=page-1, province=selected_province, city=selected_city) }}">
+                <i class="fas fa-chevron-left"></i> Precedente
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link"><i class="fas fa-chevron-left"></i> Precedente</span>
+        </li>
+        {% endif %}
+
+        {% for p in range(1, total_pages + 1) %}
+            {% if p == page %}
+                <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+            {% elif (p <= 3) or (p >= total_pages - 2) or (p >= page - 1 and p <= page + 1) %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('profiles.companies', page=p, province=selected_province, city=selected_city) }}">{{ p }}</a>
+                </li>
+            {% elif p == page - 2 or p == page + 2 %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page < total_pages %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('profiles.companies', page=page+1, province=selected_province, city=selected_city) }}">
+                Successivo <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Successivo <i class="fas fa-chevron-right"></i></span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+</div>
 {% endblock %}

@@ -132,6 +132,7 @@ def create_app():
                     product_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('product')}
                     additions_product = [
                         ('unit', 'VARCHAR(20)'),
+                        ('category', "VARCHAR(50) DEFAULT 'altro'"),
                         ('image_path', 'VARCHAR(300)')
                     ]
                     for col_name, col_type in additions_product:

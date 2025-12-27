@@ -61,6 +61,15 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="form-group mb-3">
+                        {{ form.category.label(class="font-weight-bold") }}
+                        {{ form.category(class="form-control") }}
+                        <small class="form-text text-muted">Seleziona la categoria del prodotto</small>
+                        {% if form.category.errors %}
+                            <small class="text-danger">{{ form.category.errors[0] }}</small>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <div class="mb-4">

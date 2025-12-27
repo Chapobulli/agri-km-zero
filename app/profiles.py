@@ -181,6 +181,8 @@ def my_client_orders():
 def companies():
     province = request.args.get('province', '').strip()
     city = request.args.get('city', '').strip()
+    page = request.args.get('page', 1, type=int)
+    per_page = 12
 
     query = User.query.filter_by(is_farmer=True)
     if province:
@@ -188,7 +190,10 @@ def companies():
     if city:
         query = query.filter_by(city=city)
 
-    farmers = query.all()
+    total = query.count()
+    total_pages = (total + per_page - 1) // per_page
+    farmers = query.offset((page - 1) * per_page).limit(per_page).all()
+    
     updated = False
     for f in farmers:
         if not f.company_slug:
@@ -204,4 +209,4 @@ def companies():
     else:
         city_options = sorted({f.city for f in User.query.filter_by(is_farmer=True).filter(User.city.isnot(None)).all()})
 
-    return render_template('companies.html', farmers=farmers, provinces=province_options, cities=city_options, selected_province=province, selected_city=city)
+    return render_template('companies.html', farmers=farmers, provinces=province_options, cities=city_options, selected_province=province, selected_city=city, page=page, total_pages=total_pages)

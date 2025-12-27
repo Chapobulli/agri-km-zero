@@ -11,7 +11,7 @@
 
     <form method="get" class="mb-4">
         <div class="form-row align-items-end">
-            <div class="form-group col-md-4">
+            <div class="form-group col-md-3">
                 <label>Provincia</label>
                 <select name="province" class="form-control" onchange="this.form.submit()">
                     <option value="">Tutte</option>
@@ -20,7 +20,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="form-group col-md-4">
+            <div class="form-group col-md-3">
                 <label>Comune</label>
                 <select name="city" class="form-control" onchange="this.form.submit()">
                     <option value="">Tutti</option>
@@ -29,7 +29,16 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="form-group col-md-4 d-flex align-items-end">
+            <div class="form-group col-md-3">
+                <label>Categoria</label>
+                <select name="category" class="form-control" onchange="this.form.submit()">
+                    <option value="">Tutte</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat.capitalize() }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group col-md-3 d-flex align-items-end">
                 <button class="btn btn-success mr-2" type="submit">Filtra</button>
                 <a class="btn btn-outline-secondary" href="{{ url_for('products.list_products') }}">Azzera</a>
             </div>
@@ -136,6 +145,48 @@
             </div>
         {% endif %}
     </div>
+
+    {% if total_pages > 1 %}
+    <nav aria-label="Paginazione prodotti" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('products.list_products', page=page-1, province=selected_province, city=selected_city, category=selected_category) }}">
+                    <i class="fas fa-chevron-left"></i> Precedente
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link"><i class="fas fa-chevron-left"></i> Precedente</span>
+            </li>
+            {% endif %}
+
+            {% for p in range(1, total_pages + 1) %}
+                {% if p == page %}
+                    <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                {% elif (p <= 3) or (p >= total_pages - 2) or (p >= page - 1 and p <= page + 1) %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('products.list_products', page=p, province=selected_province, city=selected_city, category=selected_category) }}">{{ p }}</a>
+                    </li>
+                {% elif p == page - 2 or p == page + 2 %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page < total_pages %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('products.list_products', page=page+1, province=selected_province, city=selected_city, category=selected_category) }}">
+                    Successivo <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Successivo <i class="fas fa-chevron-right"></i></span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 </div>
 
 <style>

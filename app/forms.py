@@ -21,6 +21,7 @@ class ProductForm(FlaskForm):
     description = TextAreaField('Descrizione', validators=[Optional()])
     price = FloatField('Prezzo (€)', validators=[DataRequired(message="Il prezzo è obbligatorio")])
     unit = SelectField('Unità di Misura', choices=[('kg','€/kg'), ('pezzo','€/pezzo'), ('cassetta','€/cassetta')], validators=[DataRequired()])
+    category = SelectField('Categoria', choices=[('frutta','Frutta'), ('verdura','Verdura'), ('vino','Vino'), ('olio','Olio di Oliva'), ('latticini','Latticini e Formaggi'), ('miele','Miele'), ('altro','Altro')], validators=[DataRequired()])
     image = FileField('Foto Prodotto', validators=[Optional(), FileAllowed(['jpg','jpeg','png','gif'], 'Solo immagini JPG, PNG o GIF')])
     safety_ack = BooleanField('Dichiaro che questo prodotto rispetta le norme igienico-sanitarie vigenti per la vendita diretta', validators=[DataRequired(message="Devi dichiarare la conformità igienico-sanitaria del prodotto")])
     submit = SubmitField('Pubblica Prodotto')

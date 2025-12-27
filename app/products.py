@@ -12,14 +12,22 @@ products = Blueprint('products', __name__)
 def list_products():
     province = request.args.get('province', '').strip()
     city = request.args.get('city', '').strip()
+    category = request.args.get('category', '').strip()
+    page = request.args.get('page', 1, type=int)
+    per_page = 12
 
     query = db.session.query(Product, User).join(User, Product.user_id == User.id).filter(User.is_farmer == True)
     if province:
         query = query.filter(User.province == province)
     if city:
         query = query.filter(User.city == city)
+    if category:
+        query = query.filter(Product.category == category)
 
-    rows = query.all()
+    total = query.count()
+    total_pages = (total + per_page - 1) // per_page
+    rows = query.offset((page - 1) * per_page).limit(per_page).all()
+    
     products_data = []
     for p, farmer in rows:
         products_data.append({
@@ -44,7 +52,9 @@ def list_products():
     else:
         city_options = sorted({f.city for f in User.query.filter(User.is_farmer == True, User.city.isnot(None)).all()})
 
-    return render_template('products.html', products=products_data, provinces=province_options, cities=city_options, selected_province=province, selected_city=city)
+    category_options = ['frutta', 'verdura', 'vino', 'olio', 'latticini', 'miele', 'altro']
+
+    return render_template('products.html', products=products_data, provinces=province_options, cities=city_options, categories=category_options, selected_province=province, selected_city=city, selected_category=category, page=page, total_pages=total_pages)
 
 @products.route('/add_product', methods=['GET', 'POST'])
 @login_required
@@ -64,6 +74,7 @@ def add_product():
             description=form.description.data,
             price=form.price.data,
             unit=form.unit.data,
+            category=form.category.data,
             image_path=image_path,
             user_id=current_user.id
         )
@@ -86,6 +97,7 @@ def edit_product(product_id):
         form.description.data = product.description
         form.price.data = product.price
         form.unit.data = product.unit
+        form.category.data = product.category or 'altro'
         form.safety_ack.data = True
     if form.validate_on_submit():
         product.name = form.name.data
@@ -94,6 +106,7 @@ def edit_product(product_id):
         if form.price.data is not None:
             product.price = form.price.data
         product.unit = form.unit.data
+        product.category = form.category.data
         if form.image.data:
             import cloudinary.uploader
             upload_result = cloudinary.uploader.upload(form.image.data, folder="agri_km_zero/products")

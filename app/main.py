@@ -15,6 +15,14 @@ def terms():
 def privacy():
     return render_template('privacy.html')
 
+@main.route('/come-funziona')
+def come_funziona():
+    return render_template('come_funziona.html')
+
+@main.route('/faq')
+def faq():
+    return render_template('faq.html')
+
 @main.route('/api/cities')
 def api_cities():
     province = request.args.get('province', '')

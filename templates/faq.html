@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Domande Frequenti</h1>
+        <p class="lead text-muted">Tutto quello che devi sapere su OrtoVicino</p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-question-circle"></i> Cos'è OrtoVicino?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">OrtoVicino è una piattaforma che connette agricoltori locali e clienti per vendite dirette di prodotti freschi a km0. Funziona come una vetrina: ogni accordo su pagamento, ritiro e consegna avviene direttamente tra le parti.</p>
+                </div>
+            </div>
+
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-euro-sign"></i> Ci sono commissioni o costi nascosti?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">No. OrtoVicino non applica commissioni sulle vendite. I prezzi che vedi sono quelli stabiliti dagli agricoltori. OrtoVicino è solo una vetrina gratuita per facilitare il contatto tra produttori e consumatori.</p>
+                </div>
+            </div>
+
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> Come faccio un ordine?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">Puoi inviare una richiesta d'ordine tramite la piattaforma o contattare direttamente l'agricoltore via messaggio, telefono o WhatsApp (se disponibile). Gli accordi su modalità di pagamento e consegna si definiscono direttamente con il produttore.</p>
+                </div>
+            </div>
+
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-truck"></i> Posso ricevere i prodotti a casa?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">Dipende dall'agricoltore. Alcuni offrono consegna a domicilio, altri solo ritiro in azienda. Puoi vedere se l'agricoltore offre consegna sul suo profilo e concordare i dettagli direttamente con lui.</p>
+                </div>
+            </div>
+
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-credit-card"></i> Come pago?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">Le modalità di pagamento sono concordate direttamente con l'agricoltore. Solitamente contanti al ritiro, bonifico anticipato o altri metodi concordati tra le parti.</p>
+                </div>
+            </div>
+
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-shield-alt"></i> I prodotti sono sicuri e controllati?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">Ogni agricoltore dichiara che i propri prodotti rispettano le norme igienico-sanitarie per la vendita diretta. OrtoVicino non è responsabile della qualità o conformità dei prodotti: la responsabilità è dell'agricoltore.</p>
+                </div>
+            </div>
+
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-undo"></i> Posso restituire un prodotto?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">Le politiche di reso o rimborso sono gestite direttamente dall'agricoltore. Ti consigliamo di concordare eventuali condizioni prima dell'acquisto.</p>
+                </div>
+            </div>
+
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-plus"></i> Come faccio a registrarmi come agricoltore?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">Vai alla pagina di <a href="{{ url_for('auth.register') }}">registrazione</a>, seleziona "Sono un agricoltore" e compila il form. Dopo la registrazione potrai creare il tuo profilo aziendale e caricare i tuoi prodotti.</p>
+                </div>
+            </div>
+
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-envelope"></i> Ho altre domande, come vi contatto?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">Puoi scriverci a <a href="mailto:info@ortovicino.it">info@ortovicino.it</a>. Siamo qui per aiutarti!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

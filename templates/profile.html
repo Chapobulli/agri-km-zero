@@ -16,6 +16,30 @@
         <div class="col-md-8">
             <h4>Descrizione</h4>
             <p>{{ user.company_description or 'Acquista prodotti agricoli di qualita da agricoltori della tua zona.' }}</p>
+            
+            {% if user.phone or user.email %}
+            <div class="card bg-light mb-4">
+                <div class="card-body">
+                    <h5 class="mb-3"><i class="fas fa-address-book text-success"></i> Contatti</h5>
+                    {% if user.phone %}
+                    <p class="mb-2">
+                        <i class="fas fa-phone text-success"></i> <strong>Telefono:</strong> 
+                        <a href="tel:{{ user.phone }}">{{ user.phone }}</a>
+                        <a href="https://wa.me/{{ user.phone.replace(' ', '').replace('+', '') if user.phone.startswith('+') else '39' + user.phone.replace(' ', '') }}" target="_blank" class="btn btn-success btn-sm ml-2">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                    </p>
+                    {% endif %}
+                    {% if user.email %}
+                    <p class="mb-0">
+                        <i class="fas fa-envelope text-success"></i> <strong>Email:</strong> 
+                        <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
             <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
                 <h4 class="mb-0"><i class="fas fa-shopping-basket"></i> Prodotti</h4>
                 {% if current_user.is_authenticated and current_user.id == user.id %}
