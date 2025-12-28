@@ -209,4 +209,18 @@ def companies():
     else:
         city_options = sorted({f.city for f in User.query.filter_by(is_farmer=True).filter(User.city.isnot(None)).all()})
 
-    return render_template('companies.html', farmers=farmers, provinces=province_options, cities=city_options, selected_province=province, selected_city=city, page=page, total_pages=total_pages)
+    # Prepara dati JSON per la mappa (tutte le aziende filtrate, non solo pagina corrente)
+    all_filtered_farmers = query.all()
+    import json
+    farmers_json = json.dumps([{
+        'name': f.company_name or f.username,
+        'slug': f.company_slug or f.compute_company_slug(),
+        'city': f.city or '',
+        'province': f.province or '',
+        'lat': f.latitude,
+        'lng': f.longitude
+    } for f in all_filtered_farmers if f.latitude and f.longitude])
+
+    return render_template('companies.html', farmers=farmers, provinces=province_options, cities=city_options, 
+                         selected_province=province, selected_city=city, page=page, total_pages=total_pages,
+                         farmers_json=farmers_json)

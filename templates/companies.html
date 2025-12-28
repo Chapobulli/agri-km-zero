@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container mt-4">
-<h2>Aziende Agricole</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Aziende Agricole</h2>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-outline-success active" id="btnLista" onclick="switchView('lista')">
+            <i class="fas fa-list"></i> Lista
+        </button>
+        <button type="button" class="btn btn-outline-success" id="btnMappa" onclick="switchView('mappa')">
+            <i class="fas fa-map-marked-alt"></i> Mappa
+        </button>
+    </div>
+</div>
 
 <form method="get" class="mb-4">
     <div class="form-row align-items-end">
@@ -30,6 +40,8 @@
     </div>
 </form>
 
+<!-- Vista Lista -->
+<div id="vistaLista">
 <div class="row">
     {% for f in farmers %}
     <div class="col-md-4 mb-4">
@@ -95,4 +107,75 @@
 </nav>
 {% endif %}
 </div>
+
+<!-- Vista Mappa -->
+<div id="vistaMappa" style="display: none;">
+    <div id="companiesMap" style="height: 600px; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+</div>
+
+</div>
+
+<!-- Leaflet Assets -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+let companiesMap = null;
+
+function switchView(view) {
+    if (view === 'lista') {
+        document.getElementById('vistaLista').style.display = 'block';
+        document.getElementById('vistaMappa').style.display = 'none';
+        document.getElementById('btnLista').classList.add('active');
+        document.getElementById('btnMappa').classList.remove('active');
+    } else {
+        document.getElementById('vistaLista').style.display = 'none';
+        document.getElementById('vistaMappa').style.display = 'block';
+        document.getElementById('btnLista').classList.remove('active');
+        document.getElementById('btnMappa').classList.add('active');
+        
+        // Inizializza mappa solo la prima volta
+        if (!companiesMap) {
+            initCompaniesMap();
+        }
+    }
+}
+
+function initCompaniesMap() {
+    if (!window.L) {
+        console.error('Leaflet non caricato');
+        return;
+    }
+    
+    // Centro Sardegna di default
+    const center = [40.12, 9.01];
+    companiesMap = L.map('companiesMap').setView(center, 9);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(companiesMap);
+    
+    // Aggiungi marker per ogni azienda
+    const farmers = {{ farmers_json|safe }};
+    
+    farmers.forEach(function(f) {
+        if (f.lat && f.lng) {
+            const marker = L.marker([f.lat, f.lng]).addTo(companiesMap);
+            const popupHtml = '<div style="min-width: 200px;"><strong>' + f.name + '</strong><br>' +
+                            '<small><i class="fas fa-map-marker-alt"></i> ' + (f.city || '') + '</small><br>' +
+                            '<a href="/azienda/' + f.slug + '" class="btn btn-success btn-sm mt-2">Vedi Profilo</a></div>';
+            marker.bindPopup(popupHtml);
+        }
+    });
+    
+    // Centra mappa sui marker se presenti
+    if (farmers.length > 0) {
+        const bounds = L.latLngBounds(farmers.filter(f => f.lat && f.lng).map(f => [f.lat, f.lng]));
+        if (bounds.isValid()) {
+            companiesMap.fitBounds(bounds, { padding: [50, 50] });
+        }
+    }
+}
+</script>
 {% endblock %}
