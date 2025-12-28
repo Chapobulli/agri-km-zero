@@ -9,12 +9,22 @@ reviews_bp = Blueprint('reviews', __name__)
 def submit_review(farmer_id):
     """Ricevi una recensione per un'azienda agricola"""
     try:
-        rating = int(request.form.get('rating'))
+        rating_str = request.form.get('rating', '').strip()
+        
+        # Validate rating
+        if not rating_str:
+            return jsonify({'success': False, 'message': 'Seleziona un punteggio con le stelle'}), 400
+        
+        try:
+            rating = int(rating_str)
+        except ValueError:
+            return jsonify({'success': False, 'message': 'Valutazione non valida'}), 400
+        
+        if rating < 1 or rating > 5:
+            return jsonify({'success': False, 'message': 'Valutazione deve essere tra 1 e 5 stelle'}), 400
+        
         comment = request.form.get('comment', '').strip()
         order_id = request.form.get('order_id')
-        
-        if not rating or rating < 1 or rating > 5:
-            return jsonify({'success': False, 'message': 'Valutazione non valida'}), 400
         
         # Verifica che l'azienda esista
         farmer = User.query.get(farmer_id)
