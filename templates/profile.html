@@ -437,3 +437,30 @@
     </div>
 {% endif %}
 {% endblock %}
+
+{% block scripts %}
+<script>
+// Scroll automatico al carrello su mobile dopo aggiunta prodotto
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.innerWidth <= 768) {
+        const cartCard = document.querySelector('.profile-sidebar .card.mt-3');
+        if (cartCard && window.location.hash === '#cart-updated') {
+            cartCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            cartCard.classList.add('cart-updated');
+            setTimeout(() => cartCard.classList.remove('cart-updated'), 600);
+        }
+    }
+});
+
+// Aggiungi parametro hash quando si aggiunge prodotto
+document.querySelectorAll('form[action*="add_to_cart"]').forEach(form => {
+    form.addEventListener('submit', function() {
+        if (window.innerWidth <= 768) {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.hash = 'cart-updated';
+            window.history.replaceState(null, '', currentUrl);
+        }
+    });
+});
+</script>
+{% endblock %}

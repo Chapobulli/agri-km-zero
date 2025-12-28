@@ -203,21 +203,3 @@ def verify_claim(token):
     
     # Redirect a pagina reset password
     return redirect(url_for('auth.reset_password_form', token=reset_token))
-
-# ENDPOINT TEMPORANEO PER PULIRE DATABASE (RIMUOVERE DOPO L'USO)
-@main.route('/admin/cleanup-scraped-temp-xyz123')
-def cleanup_scraped():
-    """Rimuove tutte le aziende scraped dal database"""
-    try:
-        scraped = User.query.filter_by(is_scraped=True).all()
-        count = len(scraped)
-        
-        for user in scraped:
-            db.session.delete(user)
-        
-        db.session.commit()
-        
-        return f"<html><body style='font-family: Arial; padding: 40px; text-align: center;'><h2 style='color: green;'>✓ Pulizia completata!</h2><p style='font-size: 18px;'>Aziende rimosse: <strong>{count}</strong></p><a href='/companies' style='display: inline-block; margin-top: 20px; padding: 12px 24px; background: #6B8E23; color: white; text-decoration: none; border-radius: 4px;'>Vedi Aziende</a></body></html>", 200
-    except Exception as e:
-        db.session.rollback()
-        return f"<html><body style='font-family: Arial; padding: 40px;'><h2 style='color: red;'>Errore</h2><p>{str(e)}</p></body></html>", 500
