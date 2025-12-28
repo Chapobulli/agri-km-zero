@@ -1,4 +1,4 @@
-from flask import Blueprint, session, redirect, url_for, request, flash
+from flask import Blueprint, session, redirect, url_for, request, flash, render_template
 from flask_login import login_required, current_user
 from . import db
 from .models import Product, Message, User, OrderRequest

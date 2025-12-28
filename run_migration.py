@@ -1,0 +1,74 @@
+"""Execute SQL migration on Render database"""
+import psycopg2
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Database connection
+db_url = "postgresql://agri_km_zero_db_cdn1_user:vlsiT0Jv0ooz7yXhxxQ9tpzcKdRGu8Tz@dpg-d4vcuu3uibrs73d5c9q0-a.frankfurt-postgres.render.com/agri_km_zero_db_cdn1?sslmode=require"
+
+print(f"Connecting to database...")
+
+try:
+    conn = psycopg2.connect(db_url)
+    cursor = conn.cursor()
+    
+    print("✓ Connected to database")
+    
+    # Add minimum_order_quantity column
+    print("\n1. Adding minimum_order_quantity column to product table...")
+    cursor.execute("""
+        ALTER TABLE product ADD COLUMN IF NOT EXISTS minimum_order_quantity INTEGER DEFAULT 1;
+    """)
+    print("✓ Column added")
+    
+    # Update existing products
+    print("\n2. Updating existing products with minimum order quantity of 10...")
+    cursor.execute("""
+        UPDATE product SET minimum_order_quantity = 10 
+        WHERE minimum_order_quantity IS NULL OR minimum_order_quantity < 10;
+    """)
+    updated = cursor.rowcount
+    print(f"✓ Updated {updated} products")
+    
+    # Create review table
+    print("\n3. Creating review table...")
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS review (
+            id SERIAL PRIMARY KEY,
+            farmer_id INTEGER NOT NULL REFERENCES "user"(id),
+            client_id INTEGER REFERENCES "user"(id),
+            order_id INTEGER REFERENCES order_request(id),
+            client_name VARCHAR(150),
+            rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+            comment TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
+    print("✓ Table created")
+    
+    # Create indexes
+    print("\n4. Creating indexes...")
+    cursor.execute("""
+        CREATE INDEX IF NOT EXISTS idx_review_farmer_id ON review(farmer_id);
+    """)
+    cursor.execute("""
+        CREATE INDEX IF NOT EXISTS idx_review_client_id ON review(client_id);
+    """)
+    cursor.execute("""
+        CREATE INDEX IF NOT EXISTS idx_review_order_id ON review(order_id);
+    """)
+    print("✓ Indexes created")
+    
+    # Commit changes
+    conn.commit()
+    print("\n✅ Migration completed successfully!")
+    
+    cursor.close()
+    conn.close()
+    
+except Exception as e:
+    print(f"\n❌ Error: {e}")
+    if 'conn' in locals():
+        conn.rollback()
