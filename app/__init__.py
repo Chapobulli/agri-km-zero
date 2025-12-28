@@ -7,6 +7,10 @@ import logging
 from sqlalchemy import inspect, text
 import cloudinary
 import cloudinary.uploader
+from dotenv import load_dotenv
+
+# Carica variabili d'ambiente da .env
+load_dotenv()
 
 db = SQLAlchemy()
 login_manager = LoginManager()
