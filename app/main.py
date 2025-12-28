@@ -203,36 +203,21 @@ def verify_claim(token):
     
     # Redirect a pagina reset password
     return redirect(url_for('auth.reset_password_form', token=reset_token))
-# ENDPOINT TEMPORANEO PER CARICARE AZIENDE (RIMUOVERE DOPO L'USO)
-@main.route('/admin/load-osm-companies-temp-xyz123')
-def load_osm_companies():
-    """Endpoint temporaneo per caricare aziende da OpenStreetMap - VELOCE (5 aziende)"""
+
+# ENDPOINT TEMPORANEO PER PULIRE DATABASE (RIMUOVERE DOPO L'USO)
+@main.route('/admin/cleanup-scraped-temp-xyz123')
+def cleanup_scraped():
+    """Rimuove tutte le aziende scraped dal database"""
     try:
-        from scripts.scrape_openstreetmap import query_overpass, build_overpass_query, create_profile_from_osm, SARDEGNA_BBOX, FARM_TAGS
+        scraped = User.query.filter_by(is_scraped=True).all()
+        count = len(scraped)
         
-        # Costruisci query
-        query = build_overpass_query(SARDEGNA_BBOX, FARM_TAGS)
-        result = query_overpass(query)
+        for user in scraped:
+            db.session.delete(user)
         
-        if not result or 'elements' not in result:
-            return "Nessun elemento trovato", 404
+        db.session.commit()
         
-        elements = result['elements']
-        MAX_COMPANIES = 5  # Ridotto a 5 per velocità
-        created = 0
-        skipped = 0
-        
-        for element in elements:
-            if created >= MAX_COMPANIES:
-                break
-            
-            user = create_profile_from_osm(element)
-            if user:
-                created += 1
-            else:
-                skipped += 1
-            # Nessun sleep per velocità
-        
-        return f"<html><body style='font-family: Arial; padding: 40px; text-align: center;'><h2>✓ Caricamento completato!</h2><p style='font-size: 18px;'>Aziende create: <strong>{created}</strong><br>Saltate: {skipped}</p><a href='/companies' style='display: inline-block; margin-top: 20px; padding: 12px 24px; background: #6B8E23; color: white; text-decoration: none; border-radius: 4px;'>Vedi Aziende</a></body></html>", 200
+        return f"<html><body style='font-family: Arial; padding: 40px; text-align: center;'><h2 style='color: green;'>✓ Pulizia completata!</h2><p style='font-size: 18px;'>Aziende rimosse: <strong>{count}</strong></p><a href='/companies' style='display: inline-block; margin-top: 20px; padding: 12px 24px; background: #6B8E23; color: white; text-decoration: none; border-radius: 4px;'>Vedi Aziende</a></body></html>", 200
     except Exception as e:
-        return f"<html><body style='font-family: Arial; padding: 40px;'><h2 style='color: red;'>Errore</h2><p>{str(e)}</p><a href='/'>Torna alla home</a></body></html>", 500
+        db.session.rollback()
+        return f"<html><body style='font-family: Arial; padding: 40px;'><h2 style='color: red;'>Errore</h2><p>{str(e)}</p></body></html>", 500
