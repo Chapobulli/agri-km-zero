@@ -437,18 +437,16 @@
     </div>
 {% endif %}
 
-<!-- Floating Cart Button (Mobile Only) -->
-{% if current_user.is_authenticated and not (current_user.id == user.id) %}
+<!-- Floating Cart Button (Mobile Only) - Works for all users -->
 {% set farmer_id = user.id %}
 {% set cart = session.get('cart', {}) %}
 {% set fcart = cart.get(farmer_id|string, {}) %}
-{% if fcart %}
+{% if fcart and not (current_user.is_authenticated and current_user.id == user.id) %}
 {% set total_items = fcart.values()|map(attribute='qty')|sum %}
 <button class="floating-cart-btn d-md-none" onclick="document.querySelector('.profile-sidebar .card.mt-3').scrollIntoView({ behavior: 'smooth', block: 'center' });">
     <i class="fas fa-shopping-cart"></i>
     <span class="badge">{{ total_items }}</span>
 </button>
-{% endif %}
 {% endif %}
 
 {% endblock %}
