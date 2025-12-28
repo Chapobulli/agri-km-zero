@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Hero Section - Professional -->
-<section class="hero-section" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 80px 0; position: relative; overflow: hidden;">
-    <div class="hero-pattern" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.05; background-image: url('/static/images/hero/hero.png'); background-size: cover; background-position: center;"></div>
+<!-- Hero Section - Professional with Topographic Background -->
+<section class="hero-section" style="background-image: url('https://i.imgur.com/yKHqZ9H.png'); background-size: cover; background-position: center; background-repeat: no-repeat; padding: 100px 0; position: relative; overflow: hidden;">
+    <div class="hero-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);"></div>
     <div class="container" style="position: relative; z-index: 2;">
         <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="col-lg-7 mb-4 mb-lg-0">
                 <div class="badge badge-success mb-3" style="font-size: 0.875rem; padding: 0.5rem 1rem;"><i class="fas fa-leaf mr-1"></i> Filiera Corta e Sostenibile</div>
                 <h1 class="display-4 font-weight-bold mb-3" style="color: #2c3e50; line-height: 1.2;">Il tuo contadino di fiducia è più vicino di quanto pensi</h1>
                 <p class="lead mb-4" style="color: #6c757d; font-size: 1.25rem;">Scopri i prodotti freschi degli agricoltori della tua zona. Ordina, ritira o ricevi direttamente a casa.</p>
@@ -21,9 +21,9 @@
                     <div><i class="fas fa-check-circle text-success mr-2"></i><strong>100% Locale</strong></div>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="hero-image-wrapper" style="position: relative; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.15);">
-                    <img src="/static/images/hero/hero.png" alt="Prodotti locali OrtoVicino" class="img-fluid" style="width: 100%; height: auto; display: block;">
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="text-center" style="opacity: 0.8;">
+                    <i class="fas fa-leaf text-success" style="font-size: 8rem;"></i>
                 </div>
             </div>
         </div>
