@@ -203,3 +203,37 @@ def verify_claim(token):
     
     # Redirect a pagina reset password
     return redirect(url_for('auth.reset_password_form', token=reset_token))
+# ENDPOINT TEMPORANEO PER CARICARE AZIENDE (RIMUOVERE DOPO L'USO)
+@main.route('/admin/load-osm-companies-temp-xyz123')
+def load_osm_companies():
+    """Endpoint temporaneo per caricare aziende da OpenStreetMap"""
+    try:
+        from scripts.scrape_openstreetmap import query_overpass, build_overpass_query, create_profile_from_osm, SARDEGNA_BBOX, FARM_TAGS
+        import time
+        
+        # Costruisci query
+        query = build_overpass_query(SARDEGNA_BBOX, FARM_TAGS)
+        result = query_overpass(query)
+        
+        if not result or 'elements' not in result:
+            return "Nessun elemento trovato", 404
+        
+        elements = result['elements']
+        MAX_COMPANIES = 10
+        created = 0
+        skipped = 0
+        
+        for element in elements:
+            if created >= MAX_COMPANIES:
+                break
+            
+            user = create_profile_from_osm(element)
+            if user:
+                created += 1
+            else:
+                skipped += 1
+            time.sleep(0.5)
+        
+        return f"✓ Caricamento completato!<br>Aziende create: {created}<br>Saltate: {skipped}<br><a href='/companies'>Vedi aziende</a>", 200
+    except Exception as e:
+        return f"Errore: {str(e)}", 500
