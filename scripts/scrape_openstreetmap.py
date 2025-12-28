@@ -50,18 +50,16 @@ SARDEGNA_BBOX = {
     'east': 9.9      # Lon massima
 }
 
-# Tag OSM per aziende agricole
+# Tag OSM per aziende agricole (solo aziende agricole vere)
 FARM_TAGS = [
-    'landuse=farmland',
-    'landuse=farmyard',
-    'amenity=farm',
-    'shop=farm',
-    'craft=winery',
-    'craft=brewery',
-    'shop=cheese',
-    'shop=greengrocer',
-    'landuse=orchard',
-    'landuse=vineyard'
+    'shop=farm',              # Vendita diretta azienda agricola
+    'shop=greengrocer',       # Fruttivendolo
+    'landuse=farmland',       # Terreno agricolo con edifici
+    'landuse=vineyard',       # Vigneto
+    'amenity=farm',           # Fattoria
+    'craft=winery',           # Cantina vinicola
+    'office=agricultural',    # Ufficio azienda agricola
+    'tourism=farm'            # Agriturismo/fattoria didattica
 ]
 
 def slugify(text):
@@ -77,13 +75,14 @@ def build_overpass_query(bbox, tags):
     # Union di tutte le query per i vari tag
     tag_queries = []
     for tag in tags:
+        key, value = tag.split('=')
         # Cerca nodi (points)
-        tag_queries.append(f'node["{tag}"]({bbox["south"]},{bbox["west"]},{bbox["north"]},{bbox["east"]})')
+        tag_queries.append(f'node["{key}"="{value}"]({bbox["south"]},{bbox["west"]},{bbox["north"]},{bbox["east"]})')
         # Cerca way (areas/buildings)
-        tag_queries.append(f'way["{tag}"]({bbox["south"]},{bbox["west"]},{bbox["north"]},{bbox["east"]})')
+        tag_queries.append(f'way["{key}"="{value}"]({bbox["south"]},{bbox["west"]},{bbox["north"]},{bbox["east"]})')
     
     query = f"""
-    [out:json][timeout:60];
+    [out:json][timeout:90];
     (
       {';'.join(tag_queries)};
     );
