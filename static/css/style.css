@@ -360,8 +360,12 @@ body {
     }
     
     .hero-section {
-        padding: 40px 0;
-        min-height: 60vh;
+        padding: 0 !important;
+        min-height: auto !important;
+    }
+    
+    .hero-section .col-lg-6 {
+        padding: 40px 20px !important;
     }
     
     .hero-section h1 {
