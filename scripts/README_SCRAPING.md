@@ -6,13 +6,40 @@ Sistema completo per importare aziende agricole da fonti pubbliche e permettere 
 
 ## 🎯 Funzionalità
 
-1. **Scraping Automatico** - Import da Google Maps API
+1. **Scraping Automatico** - Import da OpenStreetMap (GRATUITO) o Google Maps API
 2. **Profili "Unclaimed"** - Aziende visibili ma non gestibili fino al claim
 3. **Sistema di Rivendicazione** - Proprietari possono rivendicare via email
 4. **Badge Verifica** - Distintivi "Verificato" / "Non Verificato" sui profili
 5. **GDPR Compliant** - Disclaimer e possibilità di rimozione dati
 
-## 🚀 Setup
+## 🚀 Setup - OPZIONE 1: OpenStreetMap (CONSIGLIATO - GRATUITO)
+
+### 1. Installare Dipendenze
+
+```bash
+pip install requests geopy
+```
+
+### 2. Eseguire lo Scraping
+
+```bash
+python scripts/scrape_openstreetmap.py
+```
+
+**Vantaggi**:
+- ✅ 100% GRATUITO (no billing account)
+- ✅ No API key necessaria
+- ✅ Open Source (ODbL License)
+- ✅ Nessun rate limit severo
+- ✅ Dati pubblici collaborativi
+
+**Come funziona**:
+- Usa Overpass API per interrogare OpenStreetMap
+- Cerca POI con tag: `landuse=farmland`, `amenity=farm`, `shop=farm`, etc.
+- Bounding box: Sardegna (lat 38.8-41.3, lon 8.1-9.9)
+- Reverse geocoding con Nominatim per città/provincia
+
+## 🚀 Setup - OPZIONE 2: Google Maps API (Richiede Billing)
 
 ### 1. Installare Dipendenze
 
@@ -54,9 +81,30 @@ GOOGLE_MAPS_API_KEY=your_key_here
 python scripts/scrape_google_maps.py
 ```
 
+## 📊 Confronto Soluzioni
+
+| Caratteristica | OpenStreetMap | Google Maps API |
+|---|---|---|
+| **Costo** | ✅ GRATUITO | ❌ $11.90 per 700 aziende |
+| **Setup** | ✅ Nessuna API key | ❌ Richiede billing account |
+| **Qualità Dati** | ⚠️ Variabile (crowd-sourced) | ✅ Alta (commerciale) |
+| **Copertura** | ⚠️ Dipende da contributi | ✅ Completa |
+| **Rate Limits** | ✅ Gentili | ⚠️ Severi |
+| **License** | ✅ ODbL (open) | ⚠️ Proprietaria |
+
+**Raccomandazione**: Inizia con **OpenStreetMap** (gratuito), poi integra con Google Maps se necessario.
+
 ## 📊 Funzionamento
 
-### Scraping Process
+### Scraping Process (OSM)
+
+1. **Query Overpass**: Interroga OSM con bounding box Sardegna
+2. **Tag filtering**: Cerca `landuse=farmland`, `amenity=farm`, `shop=farm`, etc.
+3. **Reverse geocoding**: Nominatim per città/provincia se mancante
+4. **Deduplicazione**: Verifica telefono e coordinate duplicate
+5. **Creazione profilo**: User con `is_scraped=True`, `data_source='OpenStreetMap'`
+
+### Scraping Process (Google Maps)
 
 1. **Ricerca per provincia**: Scandisce 5 provincie Sardegna
 2. **Query multiple**: 7 tipologie (azienda agricola, produttore locale, etc.)
