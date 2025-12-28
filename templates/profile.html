@@ -228,7 +228,7 @@
                                 <button class="btn btn-success btn-block mr-sm-2 mb-2 mb-sm-0" type="submit"><i class="fas fa-paper-plane"></i> Invia Ordine</button>
                                 {% if user.phone %}
                                 <button class="btn btn-outline-success btn-block" type="submit" formmethod="POST" formaction="{{ url_for('cart.whatsapp_order', farmer_id=user.id) }}" formtarget="_blank">
-                                    <i class="fab fa-whatsapp"></i> Prepara WhatsApp
+                                    <i class="fab fa-whatsapp"></i> Invia via WhatsApp
                                 </button>
                                 {% endif %}
                             </div>

@@ -567,10 +567,6 @@ body {
         padding: 50px 0 !important;
     }
     
-    .hero-overlay {
-        background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.75) 100%) !important;
-    }
-    
     .hero-section .display-4 {
         font-size: 1.5rem !important;
     }
@@ -618,13 +614,14 @@ footer a:hover {
     padding: 100px 0;
 }
 
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.65) 100%);
+.hero-section h1,
+.hero-section .display-4 {
+    text-shadow: 0 2px 4px rgba(255,255,255,0.8);
+}
+
+.hero-section .lead,
+.hero-section p {
+    text-shadow: 0 1px 2px rgba(255,255,255,0.6);
 }
 
 /* Sticky Cart Sidebar on Mobile */
