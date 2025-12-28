@@ -10,11 +10,11 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light main-nav shadow-sm sticky-top" style="background:#fdfdfb;">
+    <nav class="navbar navbar-expand-lg navbar-light main-nav shadow-sm sticky-top" style="background:#ffffff; border-bottom: 1px solid #e9ecef;">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.index') }}">
-                <img src="/static/images/logo/favicon.jpg" alt="OrtoVicino" style="height:56px; width:auto; margin-right:10px;">
-                <span style="font-weight:600; color:#4A7C59; font-size:1.3rem;">Orto<span style="font-weight:300;">Vicino</span></span>
+                <img src="/static/images/logo/favicon.jpg" alt="OrtoVicino" style="height:48px; width:48px; border-radius: 8px; margin-right:12px; object-fit: cover;">
+                <span style="font-weight:700; color:#2c3e50; font-size:1.4rem; letter-spacing: -0.5px;">Orto<span style="color:#6B8E23;">Vicino</span></span>
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -76,48 +76,68 @@
         {% endwith %}
         {% block content %}{% endblock %}
     </div>
-    <footer class="footer">
+    <footer class="footer" style="background: #2c3e50; color: #ecf0f1; padding: 60px 0 20px;">
         <div class="container">
-            <div class="row">
-                <div class="col-md-3 mb-4">
-                    <h5>OrtoVicino</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{{ url_for('main.index') }}">Home</a></li>
-                        <li><a href="{{ url_for('profiles.companies') }}">Aziende</a></li>
-                        <li><a href="{{ url_for('main.come_funziona') }}">Come Funziona</a></li>
-                        <li><a href="{{ url_for('main.faq') }}">FAQ</a></li>
-                        <li><a href="{{ url_for('main.terms') }}">Termini</a></li>
-                        <li><a href="{{ url_for('main.privacy') }}">Privacy</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Prodotti</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{{ url_for('products.list_products') }}">Catalogo</a></li>
-                        {% if current_user.is_authenticated and current_user.is_farmer %}
-                        <li><a href="{{ url_for('products.add_product') }}">Aggiungi prodotto</a></li>
-                        {% endif %}
-                        <li><a href="{% if current_user.is_authenticated %}{{ url_for('messages.inbox') }}{% else %}{{ url_for('auth.register') }}{% endif %}">Messaggi</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Seguici</h5>
-                    <div class="mb-3">
-                        <a href="#" class="mr-3"><i class="fab fa-facebook-f fa-lg"></i></a>
-                        <a href="#" class="mr-3"><i class="fab fa-instagram fa-lg"></i></a>
+            <div class="row mb-4">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="font-weight-bold mb-3" style="color: #fff;">OrtoVicino</h5>
+                    <p style="font-size: 0.95rem; line-height: 1.8;">La piattaforma che connette consumatori e agricoltori locali. Prodotti freschi, km zero e sostenibili.</p>
+                    <div class="mt-3">
+                        <a href="#" class="text-light mr-3" style="font-size: 1.5rem;"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-light mr-3" style="font-size: 1.5rem;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-light" style="font-size: 1.5rem;"><i class="fab fa-twitter"></i></a>
                     </div>
                 </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Newsletter</h5>
-                    <p style="font-size: 0.9rem;">Novità su prodotti locali e offerte</p>
-                    <form class="form-inline">
-                        <input type="email" class="form-control mb-2 mr-2" placeholder="Email" style="border-radius: 4px;">
-                        <button type="submit" class="btn btn-success mb-2" style="border-radius: 4px;">→</button>
-                    </form>
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h6 class="font-weight-bold mb-3" style="color: #fff; text-transform: uppercase; font-size: 0.9rem;">Esplora</h6>
+                    <ul class="list-unstyled" style="line-height: 2;">
+                        <li><a href="{{ url_for('main.index') }}" class="text-light" style="text-decoration: none; font-size: 0.95rem;">Home</a></li>
+                        <li><a href="{{ url_for('products.list_products') }}" class="text-light" style="text-decoration: none; font-size: 0.95rem;">Prodotti</a></li>
+                        <li><a href="{{ url_for('profiles.companies') }}" class="text-light" style="text-decoration: none; font-size: 0.95rem;">Aziende</a></li>
+                        <li><a href="{{ url_for('main.come_funziona') }}" class="text-light" style="text-decoration: none; font-size: 0.95rem;">Come Funziona</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h6 class="font-weight-bold mb-3" style="color: #fff; text-transform: uppercase; font-size: 0.9rem;">Supporto</h6>
+                    <ul class="list-unstyled" style="line-height: 2;">
+                        <li><a href="{{ url_for('main.faq') }}" class="text-light" style="text-decoration: none; font-size: 0.95rem;">FAQ</a></li>
+                        <li><a href="{{ url_for('main.terms') }}" class="text-light" style="text-decoration: none; font-size: 0.95rem;">Termini e Condizioni</a></li>
+                        <li><a href="{{ url_for('main.privacy') }}" class="text-light" style="text-decoration: none; font-size: 0.95rem;">Privacy Policy</a></li>
+                        <li><a href="#" id="manageCookiesLink" class="text-light" style="text-decoration: none; font-size: 0.95rem;">Gestisci Cookie</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-4 mb-4">
+                    <h6 class="font-weight-bold mb-3" style="color: #fff; text-transform: uppercase; font-size: 0.9rem;">Contatti</h6>
+                    <ul class="list-unstyled" style="line-height: 2; font-size: 0.95rem;">
+                        <li><i class="fas fa-envelope mr-2 text-success"></i> info@ortovicino.it</li>
+                        <li><i class="fas fa-phone mr-2 text-success"></i> +39 345 123 4567</li>
+                        <li><i class="fas fa-map-marker-alt mr-2 text-success"></i> Sardegna, Italia</li>
+                    </ul>
+                    <div class="mt-3">
+                        <p class="mb-2 font-weight-bold" style="font-size: 0.9rem;">Newsletter</p>
+                        <form class="form-inline">
+                            <div class="input-group" style="width: 100%;">
+                                <input type="email" class="form-control" placeholder="La tua email" style="border-radius: 4px 0 0 4px; border: none;">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-success" style="border-radius: 0 4px 4px 0;"><i class="fas fa-arrow-right"></i></button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p class="mb-0">&copy; 2025 OrtoVicino. Tutti i diritti riservati · <a href="#" id="manageCookiesLink" class="text-light">Gestisci cookie</a></p>
+            <hr style="border-color: rgba(255,255,255,0.1);">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-left mb-3 mb-md-0">
+                    <p class="mb-0" style="font-size: 0.875rem;">&copy; 2025 OrtoVicino. Tutti i diritti riservati.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-right">
+                    <div class="d-inline-flex align-items-center" style="gap: 15px; font-size: 0.875rem;">
+                        <div><i class="fas fa-shield-alt text-success mr-1"></i> Pagamenti Sicuri</div>
+                        <div><i class="fas fa-lock text-success mr-1"></i> SSL Certificato</div>
+                        <div><i class="fas fa-check-circle text-success mr-1"></i> GDPR Compliant</div>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>

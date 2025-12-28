@@ -1,18 +1,61 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Hero full width with simple CTA -->
-<section class="hero-full" style="background-image: url('/static/images/hero/hero.png'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 80vh; display:flex; align-items:center; position:relative;">
-    <div style="position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4);"></div>
-    <div class="container" style="position:relative; z-index:10;">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 text-center text-white">
-                <span class="badge badge-pill badge-light text-success mb-3 d-none d-md-inline" style="font-size:1rem; background:#6B8E23; color:white!important; border:none;">Filiera corta e sostenibile</span>
-                <h1 class="mb-3 hero-title" style="font-size:3rem; font-weight:700; text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">Il tuo contadino di fiducia<br class="d-none d-md-inline"> è più vicino di quanto pensi.</h1>
-                <p class="lead mb-4 d-none d-md-block" style="font-size:1.25rem; text-shadow: 1px 1px 4px rgba(0,0,0,0.5);">Scopri i prodotti freschi degli agricoltori della tua zona. Ordina, ritira o ricevi a casa.</p>
-                <div class="d-flex flex-wrap justify-content-center mb-4">
-                    <a href="{{ url_for('products.list_products') }}" class="btn btn-lg mr-2 mb-2" style="padding:15px 40px; font-size:1.1rem; background:#6B8E23; color:white; border:none; border-radius:8px;">Vedi chi coltiva vicino a te</a>
-                    <a href="{{ url_for('profiles.companies') }}" class="btn btn-outline-light btn-lg mb-2" style="padding:15px 40px; font-size:1.1rem; border-width:2px;">Visita le aziende</a>
+<!-- Hero Section - Professional -->
+<section class="hero-section" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 80px 0; position: relative; overflow: hidden;">
+    <div class="hero-pattern" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.05; background-image: url('/static/images/hero/hero.png'); background-size: cover; background-position: center;"></div>
+    <div class="container" style="position: relative; z-index: 2;">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="badge badge-success mb-3" style="font-size: 0.875rem; padding: 0.5rem 1rem;"><i class="fas fa-leaf mr-1"></i> Filiera Corta e Sostenibile</div>
+                <h1 class="display-4 font-weight-bold mb-3" style="color: #2c3e50; line-height: 1.2;">Il tuo contadino di fiducia è più vicino di quanto pensi</h1>
+                <p class="lead mb-4" style="color: #6c757d; font-size: 1.25rem;">Scopri i prodotti freschi degli agricoltori della tua zona. Ordina, ritira o ricevi direttamente a casa.</p>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <a href="{{ url_for('products.list_products') }}" class="btn btn-success btn-lg mr-2" style="padding: 0.875rem 2rem; font-weight: 600;"><i class="fas fa-shopping-basket mr-2"></i>Scopri i Prodotti</a>
+                    <a href="{{ url_for('profiles.companies') }}" class="btn btn-outline-success btn-lg" style="padding: 0.875rem 2rem; font-weight: 600;"><i class="fas fa-store mr-2"></i>Le Aziende</a>
+                </div>
+                <!-- Trust Badges -->
+                <div class="d-flex flex-wrap align-items-center mt-4 text-muted" style="font-size: 0.875rem; gap: 1.5rem;">
+                    <div><i class="fas fa-shield-alt text-success mr-2"></i><strong>Pagamenti Sicuri</strong></div>
+                    <div><i class="fas fa-truck text-success mr-2"></i><strong>Consegna Rapida</strong></div>
+                    <div><i class="fas fa-check-circle text-success mr-2"></i><strong>100% Locale</strong></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image-wrapper" style="position: relative; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.15);">
+                    <img src="/static/images/hero/hero.png" alt="Prodotti locali OrtoVicino" class="img-fluid" style="width: 100%; height: auto; display: block;">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section - Trust Building -->
+<section class="py-4" style="background: #fff; border-bottom: 1px solid #e9ecef;">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 col-6 mb-3 mb-md-0">
+                <div class="stat-item">
+                    <h3 class="font-weight-bold text-success mb-1"><i class="fas fa-users"></i> 500+</h3>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Clienti Soddisfatti</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3 mb-md-0">
+                <div class="stat-item">
+                    <h3 class="font-weight-bold text-success mb-1"><i class="fas fa-seedling"></i> 50+</h3>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Agricoltori Partner</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-item">
+                    <h3 class="font-weight-bold text-success mb-1"><i class="fas fa-shopping-basket"></i> 200+</h3>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Prodotti Disponibili</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-item">
+                    <h3 class="font-weight-bold text-success mb-1"><i class="fas fa-star"></i> 4.8/5</h3>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Valutazione Media</p>
                 </div>
             </div>
         </div>
@@ -56,6 +99,81 @@
             <p class="mb-0">Nessun prodotto disponibile al momento. <a href="{{ url_for('auth.register') }}">Registrati</a> come agricoltore per iniziare a vendere!</p>
         </div>
         {% endif %}
+    </div>
+</section>
+
+<!-- Testimonials Section - Trust Building -->
+<section class="py-5" style="background: linear-gradient(135deg, #6B8E23 0%, #4A7C59 100%);">
+    <div class="container">
+        <div class="text-center mb-5 text-white">
+            <h2 class="font-weight-bold mb-3">Cosa Dicono i Nostri Clienti</h2>
+            <p class="lead">Le recensioni di chi ha già scelto OrtoVicino</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="mb-3">"Finalmente posso acquistare verdure fresche direttamente dal contadino! La qualità è incomparabile e i prezzi sono molto convenienti."</p>
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px; font-weight: 700;">MR</div>
+                            <div class="text-left">
+                                <h6 class="mb-0 font-weight-bold">Maria Rossi</h6>
+                                <small class="text-muted">Cagliari</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="mb-3">"Ottima piattaforma! Ho trovato agricoltori vicino a casa mia e ora compro sempre da loro. Prodotti freschi e km zero garantito."</p>
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px; font-weight: 700;">GL</div>
+                            <div class="text-left">
+                                <h6 class="mb-0 font-weight-bold">Giovanni Lai</h6>
+                                <small class="text-muted">Sassari</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="mb-3">"Sono un'agricoltrice e grazie a OrtoVicino ho trovato nuovi clienti. Semplice da usare e mi aiuta a vendere i miei prodotti direttamente."</p>
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px; font-weight: 700;">AP</div>
+                            <div class="text-left">
+                                <h6 class="mb-0 font-weight-bold">Anna Piras</h6>
+                                <small class="text-muted">Oristano</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
