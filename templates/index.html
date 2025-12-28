@@ -389,6 +389,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.warn('Container mappa mancante');
             return;
         }
+        // eslint-disable-next-line
         var center = [{{ center_lat|default(40.0) }}, {{ center_lng|default(9.0) }}];
         var map = L.map('farmersMap').setView(center, 11);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -397,7 +398,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }).addTo(map);
         
         // Farmers data from server
-        var farmersData = {{ farmers_json|safe }};
+        // eslint-disable-next-line
+        var farmersData = {{ farmers_json|default('[]')|safe }};
         
         function addMarker(f) {
             var m = L.marker([f.lat, f.lng]).addTo(map);
