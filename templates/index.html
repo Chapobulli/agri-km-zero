@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.warn('Container mappa mancante');
             return;
         }
-        var center = [{{ center_lat }}, {{ center_lng }}];
+        var center = [{{ center_lat|default(40.0) }}, {{ center_lng|default(9.0) }}];
         var map = L.map('farmersMap').setView(center, 11);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
