@@ -563,11 +563,19 @@ body {
     
     /* Hero section mobile fix per evitare sovrapposizioni */
     .hero-section {
-        padding: 60px 0 !important;
+        padding: 50px 0 !important;
     }
     
     .hero-overlay {
-        background: linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.92) 100%) !important;
+        background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%) !important;
+    }
+    
+    .hero-section .display-4 {
+        font-size: 1.5rem !important;
+    }
+    
+    .hero-section .lead {
+        font-size: 0.95rem !important;
     }
 }
 
@@ -602,6 +610,20 @@ a {
 
 footer a:hover {
     color: #6B8E23 !important;
+}
+
+/* Hero Section Styles */
+.hero-section {
+    padding: 100px 0;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
 }
 
 /* Sticky Cart Sidebar on Mobile */
