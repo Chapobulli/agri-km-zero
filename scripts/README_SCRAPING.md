@@ -2,17 +2,17 @@
 
 ## 📋 Overview
 
-Sistema completo per importare aziende agricole da fonti pubbliche e permettere ai proprietari di rivendicare i loro profili.
+Sistema completo per importare aziende agricole da OpenStreetMap (fonte pubblica e gratuita) e permettere ai proprietari di rivendicare i loro profili.
 
 ## 🎯 Funzionalità
 
-1. **Scraping Automatico** - Import da OpenStreetMap (GRATUITO) o Google Maps API
+1. **Scraping Automatico** - Import gratuito da OpenStreetMap
 2. **Profili "Unclaimed"** - Aziende visibili ma non gestibili fino al claim
 3. **Sistema di Rivendicazione** - Proprietari possono rivendicare via email
 4. **Badge Verifica** - Distintivi "Verificato" / "Non Verificato" sui profili
 5. **GDPR Compliant** - Disclaimer e possibilità di rimozione dati
 
-## 🚀 Setup - OPZIONE 1: OpenStreetMap (CONSIGLIATO - GRATUITO)
+## 🚀 Setup
 
 ### 1. Installare Dipendenze
 
@@ -26,7 +26,7 @@ pip install requests geopy
 python scripts/scrape_openstreetmap.py
 ```
 
-**Vantaggi**:
+**Vantaggi OpenStreetMap**:
 - ✅ 100% GRATUITO (no billing account)
 - ✅ No API key necessaria
 - ✅ Open Source (ODbL License)
@@ -39,78 +39,15 @@ python scripts/scrape_openstreetmap.py
 - Bounding box: Sardegna (lat 38.8-41.3, lon 8.1-9.9)
 - Reverse geocoding con Nominatim per città/provincia
 
-## 🚀 Setup - OPZIONE 2: Google Maps API (Richiede Billing)
-
-### 1. Installare Dipendenze
-
-```bash
-pip install googlemaps
-```
-
-### 2. Ottenere API Key Google Maps
-
-1. Vai su [Google Cloud Console](https://console.cloud.google.com/)
-2. Crea un nuovo progetto o selezionane uno esistente
-3. Abilita **Places API**
-4. Crea credenziali (API Key)
-5. Imposta restrizioni (opzionale ma raccomandato):
-   - Restrizioni HTTP referrer per production
-   - Limita alle API necessarie (Places API)
-
-### 3. Configurare Variabile d'Ambiente
-
-```bash
-# Windows PowerShell
-$env:GOOGLE_MAPS_API_KEY="YOUR_API_KEY_HERE"
-
-# Windows CMD
-set GOOGLE_MAPS_API_KEY=YOUR_API_KEY_HERE
-
-# Linux/Mac
-export GOOGLE_MAPS_API_KEY="YOUR_API_KEY_HERE"
-```
-
-O aggiungi al file `.env`:
-```
-GOOGLE_MAPS_API_KEY=your_key_here
-```
-
-### 4. Eseguire lo Scraping
-
-```bash
-python scripts/scrape_google_maps.py
-```
-
-## 📊 Confronto Soluzioni
-
-| Caratteristica | OpenStreetMap | Google Maps API |
-|---|---|---|
-| **Costo** | ✅ GRATUITO | ❌ $11.90 per 700 aziende |
-| **Setup** | ✅ Nessuna API key | ❌ Richiede billing account |
-| **Qualità Dati** | ⚠️ Variabile (crowd-sourced) | ✅ Alta (commerciale) |
-| **Copertura** | ⚠️ Dipende da contributi | ✅ Completa |
-| **Rate Limits** | ✅ Gentili | ⚠️ Severi |
-| **License** | ✅ ODbL (open) | ⚠️ Proprietaria |
-
-**Raccomandazione**: Inizia con **OpenStreetMap** (gratuito), poi integra con Google Maps se necessario.
-
 ## 📊 Funzionamento
 
-### Scraping Process (OSM)
+### Scraping Process
 
 1. **Query Overpass**: Interroga OSM con bounding box Sardegna
 2. **Tag filtering**: Cerca `landuse=farmland`, `amenity=farm`, `shop=farm`, etc.
 3. **Reverse geocoding**: Nominatim per città/provincia se mancante
 4. **Deduplicazione**: Verifica telefono e coordinate duplicate
 5. **Creazione profilo**: User con `is_scraped=True`, `data_source='OpenStreetMap'`
-
-### Scraping Process (Google Maps)
-
-1. **Ricerca per provincia**: Scandisce 5 provincie Sardegna
-2. **Query multiple**: 7 tipologie (azienda agricola, produttore locale, etc.)
-3. **Filtro types**: Verifica che siano effettivamente farm/food
-4. **Estrazione dati**: Nome, indirizzo, telefono, coordinate
-5. **Creazione profilo**: User con `is_scraped=True`, `is_claimed=False`
 
 ### Claim Process
 
@@ -123,12 +60,12 @@ python scripts/scrape_google_maps.py
 
 ## 🔒 Compliance Legale
 
-### Google Maps Terms of Service
+### OpenStreetMap License (ODbL)
 
-✅ **Permesso**: Usare dati per creare servizi derivati
-✅ **Attribution**: Footer include crediti OpenStreetMap
-✅ **Rate Limits**: Rispettati (max 100 place details/minuto)
-❌ **NON permesso**: Redistribuire dati raw, cachare >30 giorni
+✅ **Uso libero**: Dati utilizzabili per qualsiasi scopo
+✅ **Attribution**: Footer include crediti © OpenStreetMap contributors
+✅ **Share-Alike**: Modifiche ai dati OSM devono essere condivise
+✅ **No API restrictions**: Nessun limite commerciale
 
 ### GDPR (Art. 14)
 
