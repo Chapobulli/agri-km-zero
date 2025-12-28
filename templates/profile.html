@@ -99,6 +99,11 @@
                             <div class="card-body">
                                 <h6 class="card-title font-weight-bold">{{ p.name }}</h6>
                                 <p class="small text-muted">{{ p.description or 'Nessuna descrizione' }}</p>
+                                {% if p.minimum_order_quantity and p.minimum_order_quantity > 1 %}
+                                    <div class="badge badge-info mb-2">
+                                        <i class="fas fa-box"></i> Ordine minimo: {{ p.minimum_order_quantity }} {{ p.unit or 'pz' }}
+                                    </div>
+                                {% endif %}
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-success font-weight-bold h5 mb-0">{{ '%.2f'|format(p.price) }} €/{{ p.unit or 'kg' }}</span>
                                     {% if current_user.is_authenticated and current_user.id == user.id %}
@@ -113,7 +118,8 @@
                                         <form id="del-{{ p.id }}" method="POST" action="{{ url_for('products.delete_product', product_id=p.id) }}" style="display:none;"></form>
                                     {% else %}
                                         <form method="POST" action="{{ url_for('cart.add_to_cart', product_id=p.id) }}" class="form-inline">
-                                            <input type="number" name="qty" min="1" value="1" class="form-control form-control-sm mr-2" style="width:70px;">
+                                            {% set min_qty = p.minimum_order_quantity or 1 %}
+                                            <input type="number" name="qty" min="{{ min_qty }}" value="{{ min_qty }}" class="form-control form-control-sm mr-2" style="width:70px;" title="Ordine minimo: {{ min_qty }}">
                                             <button class="btn btn-success btn-sm" type="submit"><i class="fas fa-shopping-cart"></i> Aggiungi</button>
                                         </form>
                                     {% endif %}

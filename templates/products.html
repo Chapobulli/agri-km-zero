@@ -104,7 +104,8 @@
                                 {% if current_user.id != product.user_id %}
                                     <div class="d-flex">
                                         <form method="POST" action="{{ url_for('cart.add_to_cart', product_id=product.id) }}" class="form-inline mr-2" style="flex:1;">
-                                            <input type="number" name="qty" min="1" value="1" class="form-control form-control-sm mr-2" style="width:70px;">
+                                            {% set min_qty = product.minimum_order_quantity or 1 %}
+                                            <input type="number" name="qty" min="{{ min_qty }}" value="{{ min_qty }}" class="form-control form-control-sm mr-2" style="width:70px;" title="Ordine minimo: {{ min_qty }}">
                                             <button class="btn btn-success btn-sm btn-block" type="submit">
                                                 <i class="fas fa-shopping-cart"></i> Aggiungi
                                             </button>
@@ -122,8 +123,9 @@
                                 {% endif %}
                             {% else %}
                                 <form method="post" action="{{ url_for('cart.add_to_cart', product_id=product.id) }}" style="margin-top: 8px;">
+                                    {% set min_qty = product.minimum_order_quantity or 1 %}
                                     <div style="display:flex;gap:4px;">
-                                        <input type="number" name="qty" value="1" min="1" max="99" style="width:60px;border:1px solid #ccc;padding:6px;border-radius:4px;">
+                                        <input type="number" name="qty" value="{{ min_qty }}" min="{{ min_qty }}" max="99" style="width:60px;border:1px solid #ccc;padding:6px;border-radius:4px;" title="Ordine minimo: {{ min_qty }}">
                                         <button type="submit" class="btn btn-success btn-sm" style="flex:1;">
                                             <i class="fas fa-shopping-cart"></i> Aggiungi
                                         </button>
