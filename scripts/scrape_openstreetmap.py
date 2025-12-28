@@ -256,6 +256,7 @@ def main():
     print(f"📍 Area: Sardegna")
     print(f"🔍 Tag OSM: {len(FARM_TAGS)} tipologie")
     print(f"💰 Costo: GRATUITO (OpenStreetMap)")
+    print(f"🎯 Limite: 10 aziende per test")
     print()
     
     # Costruisci e esegui query
@@ -270,7 +271,11 @@ def main():
     
     elements = result['elements']
     print(f"✅ Trovati {len(elements)} elementi OSM")
+    print(f"🎯 Creazione limitata a 10 aziende per test")
     print()
+    
+    # LIMITE: Max 10 aziende per iniziare
+    MAX_COMPANIES = 10
     
     total_created = 0
     total_skipped = 0
@@ -279,6 +284,11 @@ def main():
     print("-" * 60)
     
     for idx, element in enumerate(elements, 1):
+        # Stop dopo aver creato 10 aziende
+        if total_created >= MAX_COMPANIES:
+            print(f"\n✋ Raggiunto limite di {MAX_COMPANIES} aziende")
+            break
+            
         if idx % 10 == 0:
             print(f"  Progresso: {idx}/{len(elements)}...")
         
