@@ -1,25 +1,41 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Hero Section - Professional with Topographic Background -->
-<section class="hero-section" style="background-image: url('/static/images/logo/image.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; position: relative; overflow: hidden;">
-    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.4); z-index: 1;"></div>
-    <div class="container" style="position: relative; z-index: 2;">
-        <div class="row align-items-center justify-content-start">
-            <div class="col-lg-6 col-md-8 mb-4 mb-lg-0" style="background: rgba(255,255,255,0.9); padding: 2rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15);">
-                <div class="badge badge-success mb-3" style="font-size: 0.875rem; padding: 0.5rem 1rem;"><i class="fas fa-leaf mr-1"></i> Filiera Corta e Sostenibile</div>
-                <h1 class="display-4 font-weight-bold mb-3" style="color: #2c3e50; line-height: 1.2;">Il tuo contadino di fiducia è più vicino di quanto pensi</h1>
-                <p class="lead mb-4" style="color: #6c757d; font-size: 1.25rem;">Scopri i prodotti freschi degli agricoltori della tua zona. Ordina, ritira o ricevi direttamente a casa.</p>
-                <div class="d-flex flex-wrap gap-3 mb-4">
-                    <a href="{{ url_for('products.list_products') }}" class="btn btn-success btn-lg mr-2" style="padding: 0.875rem 2rem; font-weight: 600;"><i class="fas fa-shopping-basket mr-2"></i>Scopri i Prodotti</a>
-                    <a href="{{ url_for('profiles.companies') }}" class="btn btn-outline-success btn-lg" style="padding: 0.875rem 2rem; font-weight: 600;"><i class="fas fa-store mr-2"></i>Le Aziende</a>
+<!-- Hero Section - Two Column Design with Image -->
+<section class="hero-section" style="background: #f8f9fa; padding: 0; position: relative; overflow: hidden; min-height: 600px;">
+    <div class="container-fluid p-0">
+        <div class="row no-gutters align-items-stretch" style="min-height: 600px;">
+            <!-- Contenuto a sinistra -->
+            <div class="col-lg-6 d-flex align-items-center" style="background: white; padding: 60px 80px;">
+                <div class="w-100">
+                    <div class="badge badge-success mb-3" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                        <i class="fas fa-leaf mr-1"></i> Filiera Corta e Sostenibile
+                    </div>
+                    <h1 class="display-4 font-weight-bold mb-3" style="color: #2c3e50; line-height: 1.2;">
+                        Il tuo contadino di fiducia è più vicino di quanto pensi
+                    </h1>
+                    <p class="lead mb-4" style="color: #6c757d; font-size: 1.25rem;">
+                        Scopri i prodotti freschi degli agricoltori della tua zona. Ordina, ritira o ricevi direttamente a casa.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        <a href="{{ url_for('products.list_products') }}" class="btn btn-success btn-lg mr-2" style="padding: 0.875rem 2rem; font-weight: 600;">
+                            <i class="fas fa-shopping-basket mr-2"></i>Scopri i Prodotti
+                        </a>
+                        <a href="{{ url_for('profiles.companies') }}" class="btn btn-outline-success btn-lg" style="padding: 0.875rem 2rem; font-weight: 600;">
+                            <i class="fas fa-store mr-2"></i>Le Aziende
+                        </a>
+                    </div>
+                    <!-- Trust Badges -->
+                    <div class="d-flex flex-wrap align-items-center mt-4 text-muted" style="font-size: 0.875rem; gap: 1.5rem;">
+                        <div><i class="fas fa-shield-alt text-success mr-2"></i><strong>Pagamenti Sicuri</strong></div>
+                        <div><i class="fas fa-truck text-success mr-2"></i><strong>Consegna Rapida</strong></div>
+                        <div><i class="fas fa-check-circle text-success mr-2"></i><strong>100% Locale</strong></div>
+                    </div>
                 </div>
-                <!-- Trust Badges -->
-                <div class="d-flex flex-wrap align-items-center mt-4 text-muted" style="font-size: 0.875rem; gap: 1.5rem;">
-                    <div><i class="fas fa-shield-alt text-success mr-2"></i><strong>Pagamenti Sicuri</strong></div>
-                    <div><i class="fas fa-truck text-success mr-2"></i><strong>Consegna Rapida</strong></div>
-                    <div><i class="fas fa-check-circle text-success mr-2"></i><strong>100% Locale</strong></div>
-                </div>
+            </div>
+            <!-- Immagine topografica a destra -->
+            <div class="col-lg-6 d-none d-lg-block" style="background: url('/static/images/logo/image.jpg') center center / cover no-repeat; position: relative;">
+                <div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, transparent 20%);"></div>
             </div>
         </div>
     </div>
