@@ -121,7 +121,12 @@ def create_app():
                         ('verification_token', 'VARCHAR(100)'),
                         ('reset_token', 'VARCHAR(100)'),
                         ('province', 'VARCHAR(100)'),
-                        ('city', 'VARCHAR(100)')
+                        ('city', 'VARCHAR(100)'),
+                        ('is_claimed', 'BOOLEAN DEFAULT FALSE'),
+                        ('is_scraped', 'BOOLEAN DEFAULT FALSE'),
+                        ('claim_token', 'VARCHAR(64)'),
+                        ('verified_at', 'TIMESTAMP'),
+                        ('data_source', 'VARCHAR(100)')
                     ]
                     for col_name, col_type in additions_user:
                         if col_name not in user_cols:

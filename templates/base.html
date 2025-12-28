@@ -104,6 +104,7 @@
                         <li><a href="{{ url_for('main.terms') }}" class="text-light" style="text-decoration: none; font-size: 0.95rem;">Termini e Condizioni</a></li>
                         <li><a href="{{ url_for('main.privacy') }}" class="text-light" style="text-decoration: none; font-size: 0.95rem;">Privacy Policy</a></li>
                         <li><a href="#" id="manageCookiesLink" class="text-light" style="text-decoration: none; font-size: 0.95rem;">Gestisci Cookie</a></li>
+                        <li><a href="{{ url_for('main.claim_search') }}" class="text-light" style="text-decoration: none; font-size: 0.95rem;"><i class="fas fa-store"></i> Rivendica Azienda</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4 col-md-4 mb-4">
@@ -127,6 +128,17 @@
                 </div>
             </div>
             <hr style="border-color: rgba(255,255,255,0.1);">
+            <div class="row">
+                <div class="col-md-12 mb-2">
+                    <p class="small text-center mb-2" style="font-size: 0.8rem; opacity: 0.8;">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Disclaimer GDPR:</strong> Alcuni profili aziendali sono stati creati automaticamente da dati pubblici 
+                        (Google Maps, Registri CCIAA) per fornire un servizio completo agli utenti. 
+                        I proprietari delle aziende possono <a href="{{ url_for('main.claim_search') }}" class="text-light font-weight-bold">rivendicare</a> 
+                        o <a href="mailto:privacy@ortovicino.it" class="text-light">richiedere la rimozione</a> dei propri dati in qualsiasi momento.
+                    </p>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-6 text-center text-md-left mb-3 mb-md-0">
                     <p class="mb-0" style="font-size: 0.875rem;">&copy; 2025 OrtoVicino. Tutti i diritti riservati.</p>

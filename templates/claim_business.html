@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white text-center py-4">
+                    <i class="fas fa-hand-paper fa-3x mb-3"></i>
+                    <h3 class="mb-0 font-weight-bold">Rivendica la Tua Azienda</h3>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Company Info -->
+                    <div class="alert alert-info">
+                        <h5 class="mb-3"><i class="fas fa-store"></i> {{ company.company_name or company.username }}</h5>
+                        {% if company.address %}
+                        <p class="mb-1"><i class="fas fa-map-marker-alt"></i> {{ company.address }}</p>
+                        {% endif %}
+                        {% if company.city or company.province %}
+                        <p class="mb-1">
+                            <i class="fas fa-location-arrow"></i>
+                            {% if company.city %}{{ company.city }}{% endif %}
+                            {% if company.province %} ({{ company.province }}){% endif %}
+                        </p>
+                        {% endif %}
+                        {% if company.phone %}
+                        <p class="mb-0"><i class="fas fa-phone"></i> {{ company.phone }}</p>
+                        {% endif %}
+                    </div>
+
+                    <h5 class="mb-3">Conferma la tua identità</h5>
+                    <p class="text-muted mb-4">
+                        Per verificare che tu sia il proprietario di questa azienda, fornisci i tuoi dati di contatto. 
+                        Riceverai un link di verifica via email.
+                    </p>
+
+                    <!-- Claim Form -->
+                    <form method="POST">
+                        <div class="form-group">
+                            <label for="email" class="font-weight-bold">
+                                <i class="fas fa-envelope text-success"></i> Email Aziendale *
+                            </label>
+                            <input type="email" 
+                                   class="form-control form-control-lg" 
+                                   id="email" 
+                                   name="email" 
+                                   placeholder="tua.email@azienda.it"
+                                   required>
+                            <small class="form-text text-muted">
+                                Useremo questa email per verificare la proprietà
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone" class="font-weight-bold">
+                                <i class="fas fa-phone text-success"></i> Telefono (opzionale)
+                            </label>
+                            <input type="tel" 
+                                   class="form-control form-control-lg" 
+                                   id="phone" 
+                                   name="phone" 
+                                   placeholder="+39 123 456 7890"
+                                   value="{{ company.phone or '' }}">
+                            <small class="form-text text-muted">
+                                Può velocizzare la verifica se corrisponde ai dati pubblici
+                            </small>
+                        </div>
+
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="gdpr_consent" required>
+                            <label class="form-check-label small" for="gdpr_consent">
+                                Confermo di essere il legittimo proprietario/rappresentante dell'azienda e accetto il 
+                                <a href="{{ url_for('main.terms') }}" target="_blank">trattamento dei dati</a> 
+                                per la verifica dell'identità
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg btn-block">
+                            <i class="fas fa-paper-plane"></i> Richiedi Verifica
+                        </button>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <!-- Info -->
+                    <div class="alert alert-light">
+                        <h6 class="font-weight-bold mb-2">
+                            <i class="fas fa-info-circle text-primary"></i> Cosa succede dopo?
+                        </h6>
+                        <ol class="mb-0 small">
+                            <li>Riceverai un'email con link di verifica</li>
+                            <li>Cliccando il link confermerai la proprietà</li>
+                            <li>Potrai impostare una password per accedere</li>
+                            <li>Avrai pieno controllo su prodotti, ordini e profilo</li>
+                        </ol>
+                    </div>
+
+                    <p class="text-center mb-0">
+                        <a href="{{ url_for('main.claim_search') }}" class="text-muted">
+                            <i class="fas fa-arrow-left"></i> Torna alla ricerca
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- GDPR Notice -->
+            <div class="card mt-3">
+                <div class="card-body bg-light">
+                    <p class="mb-0 small text-muted">
+                        <i class="fas fa-shield-alt"></i> 
+                        <strong>Privacy & GDPR:</strong> 
+                        I dati di questa azienda provengono da fonti pubbliche (Google Maps, Registri CCIAA) 
+                        conformemente all'Art. 14 GDPR. La verifica della proprietà garantisce che solo i legittimi 
+                        titolari possano gestire il profilo. Puoi richiedere la rimozione dei dati in qualsiasi momento 
+                        scrivendo a <a href="mailto:privacy@ortovicino.it">privacy@ortovicino.it</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

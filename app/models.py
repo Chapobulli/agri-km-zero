@@ -33,6 +33,12 @@ class User(UserMixin, db.Model):
     email_verified = db.Column(db.Boolean, default=False)
     verification_token = db.Column(db.String(100))
     reset_token = db.Column(db.String(100))
+    # Claim business fields
+    is_claimed = db.Column(db.Boolean, default=False)  # True quando il proprietario rivendica
+    is_scraped = db.Column(db.Boolean, default=False)  # True se creato via scraping
+    claim_token = db.Column(db.String(64), unique=True)  # Token per rivendicare
+    verified_at = db.Column(db.DateTime)  # Data verifica proprietà
+    data_source = db.Column(db.String(100))  # Fonte dati (es. "Google Maps", "Manual", "Claimed")
 
     products = db.relationship('Product', backref='farmer', lazy=True)
     sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)

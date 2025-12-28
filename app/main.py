@@ -1,9 +1,12 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash
 from flask_login import login_required, current_user
 from . import db
 from .models import User, Product
 from .locations import get_provinces, get_cities
 from geopy.distance import geodesic
+import json
+from datetime import datetime
+import secrets
 
 main = Blueprint('main', __name__)
 
@@ -83,10 +86,21 @@ def index():
             center_lat = f.latitude
             center_lng = f.longitude
             break
+    
+    # Prepare farmers JSON for map (without Jinja2 loops in JS)
+    farmers_json = json.dumps([{
+        'lat': f.latitude,
+        'lng': f.longitude,
+        'name': f.company_name or f.username,
+        'slug': f.company_slug or f.compute_company_slug(),
+        'city': f.city or '',
+        'province': f.province or ''
+    } for f in farmers])
 
     return render_template('index.html', 
                          products_data=products_data,
                          farmers=farmers,
+                         farmers_json=farmers_json,
                          provinces=provinces,
                          cities=cities,
                          selected_province=province_filter,
@@ -110,3 +124,82 @@ def search():
                     nearby.append((farmer, dist))
         return render_template('search_results.html', nearby=nearby)
     return render_template('search.html')
+
+@main.route('/rivendica-azienda')
+def claim_search():
+    """Pagina di ricerca per trovare la propria azienda"""
+    query = request.args.get('q', '').strip()
+    results = []
+    
+    if query:
+        # Cerca tra profili non rivendicati
+        results = User.query.filter(
+            User.is_farmer == True,
+            User.is_scraped == True,
+            User.is_claimed == False,
+            db.or_(
+                User.company_name.ilike(f'%{query}%'),
+                User.city.ilike(f'%{query}%'),
+                User.username.ilike(f'%{query}%')
+            )
+        ).limit(20).all()
+    
+    return render_template('claim_search.html', query=query, results=results)
+
+@main.route('/rivendica/<username>', methods=['GET', 'POST'])
+def claim_business(username):
+    """Pagina per rivendicare una specifica azienda"""
+    company = User.query.filter_by(
+        username=username,
+        is_scraped=True,
+        is_claimed=False
+    ).first_or_404()
+    
+    if request.method == 'POST':
+        contact_email = request.form.get('email', '').strip()
+        contact_phone = request.form.get('phone', '').strip()
+        
+        if not contact_email:
+            flash('⚠️ Email richiesta per la verifica', 'warning')
+            return redirect(url_for('main.claim_business', username=username))
+        
+        # Genera nuovo token se non esiste
+        if not company.claim_token:
+            company.claim_token = secrets.token_urlsafe(32)
+            db.session.commit()
+        
+        # TODO: Invia email di verifica (implementare quando hai servizio email)
+        # send_claim_verification_email(company, contact_email, contact_phone)
+        
+        flash(f'✉️ Richiesta inviata! Controlla {contact_email} per il link di verifica.', 'info')
+        flash('⚠️ NOTA DEMO: Sistema email non ancora configurato. Contatta info@ortovicino.it per verifica manuale.', 'warning')
+        
+        return redirect(url_for('main.index'))
+    
+    return render_template('claim_business.html', company=company)
+
+@main.route('/verify-claim/<token>')
+def verify_claim(token):
+    """Verifica claim e permetti reset password"""
+    company = User.query.filter_by(claim_token=token).first_or_404()
+    
+    if company.is_claimed:
+        flash('✓ Questa azienda è già stata rivendicata', 'info')
+        return redirect(url_for('main.index'))
+    
+    # Marca come rivendicato
+    company.is_claimed = True
+    company.verified_at = datetime.utcnow()
+    company.data_source = 'Claimed'
+    
+    # Genera reset token per password
+    reset_token = secrets.token_urlsafe(32)
+    company.reset_token = reset_token
+    
+    db.session.commit()
+    
+    flash('✓ Azienda verificata con successo!', 'success')
+    flash('🔑 Imposta ora la tua password per accedere', 'info')
+    
+    # Redirect a pagina reset password
+    return redirect(url_for('auth.reset_password_form', token=reset_token))

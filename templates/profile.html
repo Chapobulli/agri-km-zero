@@ -6,11 +6,43 @@
     <div class="d-flex align-items-center p-3" style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.4);border-radius:8px;">
         <img src="{{ (user.company_logo | url_or_local) or 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=60&h=60&fit=crop' }}" alt="Logo" class="mr-3" style="height:60px;width:60px;object-fit:cover;border-radius:8px;" onerror="this.src='https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=60&h=60&fit=crop'">
         <div class="text-white">
-            <h2 class="m-0">{{ user.company_name or user.username }}</h2>
+            <h2 class="m-0">
+                {{ user.company_name or user.username }}
+                {% if user.is_claimed %}
+                <span class="badge badge-success ml-2" style="font-size: 0.6em;">
+                    <i class="fas fa-check-circle"></i> Verificato
+                </span>
+                {% elif user.is_scraped %}
+                <span class="badge badge-warning ml-2" style="font-size: 0.6em;">
+                    <i class="fas fa-exclamation-triangle"></i> Non Verificato
+                </span>
+                {% endif %}
+            </h2>
             <small><i class="fas fa-map-marker-alt"></i> {{ user.address or 'Posizione non impostata' }}</small>
         </div>
     </div>
 </div>
+
+<!-- Claim Banner for unclaimed businesses -->
+{% if user.is_scraped and not user.is_claimed %}
+<div class="container mt-3">
+    <div class="alert alert-warning">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fa-2x mr-3"></i>
+            <div class="flex-grow-1">
+                <strong>Sei il proprietario di questa azienda?</strong>
+                <p class="mb-0">
+                    Questo profilo è stato creato automaticamente da dati pubblici. 
+                    <a href="{{ url_for('main.claim_business', username=user.username) }}" class="alert-link font-weight-bold">
+                        Rivendicalo ora
+                    </a> per gestire prodotti, ordini e informazioni.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-8">

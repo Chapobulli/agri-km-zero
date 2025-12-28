@@ -395,18 +395,17 @@ document.addEventListener('DOMContentLoaded', function() {
             maxZoom: 19,
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
-        var farmers = [
-            {% for f in farmers %}
-            {lat: {{ f.latitude or 'null' }}, lng: {{ f.longitude or 'null' }}, name: '{{ (f.company_name or f.username)|e }}', slug: '{{ (f.company_slug or f.compute_company_slug())|e }}', city: '{{ (f.city or '')|e }}', province: '{{ (f.province or '')|e }}'},
-            {% endfor %}
-        ];
+        
+        // Farmers data from server
+        var farmersData = {{ farmers_json|safe }};
+        
         function addMarker(f) {
             var m = L.marker([f.lat, f.lng]).addTo(map);
             var html = '<strong>' + f.name + '</strong><br>' + (f.city || '') + '<br>' +
-                       '<a href="' + '{{ url_for('profiles.view_company', slug='__SLUG__') }}'.replace('__SLUG__', f.slug) + '">Vedi profilo</a>';
+                       '<a href="/azienda/' + f.slug + '">Vedi profilo</a>';
             m.bindPopup(html);
         }
-        farmers.forEach(async function(f) {
+        farmersData.forEach(async function(f) {
             if (f.lat != null && f.lng != null) {
                 addMarker(f);
             } else if (f.city) {
