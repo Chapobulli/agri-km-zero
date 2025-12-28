@@ -560,6 +560,15 @@ body {
         object-fit: cover;
         height: 250px;
     }
+    
+    /* Hero section mobile fix per evitare sovrapposizioni */
+    .hero-section {
+        padding: 60px 0 !important;
+    }
+    
+    .hero-overlay {
+        background: linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.92) 100%) !important;
+    }
 }
 
 /* Additional Professional Styling */
@@ -614,5 +623,52 @@ footer a:hover {
     @keyframes highlightCart {
         0%, 100% { background-color: transparent; }
         50% { background-color: rgba(107, 142, 35, 0.1); }
+    }
+}
+
+/* Floating Cart Button Mobile */
+.floating-cart-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #6B8E23;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.floating-cart-btn:hover {
+    background: #4A7C59;
+    transform: scale(1.1);
+}
+
+.floating-cart-btn .badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+@media (min-width: 769px) {
+    .floating-cart-btn {
+        display: none;
     }
 }
