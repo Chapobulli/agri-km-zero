@@ -9,16 +9,20 @@
   <div class="row">
     {% for o in orders %}
     <div class="col-md-6 col-lg-4 mb-4">
-      <div class="card h-100">
+      <div class="card h-100 shadow-sm">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-start mb-2">
             <h6 class="mb-0">Ordine #{{ o.id }}</h6>
             {% if o.status == 'pending' %}
-              <span class="badge badge-warning">In attesa</span>
-            {% elif o.status == 'accepted' %}
-              <span class="badge badge-success">Accettato</span>
+              <span class="badge badge-warning">In Attesa</span>
+            {% elif o.status == 'confirmed' %}
+              <span class="badge badge-info">Confermato</span>
+            {% elif o.status == 'completed' %}
+              <span class="badge badge-success">Completato</span>
+            {% elif o.status == 'cancelled' or o.status == 'rejected' %}
+              <span class="badge badge-danger">Annullato</span>
             {% else %}
-              <span class="badge badge-secondary">Rifiutato</span>
+              <span class="badge badge-secondary">{{ o.status }}</span>
             {% endif %}
           </div>
           <hr>
@@ -27,13 +31,42 @@
               {{ o.farmer.company_name or o.farmer.username }}
             </a>
           </p>
+          
+          <!-- Dettagli prodotti -->
+          {% set items = o.items_json | fromjson %}
+          <div class="mb-2">
+            <small class="text-muted"><strong>Prodotti:</strong></small>
+            <ul class="list-unstyled ml-2 mb-2">
+              {% for product_id, item in items.items() %}
+              <li style="font-size: 0.9rem;"><i class="fas fa-check text-success"></i> {{ item.name }} x{{ item.qty }} {{ item.unit }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          
           <p class="mb-2"><strong>Totale:</strong> <span class="text-success h5">{{ '%.2f'|format(o.total_price) }} €</span></p>
           {% if o.delivery_requested %}
           <p class="mb-2"><small><i class="fas fa-truck"></i> Consegna a: {{ o.delivery_address }}</small></p>
           {% else %}
           <p class="mb-2"><small><i class="fas fa-store"></i> Ritiro in azienda</small></p>
           {% endif %}
-          <p class="mb-2"><small class="text-muted">{{ o.created_at.strftime('%d/%m/%Y %H:%M') }}</small></p>
+          <p class="mb-2"><small class="text-muted"><i class="fas fa-calendar"></i> {{ o.created_at.strftime('%d/%m/%Y %H:%M') }}</small></p>
+          
+          {% if o.completed_at %}
+          <p class="mb-2"><small class="text-success"><i class="fas fa-check-circle"></i> Completato: {{ o.completed_at.strftime('%d/%m/%Y') }}</small></p>
+          {% endif %}
+          
+          <!-- Pulsante recensione solo se completato e non recensito -->
+          {% if o.status == 'completed' and not o.reviewed %}
+          <button class="btn btn-success btn-sm btn-block mb-2" 
+                  onclick="openReviewModal({{ o.farmer_id }}, {{ o.id }}, '{{ o.farmer.company_name or o.farmer.username }}')">
+            <i class="fas fa-star"></i> Lascia una Recensione
+          </button>
+          {% elif o.reviewed %}
+          <div class="alert alert-success mb-2 py-1 px-2" style="font-size: 0.85rem;">
+            <i class="fas fa-check-circle"></i> Recensione inviata. Grazie!
+          </div>
+          {% endif %}
+          
           <a class="btn btn-outline-primary btn-sm btn-block" href="{{ url_for('messages.conversation', user_id=o.farmer_id) }}">
             <i class="fas fa-comments"></i> Scrivi all'azienda
           </a>
@@ -49,4 +82,145 @@
     </div>
   {% endif %}
 </div>
+
+<!-- Modal Recensione -->
+<div class="modal fade" id="reviewModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Lascia una Recensione</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="farmerNameDisplay" class="mb-3 text-center">
+          <strong></strong>
+        </div>
+        <form id="reviewForm">
+          <input type="hidden" id="review_farmer_id">
+          <input type="hidden" id="review_order_id">
+          
+          <div class="form-group text-center">
+            <label class="font-weight-bold">Valutazione</label><br>
+            <div class="star-rating" style="font-size: 2.5rem; cursor: pointer;">
+              <i class="far fa-star" data-rating="1"></i>
+              <i class="far fa-star" data-rating="2"></i>
+              <i class="far fa-star" data-rating="3"></i>
+              <i class="far fa-star" data-rating="4"></i>
+              <i class="far fa-star" data-rating="5"></i>
+            </div>
+            <input type="hidden" id="rating" name="rating" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Commento (opzionale)</label>
+            <textarea class="form-control" id="comment" name="comment" rows="3" 
+                      placeholder="Condividi la tua esperienza..."></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-success btn-block">
+            <i class="fas fa-paper-plane"></i> Invia Recensione
+          </button>
+        </form>
+        <div id="reviewSuccess" class="alert alert-success mt-3" style="display:none;">
+          <i class="fas fa-check-circle"></i> <span id="successMessage">Grazie per la tua recensione!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.star-rating i {
+  color: #ddd;
+  transition: all 0.2s;
+}
+.star-rating i:hover,
+.star-rating i.active {
+  color: #ffc107;
+}
+</style>
+
+<script>
+let selectedRating = 0;
+
+function openReviewModal(farmerId, orderId, farmerName) {
+  document.getElementById('review_farmer_id').value = farmerId;
+  document.getElementById('review_order_id').value = orderId;
+  document.getElementById('farmerNameDisplay').querySelector('strong').textContent = farmerName;
+  selectedRating = 0;
+  document.getElementById('rating').value = '';
+  document.getElementById('comment').value = '';
+  document.getElementById('reviewSuccess').style.display = 'none';
+  document.getElementById('reviewForm').style.display = 'block';
+  
+  document.querySelectorAll('.star-rating i').forEach(star => {
+    star.classList.remove('active', 'fas');
+    star.classList.add('far');
+  });
+  
+  $('#reviewModal').modal('show');
+}
+
+// Star rating interaction
+document.querySelectorAll('.star-rating i').forEach(star => {
+  star.addEventListener('click', function() {
+    selectedRating = parseInt(this.dataset.rating);
+    document.getElementById('rating').value = selectedRating;
+    
+    document.querySelectorAll('.star-rating i').forEach(s => {
+      const starValue = parseInt(s.dataset.rating);
+      if (starValue <= selectedRating) {
+        s.classList.remove('far');
+        s.classList.add('fas', 'active');
+      } else {
+        s.classList.remove('fas', 'active');
+        s.classList.add('far');
+      }
+    });
+  });
+});
+
+// Submit review
+document.getElementById('reviewForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  if (selectedRating === 0) {
+    alert('Seleziona una valutazione con le stelle');
+    return;
+  }
+  
+  const farmerId = document.getElementById('review_farmer_id').value;
+  const orderId = document.getElementById('review_order_id').value;
+  const comment = document.getElementById('comment').value;
+  
+  const formData = new FormData();
+  formData.append('rating', selectedRating);
+  formData.append('comment', comment);
+  formData.append('order_id', orderId);
+  
+  try {
+    const response = await fetch(`/submit-review/${farmerId}`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      document.getElementById('successMessage').textContent = data.message;
+      document.getElementById('reviewSuccess').style.display = 'block';
+      document.getElementById('reviewForm').style.display = 'none';
+      
+      setTimeout(() => {
+        $('#reviewModal').modal('hide');
+        location.reload();
+      }, 2000);
+    } else {
+      alert(data.message || 'Errore durante l\'invio della recensione');
+    }
+  } catch (error) {
+    alert('Errore di connessione. Riprova.');
+  }
+});
+</script>
 {% endblock %}

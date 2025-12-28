@@ -93,8 +93,10 @@ class OrderRequest(db.Model):
     delivery_requested = db.Column(db.Boolean, default=False)
     items_json = db.Column(db.Text, nullable=False)  # JSON of items in cart
     total_price = db.Column(db.Float, default=0.0)
-    status = db.Column(db.String(20), default='pending')  # pending|accepted|rejected
+    status = db.Column(db.String(20), default='pending')  # pending|confirmed|completed|cancelled
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    completed_at = db.Column(db.DateTime, nullable=True)  # Data completamento ordine
+    reviewed = db.Column(db.Boolean, default=False)  # Se il cliente ha già recensito
     
     farmer = db.relationship('User', foreign_keys=[farmer_id], backref='received_orders')
     client = db.relationship('User', foreign_keys=[client_id], backref='placed_orders')

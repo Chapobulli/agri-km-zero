@@ -113,16 +113,16 @@ def clear_cart(farmer_id):
 
 @cart.route('/orders/success')
 def order_success():
-    """Pagina di successo ordine con prompt per recensione"""
-    pending_review = session.get('pending_review')
-    if not pending_review:
-        flash('Nessun ordine pendente', 'info')
-        return redirect(url_for('main.index'))
+    """Pagina di successo ordine - recensione disponibile dopo completamento"""
+    flash('✅ Ordine inviato con successo! Riceverai conferma dall\'azienda.', 'success')
     
-    return render_template('order_success.html',
-                          farmer_id=pending_review['farmer_id'],
-                          order_id=pending_review['order_id'],
-                          farmer_name=pending_review['farmer_name'])
+    # Rimuovi pending_review dalla sessione
+    session.pop('pending_review', None)
+    
+    # Redirect a I Miei Ordini se autenticato, altrimenti home
+    if current_user.is_authenticated:
+        return redirect(url_for('cart.my_client_orders'))
+    return redirect(url_for('main.index'))
 
 @cart.route('/cart/whatsapp/<int:farmer_id>', methods=['GET', 'POST'])
 def whatsapp_order(farmer_id):
@@ -289,15 +289,7 @@ def create_order(farmer_id):
     c.pop(str(farmer_id), None)
     _save_session()
     
-    # Store order info for review prompt
-    session['pending_review'] = {
-        'farmer_id': farmer_id,
-        'order_id': order.id,
-        'farmer_name': farmer.company_name or farmer.username
-    }
-    _save_session()
-    
-    # Redirect to order success page with review prompt
+    # Redirect to order success page
     return redirect(url_for('cart.order_success'))
 
 @cart.route('/orders/accept/<int:order_id>', methods=['POST'])
@@ -307,13 +299,13 @@ def accept_order(order_id):
     if current_user.id != order.farmer_id:
         flash('Non autorizzato', 'danger')
         return redirect(url_for('profiles.view_profile', username=current_user.username))
-    order.status = 'accepted'
+    order.status = 'confirmed'
     db.session.commit()
     # Send in-app message if client is registered
     if order.client_id:
         try:
             msg = Message(
-                content=f"Il tuo ordine #{order.id} è stato accettato! L'azienda ti contatterà a breve per i dettagli.",
+                content=f"Il tuo ordine #{order.id} è stato confermato! L'azienda ti contatterà a breve per i dettagli.",
                 sender_id=current_user.id,
                 recipient_id=order.client_id
             )
@@ -325,15 +317,45 @@ def accept_order(order_id):
     if order.client_email:
         try:
             farmer = User.query.get(order.farmer_id)
-            send_email(order.client_email, "Ordine accettato", f"""
-                <h3>Il tuo ordine è stato accettato!</h3>
+            send_email(order.client_email, "Ordine confermato", f"""
+                <h3>Il tuo ordine è stato confermato!</h3>
                 <p><strong>Azienda:</strong> {farmer.company_name or farmer.username}</p>
                 <p><strong>Totale:</strong> {order.total_price:.2f} €</p>
                 <p>L'azienda ti contatterà a breve per i dettagli.</p>
             """)
         except Exception:
             pass
-    flash('Ordine accettato', 'success')
+    flash('Ordine confermato', 'success')
+    return redirect(request.referrer or url_for('profiles.my_orders'))
+
+@cart.route('/orders/complete/<int:order_id>', methods=['POST'])
+@login_required
+def complete_order(order_id):
+    """Agricoltore segna l'ordine come completato (ritirato/consegnato)"""
+    order = OrderRequest.query.get_or_404(order_id)
+    if current_user.id != order.farmer_id:
+        flash('Non autorizzato', 'danger')
+        return redirect(url_for('main.index'))
+    
+    from datetime import datetime
+    order.status = 'completed'
+    order.completed_at = datetime.utcnow()
+    db.session.commit()
+    
+    # Notifica cliente
+    if order.client_id:
+        try:
+            msg = Message(
+                content=f"Il tuo ordine #{order.id} è stato completato! Puoi lasciare una recensione dalla pagina I Miei Ordini.",
+                sender_id=current_user.id,
+                recipient_id=order.client_id
+            )
+            db.session.add(msg)
+            db.session.commit()
+        except Exception:
+            pass
+    
+    flash('✅ Ordine segnato come completato!', 'success')
     return redirect(request.referrer or url_for('profiles.my_orders'))
 
 @cart.route('/orders/reject/<int:order_id>', methods=['POST'])

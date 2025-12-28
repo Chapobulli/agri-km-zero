@@ -60,6 +60,22 @@ try:
         CREATE INDEX IF NOT EXISTS idx_review_order_id ON review(order_id);
     """)
     print("✓ Indexes created")
+
+    # Add order completion fields
+    print("\n5. Adding order completion fields...")
+    cursor.execute("""
+        ALTER TABLE order_request ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP;
+    """)
+    cursor.execute("""
+        ALTER TABLE order_request ADD COLUMN IF NOT EXISTS reviewed BOOLEAN DEFAULT FALSE;
+    """)
+    cursor.execute("""
+        CREATE INDEX IF NOT EXISTS idx_order_request_completed ON order_request(completed_at);
+    """)
+    cursor.execute("""
+        CREATE INDEX IF NOT EXISTS idx_order_request_reviewed ON order_request(reviewed);
+    """)
+    print("✓ Order completion columns added")
     
     # Commit changes
     conn.commit()

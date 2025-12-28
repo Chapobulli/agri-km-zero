@@ -6,8 +6,9 @@ from app.models import Review, User, OrderRequest
 reviews_bp = Blueprint('reviews', __name__)
 
 @reviews_bp.route('/submit-review/<int:farmer_id>', methods=['POST'])
+@login_required
 def submit_review(farmer_id):
-    """Ricevi una recensione per un'azienda agricola"""
+    """Ricevi una recensione per un'azienda agricola (solo utenti autenticati)"""
     try:
         rating_str = request.form.get('rating', '').strip()
         
@@ -24,22 +25,50 @@ def submit_review(farmer_id):
             return jsonify({'success': False, 'message': 'Valutazione deve essere tra 1 e 5 stelle'}), 400
         
         comment = request.form.get('comment', '').strip()
-        order_id = request.form.get('order_id')
+        order_id_str = request.form.get('order_id')
         
         # Verifica che l'azienda esista
         farmer = User.query.get(farmer_id)
         if not farmer or not farmer.is_farmer:
             return jsonify({'success': False, 'message': 'Azienda non trovata'}), 404
         
+        # Valida che sia fornito un order_id
+        if not order_id_str:
+            return jsonify({'success': False, 'message': 'ID ordine mancante'}), 400
+        
+        try:
+            order_id = int(order_id_str)
+        except ValueError:
+            return jsonify({'success': False, 'message': 'ID ordine non valido'}), 400
+        
+        # Verifica che l'ordine esista e appartenga all'utente corrente
+        order = OrderRequest.query.get(order_id)
+        if not order:
+            return jsonify({'success': False, 'message': 'Ordine non trovato'}), 404
+        
+        if order.client_id != current_user.id:
+            return jsonify({'success': False, 'message': 'Non sei autorizzato a recensire questo ordine'}), 403
+        
+        # Verifica che l'ordine sia completato
+        if order.status != 'completed':
+            return jsonify({'success': False, 'message': 'Puoi recensire solo ordini completati'}), 400
+        
+        # Verifica che l'ordine non sia già stato recensito
+        if order.reviewed:
+            return jsonify({'success': False, 'message': 'Hai già recensito questo ordine'}), 400
+        
         # Crea la recensione
         review = Review(
             farmer_id=farmer_id,
-            client_id=current_user.id if current_user.is_authenticated else None,
-            client_name=current_user.username if current_user.is_authenticated else request.form.get('client_name', 'Anonimo'),
-            order_id=int(order_id) if order_id else None,
+            client_id=current_user.id,
+            client_name=current_user.username,
+            order_id=order_id,
             rating=rating,
             comment=comment if comment else None
         )
+        
+        # Contrassegna l'ordine come recensito
+        order.reviewed = True
         
         db.session.add(review)
         db.session.commit()
