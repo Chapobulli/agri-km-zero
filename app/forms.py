@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, FloatField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, FloatField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
 from flask_wtf.file import FileField, FileAllowed
 
@@ -21,6 +21,7 @@ class ProductForm(FlaskForm):
     description = TextAreaField('Descrizione', validators=[Optional()])
     price = FloatField('Prezzo (€)', validators=[DataRequired(message="Il prezzo è obbligatorio")])
     unit = SelectField('Unità di Misura', choices=[('kg','€/kg'), ('pezzo','€/pezzo'), ('cassetta','€/cassetta')], validators=[DataRequired()])
+    minimum_order_quantity = IntegerField('Ordine Minimo (pezzi/unità)', validators=[DataRequired(message="L'ordine minimo è obbligatorio")], default=10)
     category = SelectField('Categoria', choices=[('frutta','Frutta'), ('verdura','Verdura'), ('vino','Vino'), ('olio','Olio di Oliva'), ('latticini','Latticini e Formaggi'), ('miele','Miele'), ('altro','Altro')], validators=[DataRequired()])
     image = FileField('Foto Prodotto', validators=[Optional(), FileAllowed(['jpg','jpeg','png','gif'], 'Solo immagini JPG, PNG o GIF')])
     safety_ack = BooleanField('Dichiaro che questo prodotto rispetta le norme igienico-sanitarie vigenti per la vendita diretta', validators=[DataRequired(message="Devi dichiarare la conformità igienico-sanitaria del prodotto")])

@@ -69,6 +69,8 @@ def create_app():
     app.register_blueprint(cart_blueprint)
     from .debug import debug as debug_blueprint
     app.register_blueprint(debug_blueprint)
+    from .reviews import reviews_bp
+    app.register_blueprint(reviews_bp)
 
     # Register custom filters
     from .template_filters import url_or_local

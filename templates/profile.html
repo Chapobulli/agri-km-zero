@@ -46,6 +46,16 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-8">
+            <!-- Reviews Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="mb-3"><i class="fas fa-star text-warning"></i> Recensioni</h5>
+                    <div id="reviewsContainer">
+                        <p class="text-muted text-center">Caricamento recensioni...</p>
+                    </div>
+                </div>
+            </div>
+            
             <h4>Descrizione</h4>
             <p>{{ user.company_description or 'Acquista prodotti agricoli di qualita da agricoltori della tua zona.' }}</p>
             
@@ -453,8 +463,42 @@
 
 {% block scripts %}
 <script>
-// Scroll automatico al carrello su mobile dopo aggiunta prodotto
+// Load reviews
 document.addEventListener('DOMContentLoaded', function() {
+    const farmerId = {{ user.id }};
+    const reviewsContainer = document.getElementById('reviewsContainer');
+    
+    fetch(`/farmer/${farmerId}/reviews`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.total === 0) {
+                reviewsContainer.innerHTML = '<p class="text-muted text-center">Nessuna recensione ancora. Sii il primo!</p>';
+            } else {
+                let html = `<div class="mb-3 text-center">
+                    <h3 class="mb-0">${data.avg_rating.toFixed(1)} <i class="fas fa-star text-warning"></i></h3>
+                    <small class="text-muted">${data.total} recensioni</small>
+                </div><div class="list-group">`;
+                
+                data.reviews.forEach(review => {
+                    const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                    html += `<div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong>${review.client_name}</strong>
+                            <small class="text-muted">${review.created_at}</small>
+                        </div>
+                        <div class="text-warning mb-2">${stars}</div>
+                        ${review.comment ? `<p class="mb-0">${review.comment}</p>` : ''}
+                    </div>`;
+                });
+                html += '</div>';
+                reviewsContainer.innerHTML = html;
+            }
+        })
+        .catch(error => {
+            reviewsContainer.innerHTML = '<p class="text-danger">Errore nel caricamento delle recensioni</p>';
+        });
+    
+    // Scroll automatico al carrello su mobile dopo aggiunta prodotto
     if (window.innerWidth <= 768) {
         const cartCard = document.querySelector('.profile-sidebar .card.mt-3');
         if (cartCard && window.location.hash === '#cart-updated') {

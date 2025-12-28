@@ -30,13 +30,22 @@ def add_to_cart(product_id):
         qty = max(1, int(qty))
     except Exception:
         qty = 1
+    
+    # Validazione ordine minimo
+    min_qty = product.minimum_order_quantity or 1
+    if qty < min_qty:
+        flash(f'⚠️ Ordine minimo per "{product.name}": {min_qty} {product.unit or "pz"}', 'warning')
+        farmer = User.query.get(farmer_id)
+        return redirect(_profile_url_for_farmer(farmer))
+    
     c = _get_cart()
     farmer_cart = c.setdefault(str(farmer_id), {})
     item = farmer_cart.setdefault(str(product_id), {
         'name': product.name,
         'unit': product.unit or 'pz',
         'price': float(product.price or 0),
-        'qty': 0
+        'qty': 0,
+        'min_qty': min_qty
     })
     item['qty'] += qty
     _save_session()
@@ -65,19 +74,30 @@ def update_cart(product_id):
     farmer_id = product.user_id
     action = request.form.get('action', 'set')
     qty = request.form.get('qty', '1')
+    min_qty = product.minimum_order_quantity or 1
+    
     try:
-        qty = max(1, int(qty))
+        qty = max(min_qty, int(qty))
     except Exception:
-        qty = 1
+        qty = min_qty
+    
     c = _get_cart()
     farmer_cart = c.get(str(farmer_id), {})
     if str(product_id) in farmer_cart:
         if action == 'increment':
             farmer_cart[str(product_id)]['qty'] += 1
         elif action == 'decrement':
-            farmer_cart[str(product_id)]['qty'] = max(1, farmer_cart[str(product_id)]['qty'] - 1)
+            new_qty = farmer_cart[str(product_id)]['qty'] - 1
+            if new_qty < min_qty:
+                flash(f'⚠️ Ordine minimo: {min_qty} {product.unit or "pz"}', 'warning')
+                new_qty = min_qty
+            farmer_cart[str(product_id)]['qty'] = new_qty
         else:
+            if qty < min_qty:
+                flash(f'⚠️ Ordine minimo: {min_qty} {product.unit or "pz"}', 'warning')
+                qty = min_qty
             farmer_cart[str(product_id)]['qty'] = qty
+        farmer_cart[str(product_id)]['min_qty'] = min_qty
         _save_session()
     farmer = User.query.get(farmer_id)
     return redirect(url_for('profiles.view_profile', username=farmer.username))
@@ -91,6 +111,18 @@ def clear_cart(farmer_id):
     farmer = User.query.get_or_404(farmer_id)
     return redirect(_profile_url_for_farmer(farmer))
 
+@cart.route('/orders/success')
+def order_success():
+    """Pagina di successo ordine con prompt per recensione"""
+    pending_review = session.get('pending_review')
+    if not pending_review:
+        flash('Nessun ordine pendente', 'info')
+        return redirect(url_for('main.index'))
+    
+    return render_template('order_success.html',
+                          farmer_id=pending_review['farmer_id'],
+                          order_id=pending_review['order_id'],
+                          farmer_name=pending_review['farmer_name'])
 
 @cart.route('/cart/whatsapp/<int:farmer_id>', methods=['GET', 'POST'])
 def whatsapp_order(farmer_id):
@@ -153,6 +185,10 @@ def create_order(farmer_id):
         flash('Il carrello è vuoto', 'warning')
         farmer = User.query.get_or_404(farmer_id)
         return redirect(_profile_url_for_farmer(farmer))
+    
+    # Get farmer for later use
+    farmer = User.query.get_or_404(farmer_id)
+    
     name = request.form.get('name', '').strip()
     email = request.form.get('email', '').strip()
     phone = request.form.get('phone', '').strip()
@@ -252,10 +288,17 @@ def create_order(farmer_id):
     # Clear cart after creating order
     c.pop(str(farmer_id), None)
     _save_session()
-    flash('Ordine inviato: l\'azienda riceverà i dettagli e ti contatterà', 'success')
-    if is_auth:
-        return redirect(url_for('profiles.my_client_orders'))
-    return redirect(_profile_url_for_farmer(farmer))
+    
+    # Store order info for review prompt
+    session['pending_review'] = {
+        'farmer_id': farmer_id,
+        'order_id': order.id,
+        'farmer_name': farmer.company_name or farmer.username
+    }
+    _save_session()
+    
+    # Redirect to order success page with review prompt
+    return redirect(url_for('cart.order_success'))
 
 @cart.route('/orders/accept/<int:order_id>', methods=['POST'])
 @login_required

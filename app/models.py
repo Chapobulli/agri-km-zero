@@ -71,6 +71,7 @@ class Product(db.Model):
     unit = db.Column(db.String(20))  # 'kg', 'pezzo', 'cassetta'
     category = db.Column(db.String(50), default='altro')  # frutta, verdura, vino, olio, latticini, altro
     image_path = db.Column(db.String(300))
+    minimum_order_quantity = db.Column(db.Integer, default=1)  # Ordine minimo di pezzi/unità
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class Message(db.Model):
@@ -97,3 +98,16 @@ class OrderRequest(db.Model):
     
     farmer = db.relationship('User', foreign_keys=[farmer_id], backref='received_orders')
     client = db.relationship('User', foreign_keys=[client_id], backref='placed_orders')
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    farmer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('order_request.id'), nullable=True)
+    client_name = db.Column(db.String(150))  # Nome per recensioni guest
+    rating = db.Column(db.Integer, nullable=False)  # 1-5 stelle
+    comment = db.Column(db.Text)  # Commento opzionale
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    
+    farmer = db.relationship('User', foreign_keys=[farmer_id], backref='reviews')
+    client = db.relationship('User', foreign_keys=[client_id], backref='written_reviews')
+    order = db.relationship('OrderRequest', backref='review')

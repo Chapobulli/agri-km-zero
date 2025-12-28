@@ -75,6 +75,7 @@ def add_product():
             price=form.price.data,
             unit=form.unit.data,
             category=form.category.data,
+            minimum_order_quantity=form.minimum_order_quantity.data or 10,
             image_path=image_path,
             user_id=current_user.id
         )
@@ -98,6 +99,7 @@ def edit_product(product_id):
         form.price.data = product.price
         form.unit.data = product.unit
         form.category.data = product.category or 'altro'
+        form.minimum_order_quantity.data = product.minimum_order_quantity or 10
         form.safety_ack.data = True
     if form.validate_on_submit():
         product.name = form.name.data
@@ -107,6 +109,7 @@ def edit_product(product_id):
             product.price = form.price.data
         product.unit = form.unit.data
         product.category = form.category.data
+        product.minimum_order_quantity = form.minimum_order_quantity.data or 10
         if form.image.data:
             import cloudinary.uploader
             upload_result = cloudinary.uploader.upload(form.image.data, folder="agri_km_zero/products")
