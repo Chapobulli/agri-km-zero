@@ -206,10 +206,9 @@ def verify_claim(token):
 # ENDPOINT TEMPORANEO PER CARICARE AZIENDE (RIMUOVERE DOPO L'USO)
 @main.route('/admin/load-osm-companies-temp-xyz123')
 def load_osm_companies():
-    """Endpoint temporaneo per caricare aziende da OpenStreetMap"""
+    """Endpoint temporaneo per caricare aziende da OpenStreetMap - VELOCE (5 aziende)"""
     try:
         from scripts.scrape_openstreetmap import query_overpass, build_overpass_query, create_profile_from_osm, SARDEGNA_BBOX, FARM_TAGS
-        import time
         
         # Costruisci query
         query = build_overpass_query(SARDEGNA_BBOX, FARM_TAGS)
@@ -219,7 +218,7 @@ def load_osm_companies():
             return "Nessun elemento trovato", 404
         
         elements = result['elements']
-        MAX_COMPANIES = 10
+        MAX_COMPANIES = 5  # Ridotto a 5 per velocità
         created = 0
         skipped = 0
         
@@ -232,8 +231,8 @@ def load_osm_companies():
                 created += 1
             else:
                 skipped += 1
-            time.sleep(0.5)
+            # Nessun sleep per velocità
         
-        return f"✓ Caricamento completato!<br>Aziende create: {created}<br>Saltate: {skipped}<br><a href='/companies'>Vedi aziende</a>", 200
+        return f"<html><body style='font-family: Arial; padding: 40px; text-align: center;'><h2>✓ Caricamento completato!</h2><p style='font-size: 18px;'>Aziende create: <strong>{created}</strong><br>Saltate: {skipped}</p><a href='/companies' style='display: inline-block; margin-top: 20px; padding: 12px 24px; background: #6B8E23; color: white; text-decoration: none; border-radius: 4px;'>Vedi Aziende</a></body></html>", 200
     except Exception as e:
-        return f"Errore: {str(e)}", 500
+        return f"<html><body style='font-family: Arial; padding: 40px;'><h2 style='color: red;'>Errore</h2><p>{str(e)}</p><a href='/'>Torna alla home</a></body></html>", 500
