@@ -102,69 +102,73 @@ def create_app():
         db.session.rollback()
         return render_template('500.html'), 500
 
-    try:
-        with app.app_context():
-            db.create_all()
-            # Ensure schema columns exist for upgrades without migrations
-            try:
-                engine = db.engine
-                insp = inspect(engine)
-                # Use autocommit context for DDL (PostgreSQL)
-                with engine.begin() as conn:
-                    # User table columns
-                    user_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('user')}
-                    additions_user = [
-                        ('bio', 'TEXT'),
-                        ('profile_photo', 'VARCHAR(300)'),
-                        ('display_name', 'VARCHAR(150)'),
-                        ('company_slug', 'VARCHAR(200)'),
-                        ('phone', 'VARCHAR(50)'),
-                        ('company_name', 'VARCHAR(200)'),
-                        ('company_description', 'TEXT'),
-                        ('company_logo', 'VARCHAR(300)'),
-                        ('company_cover', 'VARCHAR(300)'),
-                        ('email_verified', 'BOOLEAN DEFAULT FALSE'),
-                        ('verification_token', 'VARCHAR(100)'),
-                        ('reset_token', 'VARCHAR(100)'),
-                        ('province', 'VARCHAR(100)'),
-                        ('city', 'VARCHAR(100)'),
-                        ('is_claimed', 'BOOLEAN DEFAULT FALSE'),
-                        ('is_scraped', 'BOOLEAN DEFAULT FALSE'),
-                        ('claim_token', 'VARCHAR(64)'),
-                        ('verified_at', 'TIMESTAMP'),
-                        ('data_source', 'VARCHAR(100)')
-                    ]
-                    for col_name, col_type in additions_user:
-                        if col_name not in user_cols:
-                            app.logger.info(f"Adding missing column user.{col_name}")
-                            conn.execute(text(f'ALTER TABLE "user" ADD COLUMN {col_name} {col_type}'))
+    # Avoid blocking startup if DB is unreachable: run init only in dev or when explicitly enabled
+    if os.environ.get('DB_INIT_ON_START') == '1' or os.environ.get('FLASK_ENV') == 'development':
+        try:
+            with app.app_context():
+                db.create_all()
+                # Ensure schema columns exist for upgrades without migrations
+                try:
+                    engine = db.engine
+                    insp = inspect(engine)
+                    # Use autocommit context for DDL (PostgreSQL)
+                    with engine.begin() as conn:
+                        # User table columns
+                        user_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('user')}
+                        additions_user = [
+                            ('bio', 'TEXT'),
+                            ('profile_photo', 'VARCHAR(300)'),
+                            ('display_name', 'VARCHAR(150)'),
+                            ('company_slug', 'VARCHAR(200)'),
+                            ('phone', 'VARCHAR(50)'),
+                            ('company_name', 'VARCHAR(200)'),
+                            ('company_description', 'TEXT'),
+                            ('company_logo', 'VARCHAR(300)'),
+                            ('company_cover', 'VARCHAR(300)'),
+                            ('email_verified', 'BOOLEAN DEFAULT FALSE'),
+                            ('verification_token', 'VARCHAR(100)'),
+                            ('reset_token', 'VARCHAR(100)'),
+                            ('province', 'VARCHAR(100)'),
+                            ('city', 'VARCHAR(100)'),
+                            ('is_claimed', 'BOOLEAN DEFAULT FALSE'),
+                            ('is_scraped', 'BOOLEAN DEFAULT FALSE'),
+                            ('claim_token', 'VARCHAR(64)'),
+                            ('verified_at', 'TIMESTAMP'),
+                            ('data_source', 'VARCHAR(100)')
+                        ]
+                        for col_name, col_type in additions_user:
+                            if col_name not in user_cols:
+                                app.logger.info(f"Adding missing column user.{col_name}")
+                                conn.execute(text(f'ALTER TABLE "user" ADD COLUMN {col_name} {col_type}'))
 
-                    # Product table columns
-                    product_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('product')}
-                    additions_product = [
-                        ('unit', 'VARCHAR(20)'),
-                        ('category', "VARCHAR(50) DEFAULT 'altro'"),
-                        ('image_path', 'VARCHAR(300)')
-                    ]
-                    for col_name, col_type in additions_product:
-                        if col_name not in product_cols:
-                            app.logger.info(f"Adding missing column product.{col_name}")
-                            conn.execute(text(f'ALTER TABLE "product" ADD COLUMN {col_name} {col_type}'))
-                    
-                    # Message table columns
-                    message_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('message')}
-                    additions_message = [
-                        ('read', 'BOOLEAN DEFAULT FALSE')
-                    ]
-                    for col_name, col_type in additions_message:
-                        if col_name not in message_cols:
-                            app.logger.info(f"Adding missing column message.{col_name}")
-                            conn.execute(text(f'ALTER TABLE "message" ADD COLUMN {col_name} {col_type}'))
-            except Exception as e:
-                app.logger.warning(f"Schema ensure failed (may already be up-to-date): {e}")
-            app.logger.info("Database tables created successfully")
-    except Exception as e:
-        app.logger.error(f"Error creating database: {e}")
-        raise
+                        # Product table columns
+                        product_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('product')}
+                        additions_product = [
+                            ('unit', 'VARCHAR(20)'),
+                            ('category', "VARCHAR(50) DEFAULT 'altro'"),
+                            ('image_path', 'VARCHAR(300)')
+                        ]
+                        for col_name, col_type in additions_product:
+                            if col_name not in product_cols:
+                                app.logger.info(f"Adding missing column product.{col_name}")
+                                conn.execute(text(f'ALTER TABLE "product" ADD COLUMN {col_name} {col_type}'))
+                        
+                        # Message table columns
+                        message_cols = {c['name'] if isinstance(c, dict) else c for c in insp.get_columns('message')}
+                        additions_message = [
+                            ('read', 'BOOLEAN DEFAULT FALSE')
+                        ]
+                        for col_name, col_type in additions_message:
+                            if col_name not in message_cols:
+                                app.logger.info(f"Adding missing column message.{col_name}")
+                                conn.execute(text(f'ALTER TABLE "message" ADD COLUMN {col_name} {col_type}'))
+                except Exception as e:
+                    app.logger.warning(f"Schema ensure failed (may already be up-to-date): {e}")
+                app.logger.info("Database tables created successfully")
+        except Exception as e:
+            # Do not prevent app from booting if DB init fails
+            app.logger.error(f"Error creating database: {e}")
+    else:
+        app.logger.info("Skipping DB init on start; set DB_INIT_ON_START=1 to enable.")
 
     return app
