@@ -10,6 +10,11 @@ import secrets
 
 main = Blueprint('main', __name__)
 
+@main.route('/health')
+def health():
+    """Lightweight health check for Render without DB query"""
+    return jsonify({"status": "ok", "timestamp": datetime.utcnow().isoformat()}), 200
+
 @main.route('/terms')
 def terms():
     return render_template('terms.html')

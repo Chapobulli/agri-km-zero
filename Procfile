@@ -1,1 +1,1 @@
-web: gunicorn main:app --workers ${WEB_CONCURRENCY:-1} --timeout 120 --log-level info
+web: gunicorn main:app --workers ${WEB_CONCURRENCY:-1} --timeout 300 --graceful-timeout 30 --preload --log-level info

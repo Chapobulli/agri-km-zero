@@ -26,6 +26,11 @@ def create_app():
     if db_url.startswith('postgresql://') and 'sslmode=' not in db_url and 'localhost' not in db_url:
         separator = '&' if '?' in db_url else '?'
         db_url = f"{db_url}{separator}sslmode=prefer"
+    # Tag connections to identify the app in PostgreSQL logs
+    if db_url.startswith('postgresql://') and 'application_name=' not in db_url:
+        app_name = os.environ.get('DB_APPLICATION_NAME', 'agri-km-zero')
+        separator = '&' if '?' in db_url else '?'
+        db_url = f"{db_url}{separator}application_name={app_name}"
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # Pool configuration for better connection handling
