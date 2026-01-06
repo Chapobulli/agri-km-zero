@@ -39,79 +39,71 @@ def api_cities():
 
 @main.route('/')
 def index():
-    # Get filter parameters from query string
-    province_filter = request.args.get('province', '')
-    city_filter = request.args.get('city', '')
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info("Home page request started")
     
-    # Start with all farmers - limit to 50 for performance
-    query = User.query.filter_by(is_farmer=True)
-    
-    # Apply filters
-    if province_filter:
-        query = query.filter_by(province=province_filter)
-    if city_filter:
-        query = query.filter_by(city=city_filter)
-    
-    farmers = query.limit(50).all()
-    
-    # Get products from filtered farmers
-    farmer_ids = [f.id for f in farmers]
-    products = Product.query.filter(Product.user_id.in_(farmer_ids)).all() if farmer_ids else []
-    
-    # Prepare data with farmer info
-    products_data = []
-    for product in products:
-        farmer = db.session.get(User, product.user_id)
-        if farmer:
-            products_data.append({
-                'id': product.id,
-                'name': product.name,
-                'description': product.description,
-                'price': product.price,
-                'unit': product.unit,
-                'image_path': product.image_path,
-                'farmer_name': farmer.company_name or farmer.username,
-                'farmer_username': farmer.username,
-                'farmer_slug': farmer.company_slug or farmer.compute_company_slug(),
-                'farmer_city': farmer.city,
-                'farmer_province': farmer.province,
-                'farmer_address': farmer.address,
-                'user_id': farmer.id
-            })
-    
-    # Get provinces and cities for filters
-    provinces = get_provinces()
-    cities = get_cities(province_filter) if province_filter else []
-    
-    # Choose map center: default Oristano, else first farmer with coordinates
-    center_lat = 39.9043
-    center_lng = 8.5900
-    for f in farmers:
-        if f.latitude and f.longitude:
-            center_lat = f.latitude
-            center_lng = f.longitude
-            break
-    
-    # Prepare farmers JSON for map (without Jinja2 loops in JS)
-    farmers_json = json.dumps([{
-        'lat': f.latitude,
-        'lng': f.longitude,
-        'name': f.company_name or f.username,
-        'slug': f.company_slug or f.compute_company_slug(),
-        'city': f.city or '',
-        'province': f.province or ''
-    } for f in farmers])
-
-    return render_template('index.html', 
-                         products_data=products_data,
-                         farmers=farmers,
-                         farmers_json=farmers_json,
-                         provinces=provinces,
-                         cities=cities,
-                         selected_province=province_filter,
-                         selected_city=city_filter,
-                         center_lat=center_lat,
-                         center_lng=center_lng)
+    try:
+        # Get filter parameters from query string
+        province_filter = request.args.get('province', '')
+        city_filter = request.args.get('city', '')
+        
+        logger.info(f"Querying farmers with filters: province={province_filter}, city={city_filter}")
+        
+        # Start with minimal farmers - just 10 for now
+        query = User.query.filter_by(is_farmer=True)
+        
+        # Apply filters
+        if province_filter:
+            query = query.filter_by(province=province_filter)
+        if city_filter:
+            query = query.filter_by(city=city_filter)
+        
+        farmers = query.limit(10).all()
+        logger.info(f"Found {len(farmers)} farmers")
+        
+        # Skip products for now to speed up loading
+        products_data = []
+        
+        # Get provinces and cities for filters
+        logger.info("Loading provinces and cities")
+        provinces = get_provinces()
+        cities = get_cities(province_filter) if province_filter else []
+        
+        # Choose map center: default Oristano, else first farmer with coordinates
+        center_lat = 39.9043
+        center_lng = 8.5900
+        for f in farmers:
+            if f.latitude and f.longitude:
+                center_lat = f.latitude
+                center_lng = f.longitude
+                break
+        
+        logger.info("Preparing farmers JSON for map")
+        # Prepare farmers JSON for map (without Jinja2 loops in JS)
+        farmers_json = json.dumps([{
+            'lat': f.latitude,
+            'lng': f.longitude,
+            'name': f.company_name or f.username,
+            'slug': f.company_slug or f.compute_company_slug(),
+            'city': f.city or '',
+            'province': f.province or ''
+        } for f in farmers])
+        
+        logger.info("Rendering template")
+        return render_template('index.html', 
+                             products_data=products_data,
+                             farmers=farmers,
+                             farmers_json=farmers_json,
+                             provinces=provinces,
+                             cities=cities,
+                             selected_province=province_filter,
+                             selected_city=city_filter,
+                             center_lat=center_lat,
+                             center_lng=center_lng)
+    except Exception as e:
+        logger.error(f"Error in index route: {e}", exc_info=True)
+        return f"Error loading home page: {str(e)}", 500
 
 @main.route('/search', methods=['GET', 'POST'])
 @login_required

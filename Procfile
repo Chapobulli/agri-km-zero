@@ -1,1 +1,1 @@
-web: gunicorn main:app --workers ${WEB_CONCURRENCY:-1} --timeout 300 --graceful-timeout 30 --log-level info
+web: gunicorn main:app --bind 0.0.0.0:$PORT --workers 1 --timeout 300 --graceful-timeout 30 --log-level info
