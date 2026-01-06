@@ -43,7 +43,7 @@ def index():
     province_filter = request.args.get('province', '')
     city_filter = request.args.get('city', '')
     
-    # Start with all farmers
+    # Start with all farmers - limit to 50 for performance
     query = User.query.filter_by(is_farmer=True)
     
     # Apply filters
@@ -52,7 +52,7 @@ def index():
     if city_filter:
         query = query.filter_by(city=city_filter)
     
-    farmers = query.all()
+    farmers = query.limit(50).all()
     
     # Get products from filtered farmers
     farmer_ids = [f.id for f in farmers]
