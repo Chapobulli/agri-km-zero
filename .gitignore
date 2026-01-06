@@ -3,3 +3,8 @@ __pycache__/
 *.pyo
 *.db
 .env
+backup_*.sql
+docs/
+migrate_*.py
+run_migration.py
+run_migration_*.py

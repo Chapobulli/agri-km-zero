@@ -5,8 +5,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Database connection
-db_url = "postgresql://agri_km_zero_db_cdn1_user:vlsiT0Jv0ooz7yXhxxQ9tpzcKdRGu8Tz@dpg-d4vcuu3uibrs73d5c9q0-a.frankfurt-postgres.render.com/agri_km_zero_db_cdn1?sslmode=require"
+# Database connection from env var only (no hardcoded secrets)
+db_url = os.environ.get("DATABASE_URL")
+if not db_url:
+    raise RuntimeError("DATABASE_URL non impostata. Imposta la variabile d'ambiente e riprova.")
 
 print(f"Connecting to database...")
 
