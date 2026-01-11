@@ -2,9 +2,9 @@
 
 {% block content %}
 <!-- Hero Section - Two Column Design with Image -->
-<section class="hero-section" style="background: #f8f9fa; padding: 0; position: relative; overflow: hidden; min-height: 600px; margin-top: -1px;">
+<section class="hero-section" style="background: #f8f9fa; padding: 0; position: relative; overflow: hidden; min-height: 450px; margin-top: -1px;">
     <!-- Banner decorativo mobile -->
-    <div class="d-lg-none" style="height: 120px; background: url('/static/images/logo/banner.jpg') center center / cover no-repeat;"></div>
+    <div class="d-lg-none" style="height: 100px; background: url('/static/images/logo/banner.jpg') center center / cover no-repeat;"></div>
     
     <!-- Contenuto mobile sotto il banner -->
     <div class="d-lg-none" style="background: white; padding: 30px 20px;">
@@ -25,13 +25,6 @@
             <a href="{{ url_for('profiles.companies') }}" class="btn btn-outline-success btn-lg btn-block" style="padding: 0.875rem 2rem; font-weight: 600;">
                 <i class="fas fa-store mr-2"></i>Le Aziende
             </a>
-        </div>
-        
-        <!-- Trust Badges -->
-        <div class="d-flex flex-wrap align-items-center justify-content-center mt-4 text-muted" style="font-size: 0.75rem; gap: 1rem;">
-            <div><i class="fas fa-shield-alt text-success mr-1"></i><strong>Pagamenti Sicuri</strong></div>
-            <div><i class="fas fa-truck text-success mr-1"></i><strong>Consegna Rapida</strong></div>
-            <div><i class="fas fa-check-circle text-success mr-1"></i><strong>100% Locale</strong></div>
         </div>
     </div>
     
@@ -57,49 +50,11 @@
                             <i class="fas fa-store mr-2"></i>Le Aziende
                         </a>
                     </div>
-                    <!-- Trust Badges -->
-                    <div class="d-flex flex-wrap align-items-center mt-4 text-muted" style="font-size: 0.875rem; gap: 1.5rem;">
-                        <div><i class="fas fa-shield-alt text-success mr-2"></i><strong>Pagamenti Sicuri</strong></div>
-                        <div><i class="fas fa-truck text-success mr-2"></i><strong>Consegna Rapida</strong></div>
-                        <div><i class="fas fa-check-circle text-success mr-2"></i><strong>100% Locale</strong></div>
-                    </div>
                 </div>
             </div>
             <!-- Immagine topografica a destra -->
             <div class="col-lg-6" style="background: url('/static/images/logo/image.jpg') center center / cover no-repeat; position: relative;">
                 <div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, transparent 20%);"></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Stats Section - Trust Building -->
-<section class="py-4" style="background: #fff; border-bottom: 1px solid #e9ecef;">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-md-3 col-6 mb-3 mb-md-0">
-                <div class="stat-item">
-                    <h3 class="font-weight-bold text-success mb-1"><i class="fas fa-users"></i> 500+</h3>
-                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Clienti Soddisfatti</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6 mb-3 mb-md-0">
-                <div class="stat-item">
-                    <h3 class="font-weight-bold text-success mb-1"><i class="fas fa-seedling"></i> 50+</h3>
-                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Agricoltori Partner</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-item">
-                    <h3 class="font-weight-bold text-success mb-1"><i class="fas fa-shopping-basket"></i> 200+</h3>
-                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Prodotti Disponibili</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-item">
-                    <h3 class="font-weight-bold text-success mb-1"><i class="fas fa-star"></i> 4.8/5</h3>
-                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Valutazione Media</p>
-                </div>
             </div>
         </div>
     </div>
@@ -152,8 +107,8 @@
             <h2 class="font-weight-bold mb-3">Cosa Dicono i Nostri Clienti</h2>
             <p class="lead">Le recensioni di chi ha già scelto OrtoVicino</p>
         </div>
-        <div class="row">
-            <div class="col-md-4 mb-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6 mb-4">
                 <div class="card h-100 border-0 shadow-sm">
                     <div class="card-body text-center p-4">
                         <div class="mb-3">
@@ -190,27 +145,6 @@
                             <div class="text-left">
                                 <h6 class="mb-0 font-weight-bold">Giovanni Lai</h6>
                                 <small class="text-muted">Sassari</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="mb-3">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                        </div>
-                        <p class="mb-3">"Sono un'agricoltrice e grazie a OrtoVicino ho trovato nuovi clienti. Semplice da usare e mi aiuta a vendere i miei prodotti direttamente."</p>
-                        <div class="d-flex align-items-center justify-content-center">
-                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px; font-weight: 700;">AP</div>
-                            <div class="text-left">
-                                <h6 class="mb-0 font-weight-bold">Anna Piras</h6>
-                                <small class="text-muted">Oristano</small>
                             </div>
                         </div>
                     </div>
@@ -280,44 +214,6 @@
                 </div>
                 <h5 class="font-weight-bold mb-3">Supporto Locale</h5>
                 <p class="text-muted">Sostieni le piccole aziende agricole del territorio. Ogni acquisto aiuta famiglie locali.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- La Nostra Filiera Section -->
-<section class="py-5 bg-white">
-    <div class="container">
-        <h2 class="section-title mb-4">La nostra filiera</h2>
-        <p class="text-center text-muted mb-5">Riduciamo le distanze tra chi produce e chi acquista: filiera corta, prezzi trasparenti e qualità controllata.</p>
-        <div class="row text-center">
-            <div class="col-md-3 col-6 mb-4">
-                <div class="mb-3">
-                    <i class="fas fa-seedling text-success" style="font-size: 3rem;"></i>
-                </div>
-                <h6 class="font-weight-bold">Prodotti genuini</h6>
-                <p class="text-muted small">Solo agricoltori selezionati della tua zona</p>
-            </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="mb-3">
-                    <i class="fas fa-truck text-success" style="font-size: 3rem;"></i>
-                </div>
-                <h6 class="font-weight-bold">Consegna diretta</h6>
-                <p class="text-muted small">Ritiro in azienda o consegna locale</p>
-            </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="mb-3">
-                    <i class="fas fa-hand-holding-usd text-success" style="font-size: 3rem;"></i>
-                </div>
-                <h6 class="font-weight-bold">Prezzi equi</h6>
-                <p class="text-muted small">Nessun intermediario, valore al produttore</p>
-            </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="mb-3">
-                    <i class="fas fa-leaf text-success" style="font-size: 3rem;"></i>
-                </div>
-                <h6 class="font-weight-bold">Sostenibilità</h6>
-                <p class="text-muted small">Meno km, meno sprechi, più fresco</p>
             </div>
         </div>
     </div>
