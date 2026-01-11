@@ -3,10 +3,12 @@ from flask_login import login_required, current_user
 from . import db
 from .models import User, Product
 from .locations import get_provinces, get_cities
+from .email_utils import send_email
 from geopy.distance import geodesic
 import json
 from datetime import datetime
 import secrets
+import logging
 
 main = Blueprint('main', __name__)
 
@@ -41,25 +43,35 @@ def api_cities():
 def contact():
     """Form di contatto - invia email a llochi280@gmail.com"""
     if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        subject = request.form.get('subject')
-        message = request.form.get('message')
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        subject = request.form.get('subject', '').strip()
+        message = request.form.get('message', '').strip()
+        privacy = request.form.get('privacy')
         
-        # Validazione base
-        if not all([name, email, subject, message]):
-            flash('⚠️ Tutti i campi sono obbligatori', 'danger')
+        # Validazione completa
+        if not all([name, email, subject, message, privacy]):
+            flash('⚠️ Tutti i campi sono obbligatori e devi accettare la privacy.', 'danger')
             return redirect(url_for('main.contact'))
         
-        # In futuro: inviare email vera
-        # Per ora salva in log o DB per non perdere messaggi
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.info(f"Contact form submission: {name} ({email}) - {subject}: {message}")
+        # Invia email all'admin tramite SendGrid
+        admin_email = 'llochi280@gmail.com'
+        email_subject = f'Nuovo messaggio dal sito - {subject}'
+        email_body = f"""
+            <h3>Nuovo messaggio dal form di contatto</h3>
+            <p><strong>Da:</strong> {name} ({email})</p>
+            <p><strong>Oggetto:</strong> {subject}</p>
+            <p><strong>Messaggio:</strong></p>
+            <p>{message}</p>
+            <hr>
+            <p><small>Questo messaggio è stato inviato dal form di contatto di ortovicino.onrender.com</small></p>
+        """
         
-        flash('✓ Messaggio ricevuto! Ti risponderemo entro 24-48 ore.', 'success')
-        flash('📧 Nota: Al momento stiamo configurando il sistema email. Per urgenze, scrivici direttamente.', 'info')
+        # Invia email (fallback a console log se SendGrid non configurato)
+        send_email(admin_email, email_subject, email_body)
+        logging.info(f"Contact form: {name} ({email}) - {subject}")
         
+        flash('✓ Messaggio inviato con successo! Ti risponderemo presto.', 'success')
         return redirect(url_for('main.index'))
     
     return render_template('contact.html')

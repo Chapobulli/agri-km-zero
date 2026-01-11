@@ -15,9 +15,12 @@ auth = Blueprint('auth', __name__)
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        # Normalize email to lowercase to prevent case-sensitivity issues
+        email_lower = form.email.data.lower().strip()
+        
         # Prevent duplicate email/username with a friendly message
         existing = User.query.filter(
-            or_(User.email == form.email.data, User.username == form.username.data)
+            or_(User.email == email_lower, User.username == form.username.data)
         ).first()
         if existing:
             if existing.email == form.email.data:
@@ -26,7 +29,7 @@ def register():
                 flash('⚠ Questo username è già in uso. Scegline un altro.', 'warning')
             return render_template('register.html', form=form)
 
-        user = User(username=form.username.data, email=form.email.data, is_farmer=form.is_farmer.data)
+        user = User(username=form.username.data, email=email_lower, is_farmer=form.is_farmer.data)
         user.set_password(form.password.data)
         token = user.generate_verification_token()
         try:
@@ -58,7 +61,9 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        # Normalize email to lowercase
+        email_lower = form.email.data.lower().strip()
+        user = User.query.filter_by(email=email_lower).first()
         if user and user.check_password(form.password.data):
             login_user(user)
             flash(f'✓ Benvenuto {user.username}!', 'success')
@@ -88,7 +93,8 @@ def verify_email(token):
 @auth.route('/request-reset', methods=['GET', 'POST'])
 def request_reset():
     if request.method == 'POST':
-        email = request.form.get('email')
+        # Normalize email to lowercase
+        email = request.form.get('email', '').lower().strip()
         user = User.query.filter_by(email=email).first()
         if not user:
             flash('✓ Se l\'email esiste, invieremo un link di reset.', 'info')
