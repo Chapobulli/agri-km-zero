@@ -110,21 +110,13 @@
                 <div class="col-lg-4 col-md-4 mb-4">
                     <h6 class="font-weight-bold mb-3" style="color: #fff; text-transform: uppercase; font-size: 0.9rem;">Contatti</h6>
                     <ul class="list-unstyled" style="line-height: 2; font-size: 0.95rem;">
-                        <li><i class="fas fa-envelope mr-2 text-success"></i> info@ortovicino.it</li>
-                        <li><i class="fas fa-phone mr-2 text-success"></i> +39 345 123 4567</li>
                         <li><i class="fas fa-map-marker-alt mr-2 text-success"></i> Sardegna, Italia</li>
+                        <li class="mt-3">
+                            <a href="{{ url_for('main.contact') }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-envelope mr-1"></i> Contattaci
+                            </a>
+                        </li>
                     </ul>
-                    <div class="mt-3">
-                        <p class="mb-2 font-weight-bold" style="font-size: 0.9rem;">Newsletter</p>
-                        <form class="form-inline">
-                            <div class="input-group" style="width: 100%;">
-                                <input type="email" class="form-control" placeholder="La tua email" style="border-radius: 4px 0 0 4px; border: none;">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-success" style="border-radius: 0 4px 4px 0;"><i class="fas fa-arrow-right"></i></button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
                 </div>
             </div>
             <hr style="border-color: rgba(255,255,255,0.1);">
@@ -135,7 +127,7 @@
                         <strong>Disclaimer GDPR:</strong> Alcuni profili aziendali sono stati creati automaticamente da dati pubblici 
                         (Google Maps, Registri CCIAA) per fornire un servizio completo agli utenti. 
                         I proprietari delle aziende possono <a href="{{ url_for('main.claim_search') }}" class="text-light font-weight-bold">rivendicare</a> 
-                        o <a href="mailto:privacy@ortovicino.it" class="text-light">richiedere la rimozione</a> dei propri dati in qualsiasi momento.
+                        o <a href="{{ url_for('main.contact') }}" class="text-light">richiedere la rimozione</a> dei propri dati in qualsiasi momento.
                     </p>
                 </div>
             </div>

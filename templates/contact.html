@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-envelope text-success" style="font-size: 3rem;"></i>
+                        <h2 class="mt-3 font-weight-bold">Contattaci</h2>
+                        <p class="text-muted">Hai domande? Siamo qui per aiutarti!</p>
+                    </div>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('main.contact') }}">
+                        <div class="form-group">
+                            <label for="name" class="font-weight-bold">Nome *</label>
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="Il tuo nome">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="font-weight-bold">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" required placeholder="tua.email@esempio.it">
+                            <small class="form-text text-muted">Ti risponderemo a questo indirizzo</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject" class="font-weight-bold">Oggetto *</label>
+                            <select class="form-control" id="subject" name="subject" required>
+                                <option value="">Seleziona un'opzione...</option>
+                                <option value="Informazioni">Richiesta informazioni</option>
+                                <option value="Supporto">Supporto tecnico</option>
+                                <option value="Rimozione dati">Richiesta rimozione dati (GDPR)</option>
+                                <option value="Collaborazione">Proposta di collaborazione</option>
+                                <option value="Altro">Altro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message" class="font-weight-bold">Messaggio *</label>
+                            <textarea class="form-control" id="message" name="message" rows="6" required placeholder="Scrivi qui il tuo messaggio..."></textarea>
+                        </div>
+
+                        <div class="custom-control custom-checkbox mb-4">
+                            <input type="checkbox" class="custom-control-input" id="privacy" name="privacy" required>
+                            <label class="custom-control-label" for="privacy">
+                                Accetto il trattamento dei miei dati secondo la <a href="{{ url_for('main.privacy') }}" target="_blank">Privacy Policy</a> *
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg btn-block">
+                            <i class="fas fa-paper-plane mr-2"></i>Invia Messaggio
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted small">
+                            <i class="fas fa-clock mr-1"></i> Ti risponderemo entro 24-48 ore
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info aggiuntive -->
+            <div class="row mt-4">
+                <div class="col-md-4 text-center mb-3">
+                    <i class="fas fa-clock text-success mb-2" style="font-size: 2rem;"></i>
+                    <h6 class="font-weight-bold">Tempo di risposta</h6>
+                    <p class="small text-muted">24-48 ore lavorative</p>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <i class="fas fa-shield-alt text-success mb-2" style="font-size: 2rem;"></i>
+                    <h6 class="font-weight-bold">Privacy garantita</h6>
+                    <p class="small text-muted">I tuoi dati sono protetti</p>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <i class="fas fa-headset text-success mb-2" style="font-size: 2rem;"></i>
+                    <h6 class="font-weight-bold">Supporto dedicato</h6>
+                    <p class="small text-muted">Team sempre disponibile</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

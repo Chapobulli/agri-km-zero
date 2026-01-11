@@ -37,6 +37,33 @@ def api_cities():
     cities = get_cities(province)
     return jsonify(cities)
 
+@main.route('/contact', methods=['GET', 'POST'])
+def contact():
+    """Form di contatto - invia email a llochi280@gmail.com"""
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        subject = request.form.get('subject')
+        message = request.form.get('message')
+        
+        # Validazione base
+        if not all([name, email, subject, message]):
+            flash('⚠️ Tutti i campi sono obbligatori', 'danger')
+            return redirect(url_for('main.contact'))
+        
+        # In futuro: inviare email vera
+        # Per ora salva in log o DB per non perdere messaggi
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Contact form submission: {name} ({email}) - {subject}: {message}")
+        
+        flash('✓ Messaggio ricevuto! Ti risponderemo entro 24-48 ore.', 'success')
+        flash('📧 Nota: Al momento stiamo configurando il sistema email. Per urgenze, scrivici direttamente.', 'info')
+        
+        return redirect(url_for('main.index'))
+    
+    return render_template('contact.html')
+
 @main.route('/')
 def index():
     # Get filter parameters from query string
